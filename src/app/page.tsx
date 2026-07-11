@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Faq } from "@/components/Faq";
+import { SpecialtyAutocomplete } from "@/components/SpecialtyAutocomplete";
 
 export default function Home() {
   const router = useRouter();
@@ -42,11 +43,11 @@ export default function Home() {
             <form id="recherche" onSubmit={submitSearch} className="bg-white p-2 rounded-xl shadow-sm">
               <div className="flex items-center gap-2 px-3 py-3 border-b border-gray-100">
                 <SearchIcon />
-                <input
+                <SpecialtyAutocomplete
                   value={specialty}
-                  onChange={(e) => setSpecialty(e.target.value)}
+                  onChange={setSpecialty}
                   className="flex-1 outline-none text-[15px] placeholder-gray-400"
-                  placeholder="Spécialité (cardiologue…)"
+                  placeholder="Spécialité (Cardiologie…)"
                 />
               </div>
               <div className="flex items-center gap-2">

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { SpecialtyAutocomplete } from "@/components/SpecialtyAutocomplete";
 import { doctors } from "@/lib/api";
 
 type Facility = {
@@ -111,11 +112,11 @@ function RechercheContent() {
         <h1 className="font-display text-2xl font-semibold mb-6">Trouver un médecin</h1>
 
         <form onSubmit={submitFilters} className="bg-white border border-gray-100 rounded-xl p-4 mb-8 flex flex-col sm:flex-row gap-3">
-          <input
+          <SpecialtyAutocomplete
             value={specialty}
-            onChange={(e) => setSpecialty(e.target.value)}
-            placeholder="Spécialité (cardiologue…)"
-            className="flex-1 border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-[15px]"
+            onChange={setSpecialty}
+            placeholder="Spécialité (Cardiologie…)"
+            className="flex-1 border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-[15px] w-full"
           />
           <input
             value={city}

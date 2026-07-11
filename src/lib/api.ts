@@ -73,6 +73,12 @@ export const patients = {
   getMe: () => apiFetch('/patients/me'),
 };
 
+// ── Spécialités (autocomplétion) ─────────────────────
+export const specialties = {
+  getAll: (): Promise<{ id: string; name: string }[]> =>
+    apiFetch('/specialties', { auth: false }),
+};
+
 // ── Doctors ───────────────────────────────────────────
 export const doctors = {
   search: (params: { specialty?: string; city?: string; teleconsultation?: boolean }) => {
