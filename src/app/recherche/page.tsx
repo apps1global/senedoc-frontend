@@ -116,15 +116,15 @@ function RechercheContent() {
             value={specialty}
             onChange={setSpecialty}
             placeholder="Spécialité (Cardiologie…)"
-            className="flex-1 border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-[15px] w-full"
+            className="flex-1 min-w-0 border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-[15px] w-full"
           />
           <input
             value={city}
             onChange={(e) => setCity(e.target.value)}
             placeholder="Ville"
-            className="flex-1 border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-[15px]"
+            className="flex-1 min-w-0 border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-[15px]"
           />
-          <button type="submit" className="bg-coral text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity">
+          <button type="submit" className="bg-coral text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity flex-shrink-0">
             Rechercher
           </button>
         </form>

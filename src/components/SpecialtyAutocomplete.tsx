@@ -50,7 +50,7 @@ export function SpecialtyAutocomplete({
       : all;
 
   return (
-    <div ref={containerRef} className="relative flex-1">
+    <div ref={containerRef} className="relative flex-1 min-w-0">
       <input
         value={value}
         onChange={(e) => { onChange(e.target.value); setOpen(true); }}

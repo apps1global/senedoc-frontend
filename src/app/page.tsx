@@ -41,26 +41,26 @@ export default function Home() {
 
             {/* Recherche */}
             <form id="recherche" onSubmit={submitSearch} className="bg-white p-2 rounded-xl shadow-sm">
-              <div className="flex items-center gap-2 px-3 py-3 border-b border-gray-100">
+              <div className="flex items-center gap-2 px-3 py-3 border-b border-gray-100 min-w-0">
                 <SearchIcon />
                 <SpecialtyAutocomplete
                   value={specialty}
                   onChange={setSpecialty}
-                  className="flex-1 outline-none text-[15px] placeholder-gray-400"
+                  className="flex-1 min-w-0 outline-none text-[15px] placeholder-gray-400"
                   placeholder="Spécialité (Cardiologie…)"
                 />
               </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 px-3 py-3 flex-1">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="flex items-center gap-2 px-3 py-3 flex-1 min-w-0">
                   <PinIcon />
                   <input
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="flex-1 outline-none text-[15px] placeholder-gray-400"
+                    className="flex-1 min-w-0 outline-none text-[15px] placeholder-gray-400"
                     placeholder="Ville"
                   />
                 </div>
-                <button type="submit" className="bg-coral text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                <button type="submit" className="bg-coral text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity flex-shrink-0">
                   Rechercher
                 </button>
               </div>
