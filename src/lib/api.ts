@@ -108,4 +108,43 @@ export const appointments = {
 
   create: (body: { doctorId: string; appointmentDate: string; reason?: string }) =>
     apiFetch('/appointments', { method: 'POST', body }),
+
+  updateStatus: (id: string, status: string) =>
+    apiFetch(`/appointments/${id}/status`, { method: 'PATCH', body: { status } }),
 };
+
+// ── Espace médecin ────────────────────────────────────
+export const doctorPortal = {
+  getMe: () => apiFetch('/doctor/me'),
+  getDashboard: () => apiFetch('/doctor/me/dashboard'),
+  getAppointments: () => apiFetch('/doctor/me/appointments'),
+
+  getAvailability: () => apiFetch('/doctor/me/availability'),
+  createAvailability: (body: { dayOfWeek: number; startTime: string; endTime: string }) =>
+    apiFetch('/doctor/me/availability', { method: 'POST', body }),
+  deleteAvailability: (id: string) =>
+    apiFetch(`/doctor/me/availability/${id}`, { method: 'DELETE' }),
+
+  getExceptions: () => apiFetch('/doctor/me/exceptions'),
+  createException: (body: { exceptionDate: string; reason?: string }) =>
+    apiFetch('/doctor/me/exceptions', { method: 'POST', body }),
+  deleteException: (id: string) =>
+    apiFetch(`/doctor/me/exceptions/${id}`, { method: 'DELETE' }),
+
+  updateProfile: (body: Record<string, unknown>) =>
+    apiFetch('/doctor/me/profile', { method: 'PATCH', body }),
+};
+
+// ── Upload ────────────────────────────────────────────
+export async function uploadPhoto(file: File): Promise<{ photoUrl: string }> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetch(`${API_BASE}/upload/photo`, {
+    method: 'POST',
+    credentials: 'include',
+    body: formData,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.message || `Erreur ${res.status}`);
+  return data;
+}
