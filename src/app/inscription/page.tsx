@@ -41,7 +41,7 @@ export default function Inscription() {
     }
     setLoading(true);
     try {
-      const res: any = await auth.register({ firstName, lastName, phone });
+      const res: any = await auth.register({ firstName, lastName, phone, region, city });
       setUserId(res.id);
       setStep("otp");
     } catch (err: any) {
@@ -86,7 +86,7 @@ export default function Inscription() {
       // Numéro mémorisé sur cet appareil : à la prochaine connexion, seul
       // le PIN sera demandé (voir page /connexion).
       window.localStorage.setItem(REMEMBERED_PHONE_KEY, phone);
-      router.push("/"); // compte prêt → accueil (plus tard : espace patient)
+      router.push("/espace-patient");
     } catch (err: any) {
       setError(err.message);
     } finally {

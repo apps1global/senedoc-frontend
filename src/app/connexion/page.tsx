@@ -52,7 +52,7 @@ export default function Connexion() {
       // Connexion réussie : on mémorise le numéro sur cet appareil pour
       // les prochaines fois (plus jamais redemandé, seul le PIN le sera).
       window.localStorage.setItem(REMEMBERED_PHONE_KEY, phone);
-      router.push("/");
+      router.push("/espace-patient");
     } catch (err: any) {
       setError(err.message);
     } finally {

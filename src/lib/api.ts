@@ -39,6 +39,8 @@ export const auth = {
     firstName: string;
     lastName: string;
     phone: string;
+    region?: string;
+    city?: string;
     email?: string;
     password?: string;
   }) => apiFetch('/auth/register', { method: 'POST', body, auth: false }),
@@ -60,4 +62,16 @@ export const auth = {
 
   loginAdmin: (body: { email: string; password: string }) =>
     apiFetch('/auth/login', { method: 'POST', body }),
+
+  logout: () => apiFetch('/auth/logout', { method: 'POST' }),
+};
+
+// ── Patients ──────────────────────────────────────────
+export const patients = {
+  getMe: () => apiFetch('/patients/me'),
+};
+
+// ── Appointments ──────────────────────────────────────
+export const appointments = {
+  getMine: () => apiFetch('/appointments/my'),
 };
