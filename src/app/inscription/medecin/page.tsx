@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { apiFetch } from "@/lib/api";
 import { REGIONS, citiesForRegion } from "@/lib/senegal";
+import { SPECIALTIES } from "@/lib/specialties";
 
 export default function InscriptionMedecin() {
   const [loading, setLoading] = useState(false);
@@ -16,6 +17,7 @@ export default function InscriptionMedecin() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [specialite, setSpecialite] = useState("");
+  const [specialiteAutre, setSpecialiteAutre] = useState("");
   const [numeroOrdre, setNumeroOrdre] = useState("");
   const [region, setRegion] = useState("");
   const [ville, setVille] = useState("");
@@ -23,11 +25,12 @@ export default function InscriptionMedecin() {
   const [password, setPassword] = useState("");
 
   const cities = region ? citiesForRegion(region) : [];
+  const finalSpecialite = specialite === "Autre" ? specialiteAutre.trim() : specialite;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    if (!firstName || !lastName || !phone || !specialite || !numeroOrdre || !password) {
+    if (!firstName || !lastName || !phone || !finalSpecialite || !numeroOrdre || !password) {
       setError("Merci de remplir les champs obligatoires.");
       return;
     }
@@ -38,7 +41,7 @@ export default function InscriptionMedecin() {
         auth: false,
         body: {
           firstName, lastName, phone, email, password,
-          specialite, numeroOrdre,
+          specialite: finalSpecialite, numeroOrdre,
           pays: "Sénégal", ville,
           referralCode: referralCode || undefined,
         },
@@ -83,7 +86,25 @@ export default function InscriptionMedecin() {
             </div>
             <F label="Téléphone *" value={phone} onChange={setPhone} placeholder="+221 77 123 45 67" />
             <F label="Email" value={email} onChange={setEmail} />
-            <F label="Spécialité *" value={specialite} onChange={setSpecialite} placeholder="Cardiologue" />
+            <div>
+              <label className="block text-sm font-medium mb-1">Spécialité *</label>
+              <select
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal"
+                value={specialite}
+                onChange={(e) => setSpecialite(e.target.value)}
+              >
+                <option value="">Choisir une spécialité</option>
+                {SPECIALTIES.map((s) => <option key={s} value={s}>{s}</option>)}
+              </select>
+              {specialite === "Autre" && (
+                <input
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal mt-2"
+                  value={specialiteAutre}
+                  onChange={(e) => setSpecialiteAutre(e.target.value)}
+                  placeholder="Précisez votre spécialité"
+                />
+              )}
+            </div>
             <F label="Numéro à l'Ordre *" value={numeroOrdre} onChange={setNumeroOrdre} />
             <div>
               <label className="block text-sm font-medium mb-1">Région</label>

@@ -1,0 +1,46 @@
+// Liste fermée des spécialités médicales — proposée à l'inscription du
+// médecin, avec une option "Autre" pour ne pas bloquer une spécialité rare
+// non listée. Fermer cette liste évite la fragmentation de la recherche
+// (ex. "Cardiologue" / "Cardiologie" / "cardiologie" créant 3 fiches
+// distinctes en base, invisibles les unes des autres pour un patient).
+
+export const SPECIALTIES: string[] = [
+  "Allergologie",
+  "Anesthésie-Réanimation",
+  "Cardiologie",
+  "Chirurgie générale",
+  "Chirurgie maxillo-faciale",
+  "Chirurgie orthopédique",
+  "Chirurgie pédiatrique",
+  "Chirurgie plastique",
+  "Chirurgie vasculaire",
+  "Dermatologie",
+  "Endocrinologie",
+  "Gastro-entérologie",
+  "Gériatrie",
+  "Gynécologie-Obstétrique",
+  "Hématologie",
+  "Hépatologie",
+  "Infectiologie",
+  "Médecine générale",
+  "Médecine du travail",
+  "Médecine interne",
+  "Néphrologie",
+  "Neurochirurgie",
+  "Neurologie",
+  "Nutrition",
+  "Odontologie / Dentaire",
+  "Oncologie",
+  "Ophtalmologie",
+  "ORL (Oto-rhino-laryngologie)",
+  "Orthophonie",
+  "Pédiatrie",
+  "Pneumologie",
+  "Psychiatrie",
+  "Psychologie",
+  "Radiologie",
+  "Rhumatologie",
+  "Sage-femme",
+  "Urologie",
+  "Autre",
+];
