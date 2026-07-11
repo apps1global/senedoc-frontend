@@ -23,7 +23,7 @@ export default function Home() {
             </p>
 
             {/* Recherche */}
-            <div className="bg-white p-2 rounded-xl shadow-sm">
+            <div id="recherche" className="bg-white p-2 rounded-xl shadow-sm">
               <div className="flex items-center gap-2 px-3 py-3 border-b border-gray-100">
                 <SearchIcon />
                 <input
@@ -66,9 +66,9 @@ export default function Home() {
       {/* MÉDECINS VÉRIFIÉS */}
       <section className="bg-gray-50">
         <div className="max-w-6xl mx-auto px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
-         <div className="h-72 md:h-80 rounded-xl overflow-hidden order-2 md:order-1 bg-gray-100">
-  <img src="/images/consultation.jpg" alt="Consultation médicale" className="w-full h-full object-contain" />
-</div>
+          <div className="h-64 rounded-xl overflow-hidden order-2 md:order-1">
+            <img src="/images/consultation.jpg" alt="Consultation médicale" className="w-full h-full object-cover" />
+          </div>
           <div className="order-1 md:order-2">
             <h2 className="font-display text-2xl font-semibold mb-3">Des médecins vérifiés, près de vous</h2>
             <p className="text-gray-600 mb-5 leading-relaxed">

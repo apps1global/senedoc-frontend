@@ -63,6 +63,8 @@ export const auth = {
   loginAdmin: (body: { email: string; password: string }) =>
     apiFetch('/auth/login', { method: 'POST', body }),
 
+  me: () => apiFetch('/auth/me'),
+
   logout: () => apiFetch('/auth/logout', { method: 'POST' }),
 };
 

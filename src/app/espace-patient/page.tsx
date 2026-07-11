@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { patients, appointments as appointmentsApi, auth } from "@/lib/api";
 
 type Appointment = {
@@ -107,16 +106,6 @@ export default function EspacePatient() {
     }
   }
 
-  async function handleLogout() {
-    try {
-      await auth.logout();
-    } catch {
-      // même en cas d'erreur réseau, on nettoie côté client et on repart
-    }
-    window.localStorage.removeItem("senedoc_phone");
-    router.push("/");
-  }
-
   if (loading) {
     return (
       <>
@@ -124,7 +113,6 @@ export default function EspacePatient() {
         <div className="max-w-4xl mx-auto px-6 py-16 text-center text-gray-400">
           Chargement…
         </div>
-        <Footer />
       </>
     );
   }
@@ -141,21 +129,15 @@ export default function EspacePatient() {
     <>
       <Header />
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="font-display text-3xl font-semibold text-teal-deep">
-            Bonjour{profile?.user.firstName ? `, ${profile.user.firstName}` : ""}
-          </h1>
-          <button
-            onClick={handleLogout}
-            className="text-sm text-gray-500 hover:text-coral transition-colors"
-          >
-            Se déconnecter
-          </button>
-        </div>
+        <h1 className="font-display text-3xl font-semibold text-teal-deep mb-8">
+          Bonjour{profile?.user.firstName ? `, ${profile.user.firstName}` : ""}
+        </h1>
 
-        {/* Prendre un nouveau RDV */}
+        {/* Prendre un nouveau RDV — pointe vers la barre de recherche de
+            l'accueil en attendant la vraie page de recherche/réservation
+            (prochain chantier du backlog). */}
         <Link
-          href="/"
+          href="/#recherche"
           className="block bg-teal text-white rounded-xl px-6 py-4 mb-10 font-medium hover:bg-teal-dark transition-colors text-center"
         >
           Prendre un nouveau rendez-vous
@@ -246,7 +228,6 @@ export default function EspacePatient() {
 
         {error && <p className="text-sm text-coral mt-6">{error}</p>}
       </div>
-      <Footer />
     </>
   );
 }
