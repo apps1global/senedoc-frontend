@@ -39,6 +39,9 @@ export function Header() {
           {!checking && !loggedIn && (
             <Link href="/inscription/medecin" className="hover:text-teal">Espace médecin</Link>
           )}
+          {!checking && loggedIn && (
+            <Link href="/espace-patient" className="hover:text-teal">Mon espace</Link>
+          )}
           {checking ? null : loggedIn ? (
             <button
               onClick={handleLogout}

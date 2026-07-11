@@ -312,7 +312,14 @@ export default function FicheMedecin() {
                     </div>
                   )}
                   {bookingError && <p className="text-sm text-coral mt-3">{bookingError}</p>}
-                  {bookingSuccess && <p className="text-sm text-teal-dark mt-3">{bookingSuccess}</p>}
+                  {bookingSuccess && (
+                    <div className="mt-3">
+                      <p className="text-sm text-teal-dark">{bookingSuccess}</p>
+                      <Link href="/espace-patient" className="text-sm text-teal font-medium underline">
+                        Voir mes rendez-vous
+                      </Link>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

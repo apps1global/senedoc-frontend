@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Logo } from "./Logo";
 
 export function Footer() {
@@ -12,13 +13,13 @@ export function Footer() {
         </div>
         <div className="text-sm text-gray-500 space-y-2">
           <p className="font-medium text-gray-700">Patients</p>
-          <p>Trouver un médecin</p>
-          <p>Mes rendez-vous</p>
+          <Link href="/#recherche" className="block hover:text-teal transition-colors">Trouver un médecin</Link>
+          <Link href="/espace-patient" className="block hover:text-teal transition-colors">Mes rendez-vous</Link>
         </div>
         <div className="text-sm text-gray-500 space-y-2">
           <p className="font-medium text-gray-700">Médecins</p>
-          <p>Inscription</p>
-          <p>Espace médecin</p>
+          <Link href="/inscription/medecin" className="block hover:text-teal transition-colors">Inscription</Link>
+          <Link href="/inscription/medecin" className="block hover:text-teal transition-colors">Espace médecin</Link>
         </div>
       </div>
     </footer>
