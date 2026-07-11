@@ -152,13 +152,22 @@ function AppointmentCard({
             </button>
           )}
           {appointment.status === "CONFIRMED" && (
-            <button
-              onClick={() => onChangeStatus(appointment.id, "COMPLETED")}
-              disabled={updating}
-              className="text-sm bg-teal text-white px-4 py-2 rounded-lg font-medium hover:bg-teal-dark transition-colors disabled:opacity-50"
-            >
-              Marquer terminé
-            </button>
+            <>
+              <button
+                onClick={() => onChangeStatus(appointment.id, "COMPLETED")}
+                disabled={updating}
+                className="text-sm bg-teal text-white px-4 py-2 rounded-lg font-medium hover:bg-teal-dark transition-colors disabled:opacity-50"
+              >
+                Marquer terminé
+              </button>
+              <button
+                onClick={() => onChangeStatus(appointment.id, "NO_SHOW")}
+                disabled={updating}
+                className="text-sm border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-medium hover:border-coral hover:text-coral transition-colors disabled:opacity-50"
+              >
+                Marquer absence
+              </button>
+            </>
           )}
           <button
             onClick={() => onChangeStatus(appointment.id, "CANCELLED")}

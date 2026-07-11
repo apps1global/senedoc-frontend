@@ -11,6 +11,7 @@ type Appointment = {
   appointmentDate: string;
   status: "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
   doctor: {
+    id: string;
     user: { firstName: string | null; lastName: string | null };
   };
 };
@@ -52,6 +53,7 @@ export default function EspacePatient() {
   const [error, setError] = useState("");
   const [profile, setProfile] = useState<PatientProfile | null>(null);
   const [rdvs, setRdvs] = useState<Appointment[]>([]);
+  const [cancelling, setCancelling] = useState<string | null>(null);
 
   // Changement de PIN
   const [showPinForm, setShowPinForm] = useState(false);
@@ -61,24 +63,40 @@ export default function EspacePatient() {
   const [pinError, setPinError] = useState("");
   const [pinLoading, setPinLoading] = useState(false);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const [profileRes, rdvsRes] = await Promise.all([
-          patients.getMe(),
-          appointmentsApi.getMine(),
-        ]);
-        setProfile(profileRes as PatientProfile);
-        setRdvs(rdvsRes as Appointment[]);
-      } catch (err: any) {
-        // Session invalide ou expirée → retour à la connexion
-        router.push("/connexion");
-      } finally {
-        setLoading(false);
-      }
+  async function load() {
+    try {
+      const [profileRes, rdvsRes] = await Promise.all([
+        patients.getMe(),
+        appointmentsApi.getMine(),
+      ]);
+      setProfile(profileRes as PatientProfile);
+      setRdvs(rdvsRes as Appointment[]);
+    } catch (err: any) {
+      // Session invalide ou expirée → retour à la connexion
+      router.push("/connexion");
+    } finally {
+      setLoading(false);
     }
+  }
+
+  useEffect(() => {
     load();
-  }, [router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function cancelAppointment(id: string) {
+    if (!window.confirm("Confirmer l'annulation de ce rendez-vous ?")) return;
+    setCancelling(id);
+    setError("");
+    try {
+      await appointmentsApi.updateStatus(id, "CANCELLED");
+      await load();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setCancelling(null);
+    }
+  }
 
   async function submitNewPin(e: React.FormEvent) {
     e.preventDefault();
@@ -151,7 +169,12 @@ export default function EspacePatient() {
           ) : (
             <div className="space-y-3">
               {upcoming.map((r) => (
-                <AppointmentCard key={r.id} appointment={r} />
+                <AppointmentCard
+                  key={r.id}
+                  appointment={r}
+                  cancelling={cancelling === r.id}
+                  onCancel={cancelAppointment}
+                />
               ))}
             </div>
           )}
@@ -165,7 +188,7 @@ export default function EspacePatient() {
           ) : (
             <div className="space-y-3">
               {past.map((r) => (
-                <AppointmentCard key={r.id} appointment={r} />
+                <AppointmentCard key={r.id} appointment={r} cancelling={false} onCancel={cancelAppointment} readOnly />
               ))}
             </div>
           )}
@@ -232,21 +255,52 @@ export default function EspacePatient() {
   );
 }
 
-function AppointmentCard({ appointment }: { appointment: Appointment }) {
+function AppointmentCard({
+  appointment,
+  cancelling,
+  onCancel,
+  readOnly,
+}: {
+  appointment: Appointment;
+  cancelling: boolean;
+  onCancel: (id: string) => void;
+  readOnly?: boolean;
+}) {
   const date = new Date(appointment.appointmentDate);
   const dateStr = date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   const timeStr = date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
   const doctorName = `Dr ${appointment.doctor.user.firstName ?? ""} ${appointment.doctor.user.lastName ?? ""}`.trim();
+  const canCancel = !readOnly && (appointment.status === "PENDING" || appointment.status === "CONFIRMED");
+  const canRebook = appointment.status === "CANCELLED";
 
   return (
-    <div className="bg-white border border-gray-100 rounded-xl p-5 flex items-center justify-between">
-      <div>
-        <p className="font-medium">{doctorName}</p>
-        <p className="text-sm text-gray-500 capitalize">{dateStr} à {timeStr}</p>
+    <div className="bg-white border border-gray-100 rounded-xl p-5">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <p className="font-medium">{doctorName}</p>
+          <p className="text-sm text-gray-500 capitalize">{dateStr} à {timeStr}</p>
+        </div>
+        <span className={`text-xs font-medium px-3 py-1 rounded-full whitespace-nowrap ${STATUS_COLORS[appointment.status]}`}>
+          {STATUS_LABELS[appointment.status]}
+        </span>
       </div>
-      <span className={`text-xs font-medium px-3 py-1 rounded-full ${STATUS_COLORS[appointment.status]}`}>
-        {STATUS_LABELS[appointment.status]}
-      </span>
+      {canCancel && (
+        <button
+          onClick={() => onCancel(appointment.id)}
+          disabled={cancelling}
+          className="text-sm text-gray-500 hover:text-coral transition-colors mt-3 disabled:opacity-50"
+        >
+          {cancelling ? "Annulation…" : "Annuler ce rendez-vous"}
+        </button>
+      )}
+      {canRebook && (
+        <Link
+          href={`/medecin/${appointment.doctor.id}`}
+          className="text-sm text-teal font-medium mt-3 inline-block"
+        >
+          Reprendre un rendez-vous avec ce médecin
+        </Link>
+      )}
     </div>
   );
 }
