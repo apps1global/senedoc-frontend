@@ -1,9 +1,25 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Faq } from "@/components/Faq";
 
 export default function Home() {
+  const router = useRouter();
+  const [specialty, setSpecialty] = useState("");
+  const [city, setCity] = useState("");
+
+  function submitSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (specialty) params.set("specialty", specialty);
+    if (city) params.set("city", city);
+    router.push(`/recherche${params.toString() ? `?${params.toString()}` : ""}`);
+  }
+
   return (
     <>
       <Header />
@@ -23,10 +39,12 @@ export default function Home() {
             </p>
 
             {/* Recherche */}
-            <div id="recherche" className="bg-white p-2 rounded-xl shadow-sm">
+            <form id="recherche" onSubmit={submitSearch} className="bg-white p-2 rounded-xl shadow-sm">
               <div className="flex items-center gap-2 px-3 py-3 border-b border-gray-100">
                 <SearchIcon />
                 <input
+                  value={specialty}
+                  onChange={(e) => setSpecialty(e.target.value)}
                   className="flex-1 outline-none text-[15px] placeholder-gray-400"
                   placeholder="Spécialité (cardiologue…)"
                 />
@@ -35,15 +53,17 @@ export default function Home() {
                 <div className="flex items-center gap-2 px-3 py-3 flex-1">
                   <PinIcon />
                   <input
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
                     className="flex-1 outline-none text-[15px] placeholder-gray-400"
-                    placeholder="Région"
+                    placeholder="Ville"
                   />
                 </div>
-                <button className="bg-coral text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                <button type="submit" className="bg-coral text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity">
                   Rechercher
                 </button>
               </div>
-            </div>
+            </form>
           </div>
 
           {/* Photo héro */}
@@ -66,8 +86,8 @@ export default function Home() {
       {/* MÉDECINS VÉRIFIÉS */}
       <section className="bg-gray-50">
         <div className="max-w-6xl mx-auto px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
-          <div className="h-64 rounded-xl overflow-hidden order-2 md:order-1">
-            <img src="/images/consultation.jpg" alt="Consultation médicale" className="w-full h-full object-cover" />
+          <div className="h-72 md:h-80 rounded-xl overflow-hidden order-2 md:order-1 bg-gray-100">
+            <img src="/images/consultation.jpg" alt="Consultation médicale" className="w-full h-full object-contain" />
           </div>
           <div className="order-1 md:order-2">
             <h2 className="font-display text-2xl font-semibold mb-3">Des médecins vérifiés, près de vous</h2>
@@ -90,9 +110,13 @@ export default function Home() {
         <p className="text-gray-500 mb-8">Prenez rendez-vous dans la spécialité qu'il vous faut</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {["Cardiologie", "Pédiatrie", "Ophtalmologie", "Dentaire"].map((s) => (
-            <div key={s} className="p-5 border border-gray-100 rounded-xl hover:border-teal hover:shadow-sm transition-all cursor-pointer">
+            <button
+              key={s}
+              onClick={() => router.push(`/recherche?specialty=${encodeURIComponent(s)}`)}
+              className="p-5 border border-gray-100 rounded-xl hover:border-teal hover:shadow-sm transition-all cursor-pointer text-left"
+            >
               <p className="text-sm font-medium">{s}</p>
-            </div>
+            </button>
           ))}
         </div>
       </section>

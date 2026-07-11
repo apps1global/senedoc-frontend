@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { auth } from "@/lib/api";
 
@@ -10,8 +10,11 @@ type Mode = "pin" | "reset-request" | "reset-confirm";
 
 const REMEMBERED_PHONE_KEY = "senedoc_phone";
 
-export default function Connexion() {
+function ConnexionContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/espace-patient";
+
   const [mode, setMode] = useState<Mode>("pin");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -52,7 +55,7 @@ export default function Connexion() {
       // Connexion réussie : on mémorise le numéro sur cet appareil pour
       // les prochaines fois (plus jamais redemandé, seul le PIN le sera).
       window.localStorage.setItem(REMEMBERED_PHONE_KEY, phone);
-      router.push("/espace-patient");
+      router.push(redirect);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -125,7 +128,7 @@ export default function Connexion() {
                 PIN oublié ?
               </button>
               <p className="text-sm text-gray-500 text-center mt-4">
-                Pas encore de compte ? <Link href="/inscription" className="text-teal font-medium">S'inscrire</Link>
+                Pas encore de compte ? <Link href={`/inscription${redirect !== "/espace-patient" ? `?redirect=${encodeURIComponent(redirect)}` : ""}`} className="text-teal font-medium">S'inscrire</Link>
               </p>
               <div className="border-t border-gray-100 mt-6 pt-4 text-center">
                 <Link href="/admin" className="text-xs text-gray-400 hover:text-gray-600">Accès administrateur</Link>
@@ -169,6 +172,14 @@ export default function Connexion() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Connexion() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-slate-400">Chargement…</div>}>
+      <ConnexionContent />
+    </Suspense>
   );
 }
 

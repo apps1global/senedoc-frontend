@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { auth } from "@/lib/api";
 import { REGIONS, citiesForRegion } from "@/lib/senegal";
@@ -11,8 +11,11 @@ type Step = "form" | "otp" | "pin";
 
 const REMEMBERED_PHONE_KEY = "senedoc_phone";
 
-export default function Inscription() {
+function InscriptionContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/espace-patient";
+
   const [step, setStep] = useState<Step>("form");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -86,7 +89,7 @@ export default function Inscription() {
       // Numéro mémorisé sur cet appareil : à la prochaine connexion, seul
       // le PIN sera demandé (voir page /connexion).
       window.localStorage.setItem(REMEMBERED_PHONE_KEY, phone);
-      router.push("/espace-patient");
+      router.push(redirect);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -137,7 +140,7 @@ export default function Inscription() {
                 <Submit loading={loading}>Continuer</Submit>
               </form>
               <p className="text-sm text-gray-500 text-center mt-4">
-                Déjà un compte ? <Link href="/connexion" className="text-teal font-medium">Se connecter</Link>
+                Déjà un compte ? <Link href={`/connexion${redirect !== "/espace-patient" ? `?redirect=${encodeURIComponent(redirect)}` : ""}`} className="text-teal font-medium">Se connecter</Link>
               </p>
             </>
           )}
@@ -176,6 +179,14 @@ export default function Inscription() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Inscription() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-slate-400">Chargement…</div>}>
+      <InscriptionContent />
+    </Suspense>
   );
 }
 

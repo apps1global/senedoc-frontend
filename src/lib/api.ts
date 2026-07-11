@@ -73,7 +73,33 @@ export const patients = {
   getMe: () => apiFetch('/patients/me'),
 };
 
+// ── Doctors ───────────────────────────────────────────
+export const doctors = {
+  search: (params: { specialty?: string; city?: string; teleconsultation?: boolean }) => {
+    const qs = new URLSearchParams();
+    if (params.specialty) qs.set('specialty', params.specialty);
+    if (params.city) qs.set('city', params.city);
+    if (params.teleconsultation) qs.set('teleconsultation', 'true');
+    const query = qs.toString();
+    return apiFetch(`/doctors${query ? `?${query}` : ''}`, { auth: false });
+  },
+
+  getOne: (id: string) => apiFetch(`/doctors/${id}`, { auth: false }),
+};
+
+// ── Créneaux ──────────────────────────────────────────
+export const slots = {
+  getCalendar: (doctorId: string, month: string) =>
+    apiFetch(`/slots/doctor/${doctorId}/calendar/${month}`, { auth: false }),
+
+  getForDate: (doctorId: string, date: string) =>
+    apiFetch(`/slots/doctor/${doctorId}/date/${date}`, { auth: false }),
+};
+
 // ── Appointments ──────────────────────────────────────
 export const appointments = {
   getMine: () => apiFetch('/appointments/my'),
+
+  create: (body: { doctorId: string; appointmentDate: string; reason?: string }) =>
+    apiFetch('/appointments', { method: 'POST', body }),
 };
