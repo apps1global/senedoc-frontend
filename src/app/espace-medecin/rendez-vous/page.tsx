@@ -8,6 +8,7 @@ type Appointment = {
   id: string;
   appointmentDate: string;
   status: "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
+  cancellationReason: string | null;
   patient: {
     user: { firstName: string | null; lastName: string | null; phone: string | null };
   };
@@ -35,6 +36,9 @@ export default function RendezVousMedecin() {
   const [updating, setUpdating] = useState<string | null>(null);
   const [error, setError] = useState("");
 
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
+
   async function load() {
     try {
       const data = await doctorPortal.getAppointments();
@@ -50,11 +54,13 @@ export default function RendezVousMedecin() {
     load();
   }, []);
 
-  async function changeStatus(id: string, status: string) {
+  async function changeStatus(id: string, status: string, reason?: string) {
     setUpdating(id);
     setError("");
     try {
-      await appointmentsApi.updateStatus(id, status);
+      await appointmentsApi.updateStatus(id, status, reason);
+      setCancellingId(null);
+      setCancelReason("");
       await load();
     } catch (err: any) {
       setError(err.message);
@@ -87,7 +93,16 @@ export default function RendezVousMedecin() {
             ) : (
               <div className="space-y-3">
                 {upcoming.map((a) => (
-                  <AppointmentCard key={a.id} appointment={a} updating={updating === a.id} onChangeStatus={changeStatus} />
+                  <AppointmentCard
+                    key={a.id}
+                    appointment={a}
+                    updating={updating === a.id}
+                    cancellingId={cancellingId}
+                    setCancellingId={setCancellingId}
+                    cancelReason={cancelReason}
+                    setCancelReason={setCancelReason}
+                    onChangeStatus={changeStatus}
+                  />
                 ))}
               </div>
             )}
@@ -100,7 +115,17 @@ export default function RendezVousMedecin() {
             ) : (
               <div className="space-y-3">
                 {past.map((a) => (
-                  <AppointmentCard key={a.id} appointment={a} updating={updating === a.id} onChangeStatus={changeStatus} />
+                  <AppointmentCard
+                    key={a.id}
+                    appointment={a}
+                    updating={updating === a.id}
+                    cancellingId={cancellingId}
+                    setCancellingId={setCancellingId}
+                    cancelReason={cancelReason}
+                    setCancelReason={setCancelReason}
+                    onChangeStatus={changeStatus}
+                    readOnly
+                  />
                 ))}
               </div>
             )}
@@ -114,16 +139,28 @@ export default function RendezVousMedecin() {
 function AppointmentCard({
   appointment,
   updating,
+  cancellingId,
+  setCancellingId,
+  cancelReason,
+  setCancelReason,
   onChangeStatus,
+  readOnly,
 }: {
   appointment: Appointment;
   updating: boolean;
-  onChangeStatus: (id: string, status: string) => void;
+  cancellingId: string | null;
+  setCancellingId: (id: string | null) => void;
+  cancelReason: string;
+  setCancelReason: (v: string) => void;
+  onChangeStatus: (id: string, status: string, reason?: string) => void;
+  readOnly?: boolean;
 }) {
   const date = new Date(appointment.appointmentDate);
   const dateStr = date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   const timeStr = date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
   const patientName = `${appointment.patient.user.firstName ?? ""} ${appointment.patient.user.lastName ?? ""}`.trim();
+  const isCancellingThis = cancellingId === appointment.id;
+  const canAct = !readOnly && (appointment.status === "PENDING" || appointment.status === "CONFIRMED");
 
   return (
     <div className="bg-white border border-gray-100 rounded-xl p-5">
@@ -140,7 +177,11 @@ function AppointmentCard({
         </span>
       </div>
 
-      {(appointment.status === "PENDING" || appointment.status === "CONFIRMED") && (
+      {appointment.status === "CANCELLED" && appointment.cancellationReason && (
+        <p className="text-sm text-gray-500 mt-2">Motif : {appointment.cancellationReason}</p>
+      )}
+
+      {canAct && !isCancellingThis && (
         <div className="flex gap-2 mt-4">
           {appointment.status === "PENDING" && (
             <button
@@ -170,12 +211,41 @@ function AppointmentCard({
             </>
           )}
           <button
-            onClick={() => onChangeStatus(appointment.id, "CANCELLED")}
+            onClick={() => setCancellingId(appointment.id)}
             disabled={updating}
             className="text-sm border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-medium hover:border-coral hover:text-coral transition-colors disabled:opacity-50"
           >
             Annuler
           </button>
+        </div>
+      )}
+
+      {canAct && isCancellingThis && (
+        <div className="mt-4 space-y-2">
+          <label className="block text-xs text-gray-500">Motif de l'annulation (facultatif)</label>
+          <textarea
+            value={cancelReason}
+            onChange={(e) => setCancelReason(e.target.value)}
+            rows={2}
+            placeholder="Ex : imprévu, réorganisation du planning…"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-teal"
+          />
+          <div className="flex gap-2">
+            <button
+              onClick={() => onChangeStatus(appointment.id, "CANCELLED", cancelReason)}
+              disabled={updating}
+              className="text-sm bg-coral text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {updating ? "Annulation…" : "Confirmer l'annulation"}
+            </button>
+            <button
+              onClick={() => { setCancellingId(null); setCancelReason(""); }}
+              disabled={updating}
+              className="text-sm text-gray-500"
+            >
+              Retour
+            </button>
+          </div>
         </div>
       )}
     </div>

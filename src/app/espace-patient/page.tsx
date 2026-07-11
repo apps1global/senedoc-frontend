@@ -10,6 +10,7 @@ type Appointment = {
   id: string;
   appointmentDate: string;
   status: "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
+  cancellationReason: string | null;
   doctor: {
     id: string;
     user: { firstName: string | null; lastName: string | null };
@@ -84,12 +85,16 @@ export default function EspacePatient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function cancelAppointment(id: string) {
-    if (!window.confirm("Confirmer l'annulation de ce rendez-vous ?")) return;
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
+
+  async function cancelAppointment(id: string, reason: string) {
     setCancelling(id);
     setError("");
     try {
-      await appointmentsApi.updateStatus(id, "CANCELLED");
+      await appointmentsApi.updateStatus(id, "CANCELLED", reason || undefined);
+      setCancellingId(null);
+      setCancelReason("");
       await load();
     } catch (err: any) {
       setError(err.message);
@@ -173,6 +178,10 @@ export default function EspacePatient() {
                   key={r.id}
                   appointment={r}
                   cancelling={cancelling === r.id}
+                  cancellingId={cancellingId}
+                  setCancellingId={setCancellingId}
+                  cancelReason={cancelReason}
+                  setCancelReason={setCancelReason}
                   onCancel={cancelAppointment}
                 />
               ))}
@@ -188,7 +197,17 @@ export default function EspacePatient() {
           ) : (
             <div className="space-y-3">
               {past.map((r) => (
-                <AppointmentCard key={r.id} appointment={r} cancelling={false} onCancel={cancelAppointment} readOnly />
+                <AppointmentCard
+                  key={r.id}
+                  appointment={r}
+                  cancelling={false}
+                  cancellingId={cancellingId}
+                  setCancellingId={setCancellingId}
+                  cancelReason={cancelReason}
+                  setCancelReason={setCancelReason}
+                  onCancel={cancelAppointment}
+                  readOnly
+                />
               ))}
             </div>
           )}
@@ -258,12 +277,20 @@ export default function EspacePatient() {
 function AppointmentCard({
   appointment,
   cancelling,
+  cancellingId,
+  setCancellingId,
+  cancelReason,
+  setCancelReason,
   onCancel,
   readOnly,
 }: {
   appointment: Appointment;
   cancelling: boolean;
-  onCancel: (id: string) => void;
+  cancellingId: string | null;
+  setCancellingId: (id: string | null) => void;
+  cancelReason: string;
+  setCancelReason: (v: string) => void;
+  onCancel: (id: string, reason: string) => void;
   readOnly?: boolean;
 }) {
   const date = new Date(appointment.appointmentDate);
@@ -272,6 +299,7 @@ function AppointmentCard({
   const doctorName = `Dr ${appointment.doctor.user.firstName ?? ""} ${appointment.doctor.user.lastName ?? ""}`.trim();
   const canCancel = !readOnly && (appointment.status === "PENDING" || appointment.status === "CONFIRMED");
   const canRebook = appointment.status === "CANCELLED";
+  const isCancellingThis = cancellingId === appointment.id;
 
   return (
     <div className="bg-white border border-gray-100 rounded-xl p-5">
@@ -284,15 +312,49 @@ function AppointmentCard({
           {STATUS_LABELS[appointment.status]}
         </span>
       </div>
-      {canCancel && (
+
+      {appointment.status === "CANCELLED" && appointment.cancellationReason && (
+        <p className="text-sm text-gray-500 mt-2">Motif : {appointment.cancellationReason}</p>
+      )}
+
+      {canCancel && !isCancellingThis && (
         <button
-          onClick={() => onCancel(appointment.id)}
-          disabled={cancelling}
-          className="text-sm text-gray-500 hover:text-coral transition-colors mt-3 disabled:opacity-50"
+          onClick={() => setCancellingId(appointment.id)}
+          className="text-sm text-gray-500 hover:text-coral transition-colors mt-3"
         >
-          {cancelling ? "Annulation…" : "Annuler ce rendez-vous"}
+          Annuler ce rendez-vous
         </button>
       )}
+
+      {canCancel && isCancellingThis && (
+        <div className="mt-3 space-y-2">
+          <label className="block text-xs text-gray-500">Motif de l'annulation (facultatif)</label>
+          <textarea
+            value={cancelReason}
+            onChange={(e) => setCancelReason(e.target.value)}
+            rows={2}
+            placeholder="Ex : empêchement, changement de date souhaité…"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-teal"
+          />
+          <div className="flex gap-2">
+            <button
+              onClick={() => onCancel(appointment.id, cancelReason)}
+              disabled={cancelling}
+              className="text-sm bg-coral text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {cancelling ? "Annulation…" : "Confirmer l'annulation"}
+            </button>
+            <button
+              onClick={() => { setCancellingId(null); setCancelReason(""); }}
+              disabled={cancelling}
+              className="text-sm text-gray-500"
+            >
+              Retour
+            </button>
+          </div>
+        </div>
+      )}
+
       {canRebook && (
         <Link
           href={`/medecin/${appointment.doctor.id}`}

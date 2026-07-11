@@ -127,8 +127,8 @@ export const appointments = {
   create: (body: { doctorId: string; appointmentDate: string; reason?: string }) =>
     apiFetch('/appointments', { method: 'POST', body }),
 
-  updateStatus: (id: string, status: string) =>
-    apiFetch(`/appointments/${id}/status`, { method: 'PATCH', body: { status } }),
+  updateStatus: (id: string, status: string, reason?: string) =>
+    apiFetch(`/appointments/${id}/status`, { method: 'PATCH', body: { status, reason } }),
 };
 
 // ── Espace médecin ────────────────────────────────────
