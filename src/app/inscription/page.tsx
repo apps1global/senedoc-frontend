@@ -9,6 +9,8 @@ import { REGIONS, citiesForRegion } from "@/lib/senegal";
 
 type Step = "form" | "otp" | "pin";
 
+const REMEMBERED_PHONE_KEY = "senedoc_phone";
+
 export default function Inscription() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("form");
@@ -81,6 +83,9 @@ export default function Inscription() {
     setLoading(true);
     try {
       await auth.setPin({ pin });
+      // Numéro mémorisé sur cet appareil : à la prochaine connexion, seul
+      // le PIN sera demandé (voir page /connexion).
+      window.localStorage.setItem(REMEMBERED_PHONE_KEY, phone);
       router.push("/"); // compte prêt → accueil (plus tard : espace patient)
     } catch (err: any) {
       setError(err.message);

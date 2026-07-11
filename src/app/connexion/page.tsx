@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { auth } from "@/lib/api";
 
 type Mode = "pin" | "reset-request" | "reset-confirm";
+
+const REMEMBERED_PHONE_KEY = "senedoc_phone";
 
 export default function Connexion() {
   const router = useRouter();
@@ -20,12 +22,36 @@ export default function Connexion() {
   const [otp, setOtp] = useState("");
   const [newPin, setNewPin] = useState("");
 
+  // Numéro déjà connu sur cet appareil : on ne le redemande plus, seul le
+  // PIN est saisi. Le téléphone reste envoyé au backend (obligatoire côté
+  // API), simplement il n'est plus tapé à chaque connexion.
+  const [rememberedPhone, setRememberedPhone] = useState<string | null>(null);
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem(REMEMBERED_PHONE_KEY);
+    if (saved) {
+      setRememberedPhone(saved);
+      setPhone(saved);
+    }
+  }, []);
+
+  function forgetDevice() {
+    window.localStorage.removeItem(REMEMBERED_PHONE_KEY);
+    setRememberedPhone(null);
+    setPhone("");
+    setPin("");
+    setError("");
+  }
+
   async function submitPin(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
       await auth.loginPin({ phone, pin });
+      // Connexion réussie : on mémorise le numéro sur cet appareil pour
+      // les prochaines fois (plus jamais redemandé, seul le PIN le sera).
+      window.localStorage.setItem(REMEMBERED_PHONE_KEY, phone);
       router.push("/");
     } catch (err: any) {
       setError(err.message);
@@ -56,6 +82,7 @@ export default function Connexion() {
     setLoading(true);
     try {
       await auth.resetPin({ phone, otp, newPin });
+      window.localStorage.setItem(REMEMBERED_PHONE_KEY, phone);
       setInfo("PIN réinitialisé. Vous pouvez vous connecter.");
       setMode("pin");
       setPin("");
@@ -75,10 +102,18 @@ export default function Connexion() {
           {mode === "pin" && (
             <>
               <h1 className="font-display text-2xl font-semibold mb-1">Se connecter</h1>
-              <p className="text-sm text-gray-500 mb-6">Avec votre téléphone et votre PIN.</p>
+              {rememberedPhone ? (
+                <p className="text-sm text-gray-500 mb-6">
+                  {rememberedPhone} — <button type="button" onClick={forgetDevice} className="text-teal font-medium">changer de numéro</button>
+                </p>
+              ) : (
+                <p className="text-sm text-gray-500 mb-6">Avec votre téléphone et votre PIN.</p>
+              )}
               {info && <p className="text-sm text-teal-dark mb-4">{info}</p>}
               <form onSubmit={submitPin} className="space-y-4">
-                <Field label="Téléphone" value={phone} onChange={setPhone} placeholder="+221 77 123 45 67" />
+                {!rememberedPhone && (
+                  <Field label="Téléphone" value={phone} onChange={setPhone} placeholder="+221 77 123 45 67" />
+                )}
                 <div>
                   <label className="block text-sm font-medium mb-2">Code PIN</label>
                   <Code value={pin} onChange={setPin} length={4} />
