@@ -79,6 +79,24 @@ export const specialties = {
     apiFetch('/specialties', { auth: false }),
 };
 
+// ── Portail admin (parrains + superadmin) ────────────
+export const adminPortal = {
+  dashboard: () => apiFetch('/admin-portal/dashboard'),
+  myDoctors: () => apiFetch('/admin-portal/my-doctors'),
+  validateDoctor: (doctorId: string) => apiFetch(`/admin-portal/doctors/${doctorId}/validate`, { method: 'POST' }),
+  rejectDoctor: (doctorId: string) => apiFetch(`/admin-portal/doctors/${doctorId}/reject`, { method: 'POST' }),
+};
+
+// ── Superadmin ────────────────────────────────────────
+export const superadmin = {
+  dashboard: () => apiFetch('/admin/dashboard'),
+  getUsers: () => apiFetch('/admin/users'),
+  updateUserRole: (id: string, role: string) =>
+    apiFetch(`/admin/users/${id}/role`, { method: 'PATCH', body: { role } }),
+  activateUser: (id: string) => apiFetch(`/admin/users/${id}/activate`, { method: 'PATCH' }),
+  deactivateUser: (id: string) => apiFetch(`/admin/users/${id}/deactivate`, { method: 'PATCH' }),
+};
+
 // ── Doctors ───────────────────────────────────────────
 export const doctors = {
   search: (params: { specialty?: string; city?: string; teleconsultation?: boolean }) => {
