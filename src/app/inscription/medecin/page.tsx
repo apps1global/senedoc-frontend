@@ -94,7 +94,7 @@ export default function InscriptionMedecin() {
     setLoading(true);
     try {
       await auth.setPin({ pin });
-      window.localStorage.setItem("senedoc_phone", phone);
+      window.localStorage.setItem("senedoc_medecin_phone", phone);
       setStep("done");
     } catch (err: any) {
       setError(err.message);

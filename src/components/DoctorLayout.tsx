@@ -40,7 +40,7 @@ export function DoctorLayout({ children }: { children: React.ReactNode }) {
     } catch {
       // on nettoie côté client même en cas d'erreur réseau
     }
-    window.localStorage.removeItem("senedoc_phone");
+    window.localStorage.removeItem("senedoc_medecin_phone");
     router.push("/");
   }
 

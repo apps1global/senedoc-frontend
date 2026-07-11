@@ -8,7 +8,7 @@ import { auth } from "@/lib/api";
 
 type Mode = "password" | "pin";
 
-const REMEMBERED_PHONE_KEY = "senedoc_phone";
+const REMEMBERED_PHONE_KEY = "senedoc_medecin_phone";
 
 export default function ConnexionMedecin() {
   const router = useRouter();
