@@ -28,7 +28,7 @@ export default function Home() {
       {/* HÉRO */}
       <section className="bg-teal-light">
         <div className="max-w-6xl mx-auto px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
-          <div>
+          <div className="min-w-0">
             <p className="text-xs font-semibold tracking-wide text-teal-dark mb-3">
               PRENEZ RENDEZ-VOUS AU SÉNÉGAL
             </p>
@@ -90,7 +90,7 @@ export default function Home() {
           <div className="h-72 md:h-80 rounded-xl overflow-hidden order-2 md:order-1 bg-gray-100">
             <img src="/images/consultation.jpg" alt="Consultation médicale" className="w-full h-full object-contain" />
           </div>
-          <div className="order-1 md:order-2">
+          <div className="order-1 md:order-2 min-w-0">
             <h2 className="font-display text-2xl font-semibold mb-3">Des médecins vérifiés, près de vous</h2>
             <p className="text-gray-600 mb-5 leading-relaxed">
               Chaque médecin est validé avant d'apparaître. Vous voyez sa spécialité,
@@ -128,7 +128,7 @@ export default function Home() {
       {/* BLOC MÉDECIN */}
       <section className="bg-teal-deep">
         <div className="max-w-6xl mx-auto px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
-          <div>
+          <div className="min-w-0">
             <h2 className="font-display text-2xl font-semibold text-white mb-3">Vous êtes médecin ?</h2>
             <p className="text-teal-mid mb-6 leading-relaxed">
               Rejoignez senedoc, gérez vos disponibilités et recevez vos rendez-vous.
