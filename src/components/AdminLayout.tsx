@@ -49,6 +49,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     { href: "/admin/medecins", label: "Médecins" },
     { href: "/admin/articles", label: "Blog" },
     { href: "/admin/articles/relecture", label: "Relecture" },
+    { href: "/admin/commentaires", label: "Commentaires" },
     ...(isSuperAdmin ? [{ href: "/admin/utilisateurs", label: "Utilisateurs" }] : []),
   ];
 

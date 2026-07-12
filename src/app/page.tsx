@@ -1,17 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Faq } from "@/components/Faq";
 import { SpecialtyAutocomplete } from "@/components/SpecialtyAutocomplete";
+import { articles } from "@/lib/api";
+
+type Article = {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  coverImageUrl: string | null;
+  author: {
+    firstName: string | null;
+    lastName: string | null;
+    role: string;
+    doctorProfile: { specialty: { name: string } } | null;
+  };
+};
+
+function authorLabel(author: Article["author"]): string {
+  const name = `${author.firstName ?? ""} ${author.lastName ?? ""}`.trim();
+  if (author.role === "DOCTOR") {
+    const specialty = author.doctorProfile?.specialty.name;
+    return `Dr ${name}${specialty ? ` — ${specialty}` : ""}`;
+  }
+  return "Équipe senedoc";
+}
 
 export default function Home() {
   const router = useRouter();
   const [specialty, setSpecialty] = useState("");
   const [city, setCity] = useState("");
+  const [latestArticles, setLatestArticles] = useState<Article[]>([]);
+
+  useEffect(() => {
+    articles
+      .getPublished()
+      .then((data) => setLatestArticles((data as Article[]).slice(0, 3)))
+      .catch(() => setLatestArticles([]));
+  }, []);
 
   function submitSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -124,6 +156,36 @@ export default function Home() {
 
       {/* FAQ / BESOIN D'AIDE */}
       <Faq />
+
+      {/* DERNIERS ARTICLES */}
+      {latestArticles.length > 0 && (
+        <section className="max-w-6xl mx-auto px-6 py-16">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="font-display text-2xl font-semibold">Derniers articles</h2>
+            <Link href="/blog" className="text-sm text-teal font-medium">Voir tous les articles →</Link>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {latestArticles.map((a) => (
+              <Link
+                key={a.id}
+                href={`/blog/${a.slug}`}
+                className="block bg-white border border-gray-100 rounded-xl overflow-hidden hover:border-teal hover:shadow-sm transition-all min-w-0"
+              >
+                <div className="h-40 bg-gray-100">
+                  {a.coverImageUrl && (
+                    <img src={a.coverImageUrl} alt={a.title} className="w-full h-full object-cover" />
+                  )}
+                </div>
+                <div className="p-5">
+                  <p className="font-medium mb-1 line-clamp-2">{a.title}</p>
+                  {a.excerpt && <p className="text-sm text-gray-500 line-clamp-2 mb-3">{a.excerpt}</p>}
+                  <p className="text-xs text-teal-dark">{authorLabel(a.author)}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* BLOC MÉDECIN */}
       <section className="bg-teal-deep">

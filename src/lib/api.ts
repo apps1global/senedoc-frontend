@@ -97,6 +97,18 @@ export const superadmin = {
   deactivateUser: (id: string) => apiFetch(`/admin/users/${id}/deactivate`, { method: 'PATCH' }),
 };
 
+// ── Commentaires ──────────────────────────────────────
+export const comments = {
+  getForArticle: (slug: string) => apiFetch(`/comments/${slug}`, { auth: false }),
+  create: (slug: string, content: string) =>
+    apiFetch(`/comments/${slug}`, { method: 'POST', body: { content } }),
+  getMine: () => apiFetch('/comments/mine'),
+  getPending: () => apiFetch('/comments/pending'),
+  approve: (id: string) => apiFetch(`/comments/${id}/approve`, { method: 'POST' }),
+  reject: (id: string) => apiFetch(`/comments/${id}/reject`, { method: 'POST' }),
+  remove: (id: string) => apiFetch(`/comments/${id}`, { method: 'DELETE' }),
+};
+
 // ── Blog / Articles ───────────────────────────────────
 export const articles = {
   getPublished: () => apiFetch('/articles', { auth: false }),
