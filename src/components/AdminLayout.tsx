@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Logo } from "./Logo";
-import { auth } from "@/lib/api";
+import { auth, adminPortal, articles, comments } from "@/lib/api";
 
 type Me = { sub: string; email: string; role: string };
 
@@ -13,6 +13,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [me, setMe] = useState<Me | null>(null);
+
+  const [pendingDoctors, setPendingDoctors] = useState(0);
+  const [pendingArticles, setPendingArticles] = useState(0);
+  const [pendingComments, setPendingComments] = useState(0);
 
   useEffect(() => {
     auth
@@ -27,6 +31,17 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       .catch(() => router.push("/admin"))
       .finally(() => setLoading(false));
   }, [router]);
+
+  // Compteurs "à traiter" — chargés une fois connecté, rafraîchis à chaque
+  // navigation entre pages admin (le composant remonte à chaque changement
+  // de page), pour que l'admin voie immédiatement s'il y a du travail en
+  // attente sans avoir à cliquer dans chaque rubrique.
+  useEffect(() => {
+    if (!me) return;
+    adminPortal.dashboard().then((d: any) => setPendingDoctors(d?.doctors?.pending ?? 0)).catch(() => {});
+    articles.getPendingReview().then((list: any) => setPendingArticles(list.length)).catch(() => {});
+    comments.getPending().then((list: any) => setPendingComments(list.length)).catch(() => {});
+  }, [me, pathname]);
 
   async function handleLogout() {
     try {
@@ -46,10 +61,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   const nav = [
     { href: "/admin/tableau-de-bord", label: "Tableau de bord" },
-    { href: "/admin/medecins", label: "Médecins" },
+    { href: "/admin/medecins", label: "Médecins", badge: pendingDoctors },
     { href: "/admin/articles", label: "Blog" },
-    { href: "/admin/articles/relecture", label: "Relecture" },
-    { href: "/admin/commentaires", label: "Commentaires" },
+    { href: "/admin/articles/relecture", label: "Relecture", badge: pendingArticles },
+    { href: "/admin/commentaires", label: "Commentaires", badge: pendingComments },
     ...(isSuperAdmin ? [{ href: "/admin/utilisateurs", label: "Utilisateurs" }] : []),
   ];
 
@@ -70,13 +85,18 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             <Link
               key={item.href}
               href={item.href}
-              className={`py-3 border-b-2 whitespace-nowrap transition-colors ${
+              className={`py-3 border-b-2 whitespace-nowrap transition-colors flex items-center gap-1.5 ${
                 pathname === item.href
                   ? "border-coral text-white font-medium"
                   : "border-transparent text-teal-mid hover:text-white"
               }`}
             >
               {item.label}
+              {!!item.badge && (
+                <span className="bg-coral text-white text-[11px] font-semibold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                  {item.badge}
+                </span>
+              )}
             </Link>
           ))}
         </div>
