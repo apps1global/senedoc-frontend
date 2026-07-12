@@ -97,6 +97,25 @@ export const superadmin = {
   deactivateUser: (id: string) => apiFetch(`/admin/users/${id}/deactivate`, { method: 'PATCH' }),
 };
 
+// ── Blog / Articles ───────────────────────────────────
+export const articles = {
+  getPublished: () => apiFetch('/articles', { auth: false }),
+  getBySlug: (slug: string) => apiFetch(`/articles/${slug}`, { auth: false }),
+
+  getMine: () => apiFetch('/articles/mine'),
+  getPendingReview: () => apiFetch('/articles/pending-review'),
+  getForEdit: (id: string) => apiFetch(`/articles/edit/${id}`),
+
+  create: (body: { title: string; excerpt?: string; content: string; coverImageUrl?: string }) =>
+    apiFetch('/articles', { method: 'POST', body }),
+  update: (id: string, body: { title?: string; excerpt?: string; content?: string; coverImageUrl?: string }) =>
+    apiFetch(`/articles/${id}`, { method: 'PATCH', body }),
+  submit: (id: string) => apiFetch(`/articles/${id}/submit`, { method: 'POST' }),
+  publish: (id: string) => apiFetch(`/articles/${id}/publish`, { method: 'POST' }),
+  reject: (id: string, reason?: string) => apiFetch(`/articles/${id}/reject`, { method: 'POST', body: { reason } }),
+  remove: (id: string) => apiFetch(`/articles/${id}`, { method: 'DELETE' }),
+};
+
 // ── Doctors ───────────────────────────────────────────
 export const doctors = {
   search: (params: { specialty?: string; city?: string; teleconsultation?: boolean }) => {
@@ -158,6 +177,19 @@ export async function uploadPhoto(file: File): Promise<{ photoUrl: string }> {
   const formData = new FormData();
   formData.append('file', file);
   const res = await fetch(`${API_BASE}/upload/photo`, {
+    method: 'POST',
+    credentials: 'include',
+    body: formData,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.message || `Erreur ${res.status}`);
+  return data;
+}
+
+export async function uploadArticleCover(file: File): Promise<{ url: string }> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetch(`${API_BASE}/upload/article-cover`, {
     method: 'POST',
     credentials: 'include',
     body: formData,

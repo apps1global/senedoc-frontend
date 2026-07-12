@@ -17,6 +17,7 @@ const NAV = [
   { href: "/espace-medecin", label: "Tableau de bord" },
   { href: "/espace-medecin/rendez-vous", label: "Rendez-vous" },
   { href: "/espace-medecin/disponibilites", label: "Disponibilités" },
+  { href: "/espace-medecin/articles", label: "Blog" },
   { href: "/espace-medecin/profil", label: "Profil" },
 ];
 

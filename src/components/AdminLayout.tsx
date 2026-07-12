@@ -47,6 +47,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const nav = [
     { href: "/admin/tableau-de-bord", label: "Tableau de bord" },
     { href: "/admin/medecins", label: "Médecins" },
+    { href: "/admin/articles", label: "Blog" },
+    { href: "/admin/articles/relecture", label: "Relecture" },
     ...(isSuperAdmin ? [{ href: "/admin/utilisateurs", label: "Utilisateurs" }] : []),
   ];
 

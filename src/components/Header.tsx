@@ -40,6 +40,7 @@ export function Header() {
         {/* Nav desktop */}
         <nav className="hidden sm:flex items-center gap-6 text-sm text-gray-600">
           <Link href="/" className="hover:text-teal">Trouver un médecin</Link>
+          <Link href="/blog" className="hover:text-teal">Blog</Link>
           {!checking && !loggedIn && (
             <Link href="/inscription/medecin" className="hover:text-teal">Espace médecin</Link>
           )}
@@ -81,6 +82,7 @@ export function Header() {
       {menuOpen && (
         <nav className="sm:hidden border-t border-gray-100 bg-white px-6 py-4 flex flex-col gap-4 text-sm text-gray-600 absolute top-16 left-0 right-0 z-20 shadow-sm">
           <Link href="/" onClick={() => setMenuOpen(false)} className="hover:text-teal">Trouver un médecin</Link>
+          <Link href="/blog" onClick={() => setMenuOpen(false)} className="hover:text-teal">Blog</Link>
           {!checking && !loggedIn && (
             <Link href="/inscription/medecin" onClick={() => setMenuOpen(false)} className="hover:text-teal">Espace médecin</Link>
           )}
