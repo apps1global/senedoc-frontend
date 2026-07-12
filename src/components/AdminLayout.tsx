@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Logo } from "./Logo";
+import { ToastStack } from "./ToastStack";
+import { useToasts } from "@/lib/useToasts";
+import { getSocket } from "@/lib/socket";
 import { auth, adminPortal, articles, comments } from "@/lib/api";
 
 type Me = { sub: string; email: string; role: string };
@@ -13,6 +16,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [me, setMe] = useState<Me | null>(null);
+  const { toasts, push } = useToasts();
 
   const [pendingDoctors, setPendingDoctors] = useState(0);
   const [pendingArticles, setPendingArticles] = useState(0);
@@ -32,16 +36,46 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       .finally(() => setLoading(false));
   }, [router]);
 
-  // Compteurs "à traiter" — chargés une fois connecté, rafraîchis à chaque
-  // navigation entre pages admin (le composant remonte à chaque changement
-  // de page), pour que l'admin voie immédiatement s'il y a du travail en
-  // attente sans avoir à cliquer dans chaque rubrique.
+  // Compteurs "à traiter" — chargement initial à chaque navigation entre
+  // pages admin, puis mise à jour EN TEMPS RÉEL via WebSocket ci-dessous
+  // (plus besoin de changer de page pour voir un nouveau badge apparaître).
   useEffect(() => {
     if (!me) return;
     adminPortal.dashboard().then((d: any) => setPendingDoctors(d?.doctors?.pending ?? 0)).catch(() => {});
     articles.getPendingReview().then((list: any) => setPendingArticles(list.length)).catch(() => {});
     comments.getPending().then((list: any) => setPendingComments(list.length)).catch(() => {});
   }, [me, pathname]);
+
+  // Temps réel : connexion WebSocket authentifiée via le même cookie de
+  // session. Les événements incrémentent les badges instantanément et
+  // affichent une notification, sans recharger ni changer de page.
+  useEffect(() => {
+    if (!me) return;
+    const socket = getSocket();
+
+    const onDoctorPending = (data: any) => {
+      setPendingDoctors((n) => n + 1);
+      push(`Nouveau médecin en attente : ${data.name}`);
+    };
+    const onArticlePending = (data: any) => {
+      setPendingArticles((n) => n + 1);
+      push(`Nouvel article à relire : « ${data.title} »`);
+    };
+    const onCommentPending = (data: any) => {
+      setPendingComments((n) => n + 1);
+      push(`Nouveau commentaire à modérer sur « ${data.articleTitle} »`);
+    };
+
+    socket.on("doctor:pending", onDoctorPending);
+    socket.on("article:pending", onArticlePending);
+    socket.on("comment:pending", onCommentPending);
+
+    return () => {
+      socket.off("doctor:pending", onDoctorPending);
+      socket.off("article:pending", onArticlePending);
+      socket.off("comment:pending", onCommentPending);
+    };
+  }, [me, push]);
 
   async function handleLogout() {
     try {
@@ -102,6 +136,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       <div className="max-w-5xl mx-auto px-6 py-8">{children}</div>
+      <ToastStack toasts={toasts} />
     </div>
   );
 }

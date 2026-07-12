@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
+import { ToastStack } from "@/components/ToastStack";
+import { useToasts } from "@/lib/useToasts";
+import { getSocket } from "@/lib/socket";
 import { patients, appointments as appointmentsApi, auth } from "@/lib/api";
 
 type Appointment = {
@@ -55,6 +58,7 @@ export default function EspacePatient() {
   const [profile, setProfile] = useState<PatientProfile | null>(null);
   const [rdvs, setRdvs] = useState<Appointment[]>([]);
   const [cancelling, setCancelling] = useState<string | null>(null);
+  const { toasts, push } = useToasts();
 
   // Changement de PIN
   const [showPinForm, setShowPinForm] = useState(false);
@@ -84,6 +88,20 @@ export default function EspacePatient() {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Temps réel : dès que le médecin confirme/annule/termine un rendez-vous,
+  // le patient le voit sans recharger la page.
+  useEffect(() => {
+    const socket = getSocket();
+    const onUpdated = (data: { id: string; status: Appointment["status"] }) => {
+      setRdvs((prev) => prev.map((r) => (r.id === data.id ? { ...r, status: data.status } : r)));
+      push(`Votre rendez-vous est maintenant : ${STATUS_LABELS[data.status]}`);
+    };
+    socket.on("appointment:updated", onUpdated);
+    return () => {
+      socket.off("appointment:updated", onUpdated);
+    };
+  }, [push]);
 
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState("");
@@ -270,6 +288,7 @@ export default function EspacePatient() {
 
         {error && <p className="text-sm text-coral mt-6">{error}</p>}
       </div>
+      <ToastStack toasts={toasts} />
     </>
   );
 }

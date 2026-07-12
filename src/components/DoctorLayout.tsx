@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Logo } from "./Logo";
+import { ToastStack } from "./ToastStack";
+import { useToasts } from "@/lib/useToasts";
+import { getSocket } from "@/lib/socket";
 import { doctorPortal, auth } from "@/lib/api";
 
 type DoctorInfo = {
@@ -13,19 +16,13 @@ type DoctorInfo = {
   specialty: { name: string };
 };
 
-const NAV = [
-  { href: "/espace-medecin", label: "Tableau de bord" },
-  { href: "/espace-medecin/rendez-vous", label: "Rendez-vous" },
-  { href: "/espace-medecin/disponibilites", label: "Disponibilités" },
-  { href: "/espace-medecin/articles", label: "Blog" },
-  { href: "/espace-medecin/profil", label: "Profil" },
-];
-
 export function DoctorLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [doctor, setDoctor] = useState<DoctorInfo | null>(null);
+  const { toasts, push } = useToasts();
+  const [pendingAppointments, setPendingAppointments] = useState(0);
 
   useEffect(() => {
     doctorPortal
@@ -34,6 +31,44 @@ export function DoctorLayout({ children }: { children: React.ReactNode }) {
       .catch(() => router.push("/espace-medecin/connexion"))
       .finally(() => setLoading(false));
   }, [router]);
+
+  // Compteur de RDV en attente — chargement initial à chaque navigation,
+  // puis incrémenté en temps réel via WebSocket ci-dessous.
+  useEffect(() => {
+    if (!doctor || doctor.validationStatus !== "VALIDATED") return;
+    doctorPortal
+      .getAppointments()
+      .then((list: any) => setPendingAppointments(list.filter((a: any) => a.status === "PENDING").length))
+      .catch(() => {});
+  }, [doctor, pathname]);
+
+  // Temps réel : nouvelles demandes de RDV, et retour de relecture sur les
+  // articles soumis (publié / rejeté).
+  useEffect(() => {
+    if (!doctor || doctor.validationStatus !== "VALIDATED") return;
+    const socket = getSocket();
+
+    const onNewAppointment = (data: any) => {
+      setPendingAppointments((n) => n + 1);
+      push(`Nouvelle demande de rendez-vous de ${data.patientName}`);
+    };
+    const onArticlePublished = (data: any) => {
+      push(`Votre article « ${data.title} » a été publié !`);
+    };
+    const onArticleRejected = (data: any) => {
+      push(`Votre article « ${data.title} » a été rejeté${data.reason ? ` : ${data.reason}` : ""}`);
+    };
+
+    socket.on("appointment:new", onNewAppointment);
+    socket.on("article:published", onArticlePublished);
+    socket.on("article:rejected", onArticleRejected);
+
+    return () => {
+      socket.off("appointment:new", onNewAppointment);
+      socket.off("article:published", onArticlePublished);
+      socket.off("article:rejected", onArticleRejected);
+    };
+  }, [doctor, push]);
 
   async function handleLogout() {
     try {
@@ -87,6 +122,14 @@ export function DoctorLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
+  const NAV = [
+    { href: "/espace-medecin", label: "Tableau de bord" },
+    { href: "/espace-medecin/rendez-vous", label: "Rendez-vous", badge: pendingAppointments },
+    { href: "/espace-medecin/disponibilites", label: "Disponibilités" },
+    { href: "/espace-medecin/articles", label: "Blog" },
+    { href: "/espace-medecin/profil", label: "Profil" },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-100">
@@ -104,18 +147,24 @@ export function DoctorLayout({ children }: { children: React.ReactNode }) {
             <Link
               key={item.href}
               href={item.href}
-              className={`py-3 border-b-2 whitespace-nowrap transition-colors ${
+              className={`py-3 border-b-2 whitespace-nowrap transition-colors flex items-center gap-1.5 ${
                 pathname === item.href
                   ? "border-teal text-teal-dark font-medium"
                   : "border-transparent text-gray-500 hover:text-teal-dark"
               }`}
             >
               {item.label}
+              {!!item.badge && (
+                <span className="bg-coral text-white text-[11px] font-semibold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                  {item.badge}
+                </span>
+              )}
             </Link>
           ))}
         </div>
       </header>
       <div className="max-w-5xl mx-auto px-6 py-8">{children}</div>
+      <ToastStack toasts={toasts} />
     </div>
   );
 }
