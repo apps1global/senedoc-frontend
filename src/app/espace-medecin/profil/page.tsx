@@ -7,6 +7,7 @@ import { doctorPortal, uploadPhoto, auth } from "@/lib/api";
 type DoctorMe = {
   bio: string | null;
   consultationFee: number | null;
+  teleconsultationFee: number | null;
   consultationDuration: number | null;
   teleconsultation: boolean;
   acceptNewPatients: boolean;
@@ -29,6 +30,7 @@ export default function ProfilMedecin() {
 
   const [bio, setBio] = useState("");
   const [consultationFee, setConsultationFee] = useState("");
+  const [teleconsultationFee, setTeleconsultationFee] = useState("");
   const [consultationDuration, setConsultationDuration] = useState("30");
   const [teleconsultation, setTeleconsultation] = useState(false);
   const [acceptNewPatients, setAcceptNewPatients] = useState(true);
@@ -44,8 +46,6 @@ export default function ProfilMedecin() {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Définir un PIN (utile pour les médecins inscrits avant l'ajout de cette
-  // fonctionnalité, ou qui l'ont sautée à l'inscription).
   const [showPinForm, setShowPinForm] = useState(false);
   const [newPin, setNewPin] = useState("");
   const [newPinConfirm, setNewPinConfirm] = useState("");
@@ -58,6 +58,7 @@ export default function ProfilMedecin() {
       setDoctor(d);
       setBio(d.bio ?? "");
       setConsultationFee(d.consultationFee != null ? String(d.consultationFee) : "");
+      setTeleconsultationFee(d.teleconsultationFee != null ? String(d.teleconsultationFee) : "");
       setConsultationDuration(d.consultationDuration != null ? String(d.consultationDuration) : "30");
       setTeleconsultation(!!d.teleconsultation);
       setAcceptNewPatients(d.acceptNewPatients ?? true);
@@ -96,6 +97,7 @@ export default function ProfilMedecin() {
       await doctorPortal.updateProfile({
         bio: bio || undefined,
         consultationFee: consultationFee ? Number(consultationFee) : undefined,
+        teleconsultationFee: teleconsultationFee ? Number(teleconsultationFee) : undefined,
         consultationDuration: consultationDuration ? Number(consultationDuration) : undefined,
         teleconsultation,
         acceptNewPatients,
@@ -153,7 +155,6 @@ export default function ProfilMedecin() {
     <DoctorLayout>
       <h1 className="font-display text-2xl font-semibold mb-6">Mon profil</h1>
 
-      {/* Photo */}
       <div className="flex items-center gap-4 mb-8">
         <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
           {photoUrl ? (
@@ -186,15 +187,31 @@ export default function ProfilMedecin() {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-sm font-medium mb-1">Tarif consultation (FCFA)</label>
-            <input type="number" value={consultationFee} onChange={(e) => setConsultationFee(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-sm" />
+        <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 space-y-4">
+          <p className="text-sm font-medium">Consultation en présentiel</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">Tarif (FCFA)</label>
+              <input type="number" value={consultationFee} onChange={(e) => setConsultationFee(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">Durée (min)</label>
+              <input type="number" value={consultationDuration} onChange={(e) => setConsultationDuration(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-sm" />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Durée consultation (min)</label>
-            <input type="number" value={consultationDuration} onChange={(e) => setConsultationDuration(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-sm" />
-          </div>
+        </div>
+
+        <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 space-y-4">
+          <Toggle label="Propose la téléconsultation" checked={teleconsultation} onChange={setTeleconsultation} />
+          {teleconsultation && (
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">Tarif téléconsultation (FCFA)</label>
+              <input type="number" value={teleconsultationFee} onChange={(e) => setTeleconsultationFee(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-sm" />
+              <p className="text-xs text-gray-400 mt-1">
+                N'oubliez pas d'ajouter des créneaux de type "Téléconsultation" dans Mes disponibilités.
+              </p>
+            </div>
+          )}
         </div>
 
         <div>
@@ -228,7 +245,6 @@ export default function ProfilMedecin() {
         </div>
 
         <div className="space-y-2 pt-2">
-          <Toggle label="Propose la téléconsultation" checked={teleconsultation} onChange={setTeleconsultation} />
           <Toggle label="Accepte de nouveaux patients" checked={acceptNewPatients} onChange={setAcceptNewPatients} />
           <Toggle label="Accepte d'être contacté par WhatsApp" checked={acceptWhatsapp} onChange={setAcceptWhatsapp} />
         </div>
@@ -241,7 +257,6 @@ export default function ProfilMedecin() {
         </button>
       </form>
 
-      {/* Sécurité : définir/changer le PIN */}
       <section className="mt-10 max-w-xl">
         <h2 className="font-display text-xl font-semibold mb-4">Sécurité</h2>
         <div className="bg-white border border-gray-100 rounded-xl p-6">

@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import { DoctorLayout } from "@/components/DoctorLayout";
 import { doctorPortal } from "@/lib/api";
 
-type Availability = { id: string; dayOfWeek: number; startTime: string; endTime: string };
+type AvailType = "PRESENTIEL" | "TELECONSULTATION";
+type Availability = { id: string; dayOfWeek: number; startTime: string; endTime: string; type: AvailType };
 type ExceptionDate = { id: string; exceptionDate: string; reason: string | null };
 
 const DAYS = ["", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
 
 export default function DisponibilitesMedecin() {
+  const [tab, setTab] = useState<AvailType>("PRESENTIEL");
   const [availabilities, setAvailabilities] = useState<Availability[]>([]);
   const [exceptions, setExceptions] = useState<ExceptionDate[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +32,11 @@ export default function DisponibilitesMedecin() {
         doctorPortal.getAvailability(),
         doctorPortal.getExceptions(),
       ]);
-      setAvailabilities((avail as Availability[]).sort((a, b) => a.dayOfWeek - b.dayOfWeek || a.startTime.localeCompare(b.startTime)));
+      setAvailabilities(
+        (avail as Availability[]).sort(
+          (a, b) => a.dayOfWeek - b.dayOfWeek || a.startTime.localeCompare(b.startTime)
+        )
+      );
       setExceptions(exc as ExceptionDate[]);
     } catch (err: any) {
       setError(err.message);
@@ -43,6 +49,8 @@ export default function DisponibilitesMedecin() {
     loadAll();
   }, []);
 
+  const filteredAvailabilities = availabilities.filter((a) => a.type === tab);
+
   async function addAvailability(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -52,7 +60,7 @@ export default function DisponibilitesMedecin() {
     }
     setAdding(true);
     try {
-      await doctorPortal.createAvailability({ dayOfWeek, startTime, endTime });
+      await doctorPortal.createAvailability({ dayOfWeek, startTime, endTime, type: tab });
       await loadAll();
     } catch (err: any) {
       setError(err.message);
@@ -107,15 +115,35 @@ export default function DisponibilitesMedecin() {
         <p className="text-gray-400">Chargement…</p>
       ) : (
         <>
-          {/* Créneaux hebdomadaires récurrents */}
           <section className="mb-10">
-            <h2 className="font-medium text-lg mb-4">Créneaux hebdomadaires</h2>
+            <div className="flex gap-2 mb-4">
+              <button
+                onClick={() => setTab("PRESENTIEL")}
+                className={`text-sm px-4 py-2 rounded-full font-medium transition-colors ${
+                  tab === "PRESENTIEL" ? "bg-teal text-white" : "bg-white border border-gray-200 text-gray-600"
+                }`}
+              >
+                Présentiel
+              </button>
+              <button
+                onClick={() => setTab("TELECONSULTATION")}
+                className={`text-sm px-4 py-2 rounded-full font-medium transition-colors ${
+                  tab === "TELECONSULTATION" ? "bg-teal text-white" : "bg-white border border-gray-200 text-gray-600"
+                }`}
+              >
+                Téléconsultation
+              </button>
+            </div>
+
+            <h2 className="font-medium text-lg mb-4">
+              Créneaux hebdomadaires — {tab === "PRESENTIEL" ? "présentiel" : "téléconsultation"}
+            </h2>
             <div className="bg-white border border-gray-100 rounded-xl p-5 mb-4">
-              {availabilities.length === 0 ? (
+              {filteredAvailabilities.length === 0 ? (
                 <p className="text-sm text-gray-500">Aucun créneau défini — ajoutez-en un ci-dessous.</p>
               ) : (
                 <div className="space-y-2">
-                  {availabilities.map((a) => (
+                  {filteredAvailabilities.map((a) => (
                     <div key={a.id} className="flex items-center justify-between text-sm py-2 border-b border-gray-50 last:border-0">
                       <span>{DAYS[a.dayOfWeek]} — {a.startTime} à {a.endTime}</span>
                       <button onClick={() => removeAvailability(a.id)} className="text-gray-400 hover:text-coral transition-colors">Retirer</button>
@@ -152,9 +180,9 @@ export default function DisponibilitesMedecin() {
             </form>
           </section>
 
-          {/* Indisponibilités ponctuelles */}
           <section>
             <h2 className="font-medium text-lg mb-4">Indisponibilités ponctuelles</h2>
+            <p className="text-xs text-gray-400 mb-3">S'applique aux deux modes (présentiel et téléconsultation).</p>
             <div className="bg-white border border-gray-100 rounded-xl p-5 mb-4">
               {exceptions.length === 0 ? (
                 <p className="text-sm text-gray-500">Aucune indisponibilité prévue.</p>
