@@ -32,6 +32,7 @@ export default function Medecins() {
   const [error, setError] = useState("");
   const [updating, setUpdating] = useState<string | null>(null);
   const [filter, setFilter] = useState<"ALL" | Doctor["validationStatus"]>("PENDING");
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   async function load() {
     try {
@@ -69,6 +70,21 @@ export default function Medecins() {
       await load();
     } catch (err: any) {
       setError(err.message);
+    } finally {
+      setUpdating(null);
+    }
+  }
+
+  async function confirmDelete(id: string) {
+    setUpdating(id);
+    setError("");
+    try {
+      await adminPortal.deleteDoctor(id);
+      setConfirmDeleteId(null);
+      await load();
+    } catch (err: any) {
+      setError(err.message);
+      setConfirmDeleteId(null);
     } finally {
       setUpdating(null);
     }
@@ -114,24 +130,53 @@ export default function Medecins() {
                   {STATUS_LABELS[d.validationStatus]}
                 </span>
               </div>
-              {d.validationStatus === "PENDING" && (
-                <div className="flex gap-2 mt-4">
+
+              <div className="flex gap-2 mt-4 items-center flex-wrap">
+                {d.validationStatus === "PENDING" && (
+                  <>
+                    <button
+                      onClick={() => validate(d.id)}
+                      disabled={updating === d.id}
+                      className="text-sm bg-teal text-white px-4 py-2 rounded-lg font-medium hover:bg-teal-dark transition-colors disabled:opacity-50"
+                    >
+                      Valider
+                    </button>
+                    <button
+                      onClick={() => reject(d.id)}
+                      disabled={updating === d.id}
+                      className="text-sm border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-medium hover:border-coral hover:text-coral transition-colors disabled:opacity-50"
+                    >
+                      Rejeter
+                    </button>
+                  </>
+                )}
+
+                {confirmDeleteId === d.id ? (
+                  <div className="flex items-center gap-2 ml-auto">
+                    <span className="text-xs text-gray-500">Confirmer la suppression ?</span>
+                    <button
+                      onClick={() => confirmDelete(d.id)}
+                      disabled={updating === d.id}
+                      className="text-sm bg-coral text-white px-3 py-1.5 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+                    >
+                      {updating === d.id ? "…" : "Oui, supprimer"}
+                    </button>
+                    <button
+                      onClick={() => setConfirmDeleteId(null)}
+                      className="text-sm text-gray-500 px-3 py-1.5"
+                    >
+                      Annuler
+                    </button>
+                  </div>
+                ) : (
                   <button
-                    onClick={() => validate(d.id)}
-                    disabled={updating === d.id}
-                    className="text-sm bg-teal text-white px-4 py-2 rounded-lg font-medium hover:bg-teal-dark transition-colors disabled:opacity-50"
+                    onClick={() => setConfirmDeleteId(d.id)}
+                    className="text-sm text-gray-400 px-4 py-2 rounded-lg font-medium hover:text-coral transition-colors ml-auto"
                   >
-                    Valider
+                    Supprimer
                   </button>
-                  <button
-                    onClick={() => reject(d.id)}
-                    disabled={updating === d.id}
-                    className="text-sm border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-medium hover:border-coral hover:text-coral transition-colors disabled:opacity-50"
-                  >
-                    Rejeter
-                  </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           ))}
         </div>

@@ -25,6 +25,7 @@ export function Footer() {
           <p className="font-medium text-gray-700">Légal</p>
           <Link href="/confidentialite" className="block hover:text-teal transition-colors">Politique de confidentialité</Link>
           <Link href="/cgu" className="block hover:text-teal transition-colors">Conditions d'utilisation</Link>
+          <Link href="/suppression-compte" className="block hover:text-teal transition-colors">Supprimer mon compte</Link>
           <a href="mailto:doctafrik@gmail.com" className="block hover:text-teal transition-colors">Nous contacter</a>
         </div>
       </div>

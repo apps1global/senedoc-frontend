@@ -85,6 +85,7 @@ export const adminPortal = {
   myDoctors: () => apiFetch('/admin-portal/my-doctors'),
   validateDoctor: (doctorId: string) => apiFetch(`/admin-portal/doctors/${doctorId}/validate`, { method: 'POST' }),
   rejectDoctor: (doctorId: string) => apiFetch(`/admin-portal/doctors/${doctorId}/reject`, { method: 'POST' }),
+  deleteDoctor: (doctorId: string) => apiFetch(`/admin-portal/doctors/${doctorId}`, { method: 'DELETE' }),
 };
 
 // ── Superadmin ────────────────────────────────────────
