@@ -7,7 +7,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Faq } from "@/components/Faq";
 import { SpecialtyAutocomplete } from "@/components/SpecialtyAutocomplete";
-import { articles } from "@/lib/api";
+import { articles, doctors } from "@/lib/api";
 
 type Article = {
   id: string;
@@ -36,6 +36,8 @@ export default function Home() {
   const router = useRouter();
   const [specialty, setSpecialty] = useState("");
   const [city, setCity] = useState("");
+  const [cities, setCities] = useState<string[]>([]);
+  const [citiesLoading, setCitiesLoading] = useState(false);
   const [latestArticles, setLatestArticles] = useState<Article[]>([]);
 
   useEffect(() => {
@@ -44,6 +46,31 @@ export default function Home() {
       .then((data) => setLatestArticles((data as Article[]).slice(0, 3)))
       .catch(() => setLatestArticles([]));
   }, []);
+
+  useEffect(() => {
+    if (!specialty) {
+      setCities([]);
+      setCity("");
+      return;
+    }
+    setCitiesLoading(true);
+    doctors
+      .citiesForSpecialty(specialty)
+      .then((list) => {
+        setCities(list);
+        setCity((prev) => (list.includes(prev) ? prev : ""));
+      })
+      .catch(() => setCities([]))
+      .finally(() => setCitiesLoading(false));
+  }, [specialty]);
+
+  function goToCity(c: string) {
+    setCity(c);
+    const params = new URLSearchParams();
+    if (specialty) params.set("specialty", specialty);
+    if (c) params.set("city", c);
+    router.push(`/recherche${params.toString() ? `?${params.toString()}` : ""}`);
+  }
 
   function submitSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -82,16 +109,33 @@ export default function Home() {
                   placeholder="Spécialité (Cardiologie…)"
                 />
               </div>
-              <div className="flex items-center gap-2 min-w-0">
-                <div className="flex items-center gap-2 px-3 py-3 flex-1 min-w-0">
-                  <PinIcon />
-                  <input
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    className="flex-1 min-w-0 outline-none text-[15px] placeholder-gray-400"
-                    placeholder="Ville"
-                  />
+
+              {specialty && (
+                <div className="px-3 py-3 border-b border-gray-100">
+                  {citiesLoading ? (
+                    <p className="text-xs text-gray-400">Recherche des villes…</p>
+                  ) : cities.length === 0 ? (
+                    <p className="text-xs text-gray-500">
+                      Aucun médecin disponible en {specialty} pour le moment.
+                    </p>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {cities.map((c) => (
+                        <button
+                          key={c}
+                          type="button"
+                          onClick={() => goToCity(c)}
+                          className="text-xs px-3 py-1.5 rounded-full font-medium bg-gray-50 border border-gray-200 text-gray-600 hover:border-teal hover:text-teal-dark transition-colors"
+                        >
+                          {c}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
+              )}
+
+              <div className="flex items-center justify-end px-3 py-3 min-w-0">
                 <button type="submit" className="bg-coral text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity flex-shrink-0">
                   Rechercher
                 </button>
