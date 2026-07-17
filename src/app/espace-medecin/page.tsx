@@ -9,6 +9,14 @@ type Dashboard = {
   doctor: { firstName: string | null; lastName: string | null; specialty: string };
   todayAppointments: number;
   upcomingAppointments: number;
+  validationStatus: "PENDING" | "VALIDATED" | "REJECTED";
+  isVisibleToPatients: boolean;
+  missingForBooking: string[];
+};
+
+const MISSING_LABELS: Record<string, string> = {
+  TARIF: "votre tarif de consultation",
+  DISPONIBILITES: "au moins un créneau de disponibilité",
 };
 
 export default function EspaceMedecin() {
@@ -32,6 +40,44 @@ export default function EspaceMedecin() {
         <p className="text-gray-400">Chargement…</p>
       ) : (
         <>
+          {dashboard && dashboard.validationStatus === "PENDING" && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+              <p className="text-sm text-amber-800">
+                Votre compte est en attente de validation par un administrateur.
+                Vous ne serez visible aux patients qu'une fois validé.
+              </p>
+            </div>
+          )}
+
+          {dashboard &&
+            dashboard.validationStatus === "VALIDATED" &&
+            !dashboard.isVisibleToPatients && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+                <p className="text-sm text-amber-800 font-medium mb-1">
+                  Votre profil est validé mais pas encore visible aux patients
+                </p>
+                <p className="text-sm text-amber-700">
+                  Il manque{" "}
+                  {dashboard.missingForBooking
+                    .map((code) => MISSING_LABELS[code] ?? code)
+                    .join(" et ")}
+                  . Complétez ces informations pour apparaître dans les recherches.
+                </p>
+                <div className="flex gap-3 mt-3">
+                  {dashboard.missingForBooking.includes("TARIF") && (
+                    <Link href="/espace-medecin/profil" className="text-sm text-amber-800 font-medium underline">
+                      Renseigner mon tarif
+                    </Link>
+                  )}
+                  {dashboard.missingForBooking.includes("DISPONIBILITES") && (
+                    <Link href="/espace-medecin/disponibilites" className="text-sm text-amber-800 font-medium underline">
+                      Ajouter mes disponibilités
+                    </Link>
+                  )}
+                </div>
+              </div>
+            )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
             <StatCard label="Rendez-vous aujourd'hui" value={dashboard?.todayAppointments ?? 0} />
             <StatCard label="Rendez-vous à venir" value={dashboard?.upcomingAppointments ?? 0} />

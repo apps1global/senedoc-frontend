@@ -22,7 +22,7 @@ export default function InscriptionMedecin() {
   const [specialiteAutre, setSpecialiteAutre] = useState("");
   const [numeroOrdre, setNumeroOrdre] = useState("");
   const [region, setRegion] = useState("");
-  const [ville, setVille] = useState("");
+  const [city, setCity] = useState("");
   const [referralCode, setReferralCode] = useState("");
   const [password, setPassword] = useState("");
 
@@ -37,8 +37,17 @@ export default function InscriptionMedecin() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    if (!firstName || !lastName || !phone || !finalSpecialite || !numeroOrdre || !password) {
-      setError("Merci de remplir les champs obligatoires.");
+    if (
+      !firstName ||
+      !lastName ||
+      !phone ||
+      !finalSpecialite ||
+      !numeroOrdre ||
+      !region ||
+      !city ||
+      !password
+    ) {
+      setError("Merci de remplir les champs obligatoires, y compris région et ville.");
       return;
     }
     setLoading(true);
@@ -49,7 +58,7 @@ export default function InscriptionMedecin() {
         body: {
           firstName, lastName, phone, email, password,
           specialite: finalSpecialite, numeroOrdre,
-          pays: "Sénégal", ville,
+          region, city,
           referralCode: referralCode || undefined,
         },
       });
@@ -163,15 +172,15 @@ export default function InscriptionMedecin() {
                 </div>
                 <F label="Numéro à l'Ordre *" value={numeroOrdre} onChange={setNumeroOrdre} />
                 <div>
-                  <label className="block text-sm font-medium mb-1">Région</label>
-                  <select className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal" value={region} onChange={(e) => { setRegion(e.target.value); setVille(""); }}>
+                  <label className="block text-sm font-medium mb-1">Région *</label>
+                  <select className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal" value={region} onChange={(e) => { setRegion(e.target.value); setCity(""); }}>
                     <option value="">Choisir une région</option>
                     {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Ville</label>
-                  <select className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal disabled:bg-gray-50" value={ville} onChange={(e) => setVille(e.target.value)} disabled={!region}>
+                  <label className="block text-sm font-medium mb-1">Ville *</label>
+                  <select className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal disabled:bg-gray-50" value={city} onChange={(e) => setCity(e.target.value)} disabled={!region}>
                     <option value="">{region ? "Choisir une ville" : "Choisissez d'abord une région"}</option>
                     {cities.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
