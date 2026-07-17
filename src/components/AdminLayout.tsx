@@ -100,6 +100,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     { href: "/admin/articles/relecture", label: "Relecture", badge: pendingArticles },
     { href: "/admin/commentaires", label: "Commentaires", badge: pendingComments },
     ...(isSuperAdmin ? [{ href: "/admin/utilisateurs", label: "Utilisateurs" }] : []),
+    { href: "/admin/parametres", label: "Paramètres" },
   ];
 
   return (

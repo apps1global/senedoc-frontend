@@ -66,6 +66,9 @@ export const auth = {
   me: () => apiFetch('/auth/me'),
 
   logout: () => apiFetch('/auth/logout', { method: 'POST' }),
+
+  changePassword: (body: { currentPassword: string; newPassword: string }) =>
+    apiFetch('/auth/change-password', { method: 'POST', body }),
 };
 
 // ── Patients ──────────────────────────────────────────
