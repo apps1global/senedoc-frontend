@@ -144,6 +144,12 @@ export const doctors = {
   },
 
   getOne: (id: string) => apiFetch(`/doctors/${id}`, { auth: false }),
+
+  citiesForSpecialty: (specialty: string): Promise<string[]> => {
+    const qs = new URLSearchParams();
+    if (specialty) qs.set('specialty', specialty);
+    return apiFetch(`/doctors/cities?${qs.toString()}`, { auth: false });
+  },
 };
 
 // ── Créneaux ──────────────────────────────────────────

@@ -24,13 +24,12 @@ type Doctor = {
   teleconsultation: boolean;
   yearsExperience: number | null;
   photoUrl: string | null;
+  city: string | null;
   user: { firstName: string | null; lastName: string | null };
   specialty: { name: string };
   facilityMemberships: { facility: Facility }[];
 };
 
-// Distance à vol d'oiseau (formule de Haversine), calculée entièrement
-// côté navigateur — aucune coordonnée patient n'est envoyée au serveur.
 function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -47,14 +46,17 @@ function RechercheContent() {
 
   const [specialty, setSpecialty] = useState(searchParams.get("specialty") || "");
   const [city, setCity] = useState(searchParams.get("city") || "");
+
+  const [cities, setCities] = useState<string[]>([]);
+  const [citiesLoading, setCitiesLoading] = useState(false);
+
   const [results, setResults] = useState<Doctor[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState("");
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
   const [geoDenied, setGeoDenied] = useState(false);
 
-  // Position du patient : demandée une fois, jamais envoyée au serveur —
-  // sert uniquement à calculer la distance affichée dans le navigateur.
   useEffect(() => {
     if (!navigator.geolocation) {
       setGeoDenied(true);
@@ -67,11 +69,29 @@ function RechercheContent() {
     );
   }, []);
 
-  async function runSearch() {
+  useEffect(() => {
+    if (!specialty) {
+      setCities([]);
+      return;
+    }
+    setCitiesLoading(true);
+    doctors
+      .citiesForSpecialty(specialty)
+      .then((list) => {
+        setCities(list);
+        setCity((prev) => (list.includes(prev) ? prev : ""));
+      })
+      .catch(() => setCities([]))
+      .finally(() => setCitiesLoading(false));
+  }, [specialty]);
+
+  async function runSearch(nextCity?: string) {
+    const cityToUse = nextCity !== undefined ? nextCity : city;
     setLoading(true);
+    setHasSearched(true);
     setError("");
     try {
-      const data = await doctors.search({ specialty, city });
+      const data = await doctors.search({ specialty, city: cityToUse });
       setResults(data as Doctor[]);
     } catch (err: any) {
       setError(err.message);
@@ -81,20 +101,21 @@ function RechercheContent() {
   }
 
   useEffect(() => {
-    runSearch();
+    if (searchParams.get("specialty") || searchParams.get("city")) {
+      runSearch(searchParams.get("city") || "");
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function submitFilters(e: React.FormEvent) {
-    e.preventDefault();
+  function selectCity(c: string) {
+    setCity(c);
     const params = new URLSearchParams();
     if (specialty) params.set("specialty", specialty);
-    if (city) params.set("city", city);
+    if (c) params.set("city", c);
     router.replace(`/recherche${params.toString() ? `?${params.toString()}` : ""}`);
-    runSearch();
+    runSearch(c);
   }
 
-  // Trie par distance quand la position est connue, sinon garde l'ordre du serveur.
   const sorted = [...results].sort((a, b) => {
     if (!userPos) return 0;
     const da = nearestFacilityDistance(a, userPos);
@@ -111,23 +132,50 @@ function RechercheContent() {
       <div className="max-w-4xl mx-auto px-6 py-10">
         <h1 className="font-display text-2xl font-semibold mb-6">Trouver un médecin</h1>
 
-        <form onSubmit={submitFilters} className="bg-white border border-gray-100 rounded-xl p-4 mb-8 flex flex-col sm:flex-row gap-3">
+        <div className="bg-white border border-gray-100 rounded-xl p-4 mb-8">
+          <label className="block text-sm font-medium mb-2">Spécialité</label>
           <SpecialtyAutocomplete
             value={specialty}
-            onChange={setSpecialty}
+            onChange={(v) => { setSpecialty(v); setCity(""); }}
             placeholder="Spécialité (Cardiologie…)"
-            className="flex-1 min-w-0 border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-[15px] w-full"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-[15px]"
           />
-          <input
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            placeholder="Ville"
-            className="flex-1 min-w-0 border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-[15px]"
-          />
-          <button type="submit" className="bg-coral text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity flex-shrink-0">
-            Rechercher
-          </button>
-        </form>
+
+          {specialty && (
+            <div className="mt-4">
+              <p className="text-sm font-medium mb-2">Ville</p>
+              {citiesLoading ? (
+                <p className="text-sm text-gray-400">Recherche des villes…</p>
+              ) : cities.length === 0 ? (
+                <p className="text-sm text-gray-500">
+                  Aucun médecin disponible en {specialty} pour le moment.
+                </p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => selectCity("")}
+                    className={`text-sm px-3 py-1.5 rounded-full font-medium transition-colors ${
+                      city === "" ? "bg-teal text-white" : "bg-gray-50 border border-gray-200 text-gray-600 hover:border-teal"
+                    }`}
+                  >
+                    Toutes les villes
+                  </button>
+                  {cities.map((c) => (
+                    <button
+                      key={c}
+                      onClick={() => selectCity(c)}
+                      className={`text-sm px-3 py-1.5 rounded-full font-medium transition-colors ${
+                        city === c ? "bg-teal text-white" : "bg-gray-50 border border-gray-200 text-gray-600 hover:border-teal"
+                      }`}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         {geoDenied && (
           <p className="text-xs text-gray-400 mb-6">
@@ -135,7 +183,11 @@ function RechercheContent() {
           </p>
         )}
 
-        {loading ? (
+        {!hasSearched ? (
+          <p className="text-gray-500 text-center py-16">
+            Choisissez une spécialité pour voir les villes disponibles.
+          </p>
+        ) : loading ? (
           <p className="text-gray-400 text-center py-16">Recherche en cours…</p>
         ) : error ? (
           <p className="text-coral text-center py-16">{error}</p>
@@ -167,6 +219,7 @@ function DoctorCard({ doctor, userPos }: { doctor: Doctor; userPos: { lat: numbe
   const facility = doctor.facilityMemberships[0]?.facility;
   const distance = userPos && facility ? nearestFacilityDistance(doctor, userPos) : null;
   const name = `Dr ${doctor.user.firstName ?? ""} ${doctor.user.lastName ?? ""}`.trim();
+  const location = facility?.city || doctor.city;
 
   return (
     <Link
@@ -177,9 +230,9 @@ function DoctorCard({ doctor, userPos }: { doctor: Doctor; userPos: { lat: numbe
         <div>
           <p className="font-medium">{name}</p>
           <p className="text-sm text-teal-dark">{doctor.specialty.name}</p>
-          {facility && (
+          {location && (
             <p className="text-sm text-gray-500 mt-1">
-              {facility.name}{facility.city ? ` — ${facility.city}` : ""}
+              {facility ? `${facility.name} — ${location}` : location}
             </p>
           )}
           <div className="flex items-center gap-3 mt-2 text-xs">
