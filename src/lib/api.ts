@@ -120,6 +120,7 @@ export const articles = {
 
   getMine: () => apiFetch('/articles/mine'),
   getPendingReview: () => apiFetch('/articles/pending-review'),
+  getAll: () => apiFetch('/articles/all'),
   getForEdit: (id: string) => apiFetch(`/articles/edit/${id}`),
 
   create: (body: { title: string; excerpt?: string; content: string; coverImageUrl?: string }) =>

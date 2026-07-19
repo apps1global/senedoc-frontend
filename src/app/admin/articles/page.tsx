@@ -37,7 +37,7 @@ export default function ArticlesAdmin() {
 
   async function load() {
     try {
-      const data = await articles.getMine();
+      const data = await articles.getAll();
       setList(data as Article[]);
     } catch (err: any) {
       setError(err.message);
