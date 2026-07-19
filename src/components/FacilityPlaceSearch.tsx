@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
 
 export type SelectedPlace = {
@@ -22,48 +22,70 @@ export function FacilityPlaceSearch({
   onClear: () => void;
 }) {
   const placesLib = useMapsLibrary("places");
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const elementRef = useRef<any>(null);
 
   useEffect(() => {
-    if (!placesLib || !inputRef.current) return;
-    const ac = new placesLib.Autocomplete(inputRef.current, {
+    if (!placesLib || !containerRef.current || elementRef.current) return;
+
+    const PlaceAutocompleteElement = (placesLib as any).PlaceAutocompleteElement;
+    if (!PlaceAutocompleteElement) {
+      console.error("PlaceAutocompleteElement indisponible dans cette version de la librairie places.");
+      return;
+    }
+
+    const el = new PlaceAutocompleteElement({
       componentRestrictions: { country: "sn" },
-      types: ["establishment"],
-      fields: ["place_id", "name", "formatted_address", "geometry", "address_components"],
     });
-    setAutocomplete(ac);
-  }, [placesLib]);
+    el.style.width = "100%";
+    containerRef.current.appendChild(el);
+    elementRef.current = el;
 
-  useEffect(() => {
-    if (!autocomplete) return;
-    const listener = autocomplete.addListener("place_changed", () => {
-      const place = autocomplete.getPlace();
-      if (!place.geometry?.location || !place.place_id) return;
-
-      let city = "";
-      for (const comp of place.address_components ?? []) {
-        if (comp.types.includes("locality")) { city = comp.long_name; break; }
-      }
-      if (!city) {
-        for (const comp of place.address_components ?? []) {
-          if (comp.types.includes("administrative_area_level_2")) { city = comp.long_name; break; }
+    async function handleSelect(event: any) {
+      try {
+        console.log("gmp-select event:", event);
+        const prediction = event.placePrediction;
+        const place = prediction ? prediction.toPlace() : event.place;
+        if (!place) {
+          console.error("Aucun objet place trouvé dans l'événement.", event);
+          return;
         }
-      }
+        await place.fetchFields({
+          fields: ["displayName", "formattedAddress", "location", "id", "addressComponents"],
+        });
+        console.log("place après fetchFields:", place);
 
-      onSelect({
-        name: place.name ?? "",
-        address: place.formatted_address ?? "",
-        city,
-        latitude: place.geometry.location.lat(),
-        longitude: place.geometry.location.lng(),
-        googlePlaceId: place.place_id,
-      });
-    });
+        let city = "";
+        for (const comp of place.addressComponents ?? []) {
+          if (comp.types?.includes("locality")) { city = comp.longText ?? comp.long_name ?? ""; break; }
+        }
+        if (!city) {
+          for (const comp of place.addressComponents ?? []) {
+            if (comp.types?.includes("administrative_area_level_2")) { city = comp.longText ?? comp.long_name ?? ""; break; }
+          }
+        }
+
+        const lat = typeof place.location?.lat === "function" ? place.location.lat() : place.location?.lat;
+        const lng = typeof place.location?.lng === "function" ? place.location.lng() : place.location?.lng;
+
+        onSelect({
+          name: place.displayName ?? "",
+          address: place.formattedAddress ?? "",
+          city,
+          latitude: lat,
+          longitude: lng,
+          googlePlaceId: place.id ?? "",
+        });
+      } catch (e) {
+        console.error("Erreur sélection établissement:", e);
+      }
+    }
+
+    el.addEventListener("gmp-select", handleSelect);
     return () => {
-      google.maps.event.removeListener(listener);
+      el.removeEventListener("gmp-select", handleSelect);
     };
-  }, [autocomplete, onSelect]);
+  }, [placesLib, onSelect]);
 
   if (selected) {
     return (
@@ -83,12 +105,7 @@ export function FacilityPlaceSearch({
 
   return (
     <div>
-      <input
-        ref={inputRef}
-        type="text"
-        placeholder="Rechercher votre établissement sur Google Maps *"
-        className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-sm"
-      />
+      <div ref={containerRef} />
       <p className="text-xs text-gray-400 mt-1">
         Tapez au moins 3 lettres et sélectionnez votre établissement dans la liste.
       </p>
