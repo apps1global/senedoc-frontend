@@ -24,6 +24,15 @@ export function FacilityPlaceSearch({
   const placesLib = useMapsLibrary("places");
   const containerRef = useRef<HTMLDivElement>(null);
   const elementRef = useRef<any>(null);
+  // Référence stable vers la dernière version de onSelect : évite de
+  // dépendre de onSelect dans l'effet ci-dessous (qui change de référence
+  // à chaque rendu du parent, ex: ajout d'un autre établissement), ce qui
+  // cassait le ré-attachement de l'écouteur et rendait le champ muet après
+  // le premier re-rendu du composant parent.
+  const onSelectRef = useRef(onSelect);
+  useEffect(() => {
+    onSelectRef.current = onSelect;
+  }, [onSelect]);
 
   useEffect(() => {
     if (!placesLib || !containerRef.current || elementRef.current) return;
@@ -69,7 +78,7 @@ export function FacilityPlaceSearch({
         const lat = typeof place.location?.lat === "function" ? place.location.lat() : place.location?.lat;
         const lng = typeof place.location?.lng === "function" ? place.location.lng() : place.location?.lng;
 
-        onSelect({
+        onSelectRef.current({
           name: place.displayName ?? "",
           address: place.formattedAddress ?? "",
           city,
@@ -83,10 +92,11 @@ export function FacilityPlaceSearch({
     }
 
     el.addEventListener("gmp-select", handleSelect);
-    return () => {
-      el.removeEventListener("gmp-select", handleSelect);
-    };
-  }, [placesLib, onSelect]);
+    // Pas de cleanup ici volontairement : l'effet ne dépend que de
+    // placesLib (stable après le premier chargement), donc il ne
+    // s'exécute qu'une seule fois par instance du composant — l'écouteur
+    // reste attaché en permanence, quels que soient les re-rendus du parent.
+  }, [placesLib]);
 
   if (selected) {
     return (
