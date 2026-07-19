@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Faq } from "@/components/Faq";
 import { SpecialtySelect } from "@/components/SpecialtySelect";
+import { DoctorNameSearch } from "@/components/DoctorNameSearch";
 import { articles, doctors } from "@/lib/api";
 
 type Article = {
@@ -100,6 +101,11 @@ export default function Home() {
             </p>
 
             {/* Recherche */}
+            <div className="mb-3">
+              <DoctorNameSearch className="bg-white" />
+            </div>
+            <p className="text-xs text-teal-dark mb-2">Ou parcourez par spécialité et ville :</p>
+
             <form id="recherche" onSubmit={submitSearch} className="bg-white p-2 rounded-xl shadow-sm">
               <div className="flex items-center gap-2 px-3 py-3 border-b border-gray-100 min-w-0">
                 <SearchIcon />

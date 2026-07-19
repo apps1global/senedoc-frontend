@@ -6,8 +6,31 @@ import { Logo } from "@/components/Logo";
 import { apiFetch, auth } from "@/lib/api";
 import { REGIONS, citiesForRegion } from "@/lib/senegal";
 import { SPECIALTIES } from "@/lib/specialties";
+import { FacilityMapPicker } from "@/components/FacilityMapPicker";
 
 type Step = "form" | "otp" | "pin" | "done";
+
+type FacilityDraft = {
+  id: string;
+  name: string;
+  address: string;
+  region: string;
+  city: string;
+  latitude: number | null;
+  longitude: number | null;
+};
+
+function emptyFacility(): FacilityDraft {
+  return {
+    id: Math.random().toString(36).slice(2),
+    name: "",
+    address: "",
+    region: "",
+    city: "",
+    latitude: null,
+    longitude: null,
+  };
+}
 
 export default function InscriptionMedecin() {
   const [step, setStep] = useState<Step>("form");
@@ -17,38 +40,43 @@ export default function InscriptionMedecin() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
   const [specialite, setSpecialite] = useState("");
   const [specialiteAutre, setSpecialiteAutre] = useState("");
   const [numeroOrdre, setNumeroOrdre] = useState("");
-  const [region, setRegion] = useState("");
-  const [city, setCity] = useState("");
   const [referralCode, setReferralCode] = useState("");
-  const [password, setPassword] = useState("");
+  const [facilities, setFacilities] = useState<FacilityDraft[]>([emptyFacility()]);
 
   const [userId, setUserId] = useState("");
   const [otp, setOtp] = useState("");
   const [pin, setPin] = useState("");
   const [pinConfirm, setPinConfirm] = useState("");
 
-  const cities = region ? citiesForRegion(region) : [];
   const finalSpecialite = specialite === "Autre" ? specialiteAutre.trim() : specialite;
+
+  function updateFacility(id: string, patch: Partial<FacilityDraft>) {
+    setFacilities((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));
+  }
+
+  function addFacility() {
+    setFacilities((prev) => [...prev, emptyFacility()]);
+  }
+
+  function removeFacility(id: string) {
+    setFacilities((prev) => (prev.length > 1 ? prev.filter((f) => f.id !== id) : prev));
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    if (
-      !firstName ||
-      !lastName ||
-      !phone ||
-      !finalSpecialite ||
-      !numeroOrdre ||
-      !region ||
-      !city ||
-      !password
-    ) {
-      setError("Merci de remplir les champs obligatoires, y compris région et ville.");
+    if (!firstName || !lastName || !phone || !finalSpecialite || !numeroOrdre) {
+      setError("Merci de remplir les champs obligatoires.");
       return;
+    }
+    for (const f of facilities) {
+      if (!f.name || !f.city || f.latitude == null || f.longitude == null) {
+        setError("Chaque établissement doit avoir un nom, une ville, et un emplacement placé sur la carte.");
+        return;
+      }
     }
     setLoading(true);
     try {
@@ -56,10 +84,17 @@ export default function InscriptionMedecin() {
         method: "POST",
         auth: false,
         body: {
-          firstName, lastName, phone, email, password,
+          firstName, lastName, phone,
           specialite: finalSpecialite, numeroOrdre,
-          region, city,
           referralCode: referralCode || undefined,
+          facilities: facilities.map((f) => ({
+            name: f.name,
+            address: f.address || undefined,
+            city: f.city,
+            country: "Sénégal",
+            latitude: f.latitude,
+            longitude: f.longitude,
+          })),
         },
       });
       setUserId(res.id);
@@ -124,8 +159,8 @@ export default function InscriptionMedecin() {
               votre inscription à l'Ordre. Vous serez visible aux patients une fois validé.
             </p>
             <p className="text-gray-600 leading-relaxed mt-3">
-              Vous pouvez dès maintenant accéder à votre espace médecin — avec votre email et
-              mot de passe, ou votre téléphone et le code PIN que vous venez de définir.
+              Vous pouvez dès maintenant accéder à votre espace médecin avec votre
+              téléphone et le code PIN que vous venez de définir.
             </p>
             <Link href="/espace-medecin/connexion" className="inline-block mt-6 text-teal font-medium">Accéder à mon espace</Link>
           </div>
@@ -138,7 +173,7 @@ export default function InscriptionMedecin() {
     <div className="min-h-screen bg-teal-light flex flex-col">
       <div className="p-6"><Link href="/"><Logo /></Link></div>
       <div className="flex-1 flex items-center justify-center px-6 pb-16">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-sm p-8">
+        <div className="w-full max-w-lg bg-white rounded-2xl shadow-sm p-8">
 
           {step === "form" && (
             <>
@@ -150,7 +185,6 @@ export default function InscriptionMedecin() {
                   <F label="Nom *" value={lastName} onChange={setLastName} />
                 </div>
                 <F label="Téléphone *" value={phone} onChange={setPhone} placeholder="+221 77 123 45 67" />
-                <F label="Email" value={email} onChange={setEmail} />
                 <div>
                   <label className="block text-sm font-medium mb-1">Spécialité *</label>
                   <select
@@ -171,22 +205,83 @@ export default function InscriptionMedecin() {
                   )}
                 </div>
                 <F label="Numéro à l'Ordre *" value={numeroOrdre} onChange={setNumeroOrdre} />
-                <div>
-                  <label className="block text-sm font-medium mb-1">Région *</label>
-                  <select className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal" value={region} onChange={(e) => { setRegion(e.target.value); setCity(""); }}>
-                    <option value="">Choisir une région</option>
-                    {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Ville *</label>
-                  <select className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal disabled:bg-gray-50" value={city} onChange={(e) => setCity(e.target.value)} disabled={!region}>
-                    <option value="">{region ? "Choisir une ville" : "Choisissez d'abord une région"}</option>
-                    {cities.map((c) => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </div>
-                <F label="Mot de passe *" value={password} onChange={setPassword} type="password" />
                 <F label="Code de parrainage (facultatif)" value={referralCode} onChange={setReferralCode} placeholder="Si un administrateur vous en a donné un" />
+
+                <div className="pt-2">
+                  <h2 className="font-medium mb-1">Mes établissements</h2>
+                  <p className="text-xs text-gray-500 mb-3">
+                    Ajoutez au moins un lieu de consultation, géolocalisé sur la carte.
+                  </p>
+
+                  {facilities.map((f, index) => {
+                    const cities = f.region ? citiesForRegion(f.region) : [];
+                    return (
+                      <div key={f.id} className="bg-gray-50 rounded-xl p-4 mb-3">
+                        <div className="flex items-center justify-between mb-3">
+                          <p className="text-sm font-medium">Établissement {index + 1}</p>
+                          {facilities.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeFacility(f.id)}
+                              className="text-xs text-coral font-medium"
+                            >
+                              Retirer
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="space-y-3">
+                          <input
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-sm"
+                            placeholder="Nom de l'établissement *"
+                            value={f.name}
+                            onChange={(e) => updateFacility(f.id, { name: e.target.value })}
+                          />
+                          <input
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-sm"
+                            placeholder="Adresse (optionnel)"
+                            value={f.address}
+                            onChange={(e) => updateFacility(f.id, { address: e.target.value })}
+                          />
+                          <div className="grid grid-cols-2 gap-2">
+                            <select
+                              className="border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-sm"
+                              value={f.region}
+                              onChange={(e) => updateFacility(f.id, { region: e.target.value, city: "" })}
+                            >
+                              <option value="">Région *</option>
+                              {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+                            </select>
+                            <select
+                              className="border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-sm disabled:bg-gray-100"
+                              value={f.city}
+                              onChange={(e) => updateFacility(f.id, { city: e.target.value })}
+                              disabled={!f.region}
+                            >
+                              <option value="">{f.region ? "Ville *" : "Choisir une région"}</option>
+                              {cities.map((c) => <option key={c} value={c}>{c}</option>)}
+                            </select>
+                          </div>
+
+                          <FacilityMapPicker
+                            latitude={f.latitude}
+                            longitude={f.longitude}
+                            onChangeLocation={(lat, lng) => updateFacility(f.id, { latitude: lat, longitude: lng })}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  <button
+                    type="button"
+                    onClick={addFacility}
+                    className="w-full border border-dashed border-teal text-teal text-sm font-medium py-2.5 rounded-lg hover:bg-teal-light transition-colors"
+                  >
+                    + Ajouter un autre établissement
+                  </button>
+                </div>
+
                 {error && <p className="text-sm text-coral">{error}</p>}
                 <button type="submit" disabled={loading} className="w-full bg-teal text-white py-3 rounded-lg font-medium hover:bg-teal-dark transition-colors disabled:opacity-60">
                   {loading ? "Un instant…" : "M'inscrire"}
@@ -210,7 +305,7 @@ export default function InscriptionMedecin() {
           {step === "pin" && (
             <>
               <h1 className="font-display text-2xl font-semibold mb-1">Créez votre code PIN</h1>
-              <p className="text-sm text-gray-500 mb-6">4 chiffres pour vous reconnecter facilement à votre espace médecin, sans ressaisir votre mot de passe.</p>
+              <p className="text-sm text-gray-500 mb-6">4 chiffres pour vous reconnecter facilement à votre espace médecin.</p>
               <form onSubmit={submitPin} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">Votre PIN</label>
