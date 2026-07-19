@@ -35,7 +35,8 @@ export function FacilityPlaceSearch({
     }
 
     const el = new PlaceAutocompleteElement({
-      componentRestrictions: { country: "sn" },
+      includedRegionCodes: ["sn"],
+      includedPrimaryTypes: ["establishment"],
     });
     el.style.width = "100%";
     containerRef.current.appendChild(el);
