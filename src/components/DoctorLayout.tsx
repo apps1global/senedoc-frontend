@@ -86,25 +86,10 @@ export function DoctorLayout({ children }: { children: React.ReactNode }) {
 
   if (!doctor) return null; // redirection déjà lancée
 
-  if (doctor.validationStatus === "PENDING") {
-    return (
-      <div className="min-h-screen bg-teal-light flex flex-col">
-        <div className="p-6"><Link href="/"><Logo /></Link></div>
-        <div className="flex-1 flex items-center justify-center px-6 pb-16">
-          <div className="w-full max-w-md bg-white rounded-2xl shadow-sm p-8 text-center">
-            <h1 className="font-display text-2xl font-semibold mb-3">En attente de validation</h1>
-            <p className="text-gray-600 leading-relaxed">
-              Votre inscription est en cours de vérification par un administrateur.
-              Vous serez visible aux patients et pourrez accéder à votre espace complet
-              une fois validé.
-            </p>
-            <button onClick={handleLogout} className="inline-block mt-6 text-teal font-medium">Se déconnecter</button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+  // PENDING n'est plus un blocage total : le médecin accède à son espace
+  // complet dès l'inscription (voir isActive: true côté backend), avec une
+  // bannière persistante ci-dessous lui rappelant que son compte est en
+  // cours de vérification. Seul REJECTED reste un blocage complet.
   if (doctor.validationStatus === "REJECTED") {
     return (
       <div className="min-h-screen bg-teal-light flex flex-col">
@@ -132,6 +117,15 @@ export function DoctorLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {doctor.validationStatus === "PENDING" && (
+        <div className="bg-amber-50 border-b border-amber-200 px-6 py-3 text-center">
+          <p className="text-sm text-amber-800">
+            Votre compte est en cours de vérification par un administrateur.
+            Vous serez visible aux patients une fois validé — en attendant,
+            vous pouvez déjà compléter votre profil et vos disponibilités.
+          </p>
+        </div>
+      )}
       <header className="bg-white border-b border-gray-100">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/espace-medecin"><Logo /></Link>
