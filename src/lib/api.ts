@@ -205,6 +205,12 @@ export const doctorPortal = {
 
   updateProfile: (body: Record<string, unknown>) =>
     apiFetch('/doctor/me/profile', { method: 'PATCH', body }),
+
+  getFacilities: () => apiFetch('/doctor/me/facilities'),
+  addFacility: (body: Record<string, unknown>) =>
+    apiFetch('/doctor/me/facilities', { method: 'POST', body }),
+  removeFacility: (facilityId: string) =>
+    apiFetch(`/doctor/me/facilities/${facilityId}`, { method: 'DELETE' }),
 };
 
 // ── Upload ────────────────────────────────────────────
