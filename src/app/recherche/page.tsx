@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { SpecialtyAutocomplete } from "@/components/SpecialtyAutocomplete";
+import { SpecialtySelect } from "@/components/SpecialtySelect";
+import { DoctorNameSearch } from "@/components/DoctorNameSearch";
 import { doctors } from "@/lib/api";
 
 type Facility = {
@@ -21,6 +22,7 @@ type Doctor = {
   id: string;
   bio: string | null;
   consultationFee: number | null;
+  teleconsultationFee: number | null;
   teleconsultation: boolean;
   yearsExperience: number | null;
   photoUrl: string | null;
@@ -130,14 +132,20 @@ function RechercheContent() {
     <>
       <Header />
       <div className="max-w-4xl mx-auto px-6 py-10">
-        <h1 className="font-display text-2xl font-semibold mb-6">Trouver un médecin</h1>
+        <h1 className="font-display text-2xl font-semibold mb-6">Trouver un professionnel de santé</h1>
+
+        <div className="mb-4">
+          <DoctorNameSearch />
+        </div>
+        <p className="text-xs text-gray-400 mb-6">
+          Ou parcourez par spécialité et ville ci-dessous :
+        </p>
 
         <div className="bg-white border border-gray-100 rounded-xl p-4 mb-8">
           <label className="block text-sm font-medium mb-2">Spécialité</label>
-          <SpecialtyAutocomplete
+          <SpecialtySelect
             value={specialty}
             onChange={(v) => { setSpecialty(v); setCity(""); }}
-            placeholder="Spécialité (Cardiologie…)"
             className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-[15px]"
           />
 
@@ -148,7 +156,7 @@ function RechercheContent() {
                 <p className="text-sm text-gray-400">Recherche des villes…</p>
               ) : cities.length === 0 ? (
                 <p className="text-sm text-gray-500">
-                  Aucun médecin disponible en {specialty} pour le moment.
+                  Aucun professionnel disponible en {specialty} pour le moment.
                 </p>
               ) : (
                 <div className="flex flex-wrap gap-2">
@@ -192,7 +200,7 @@ function RechercheContent() {
         ) : error ? (
           <p className="text-coral text-center py-16">{error}</p>
         ) : sorted.length === 0 ? (
-          <p className="text-gray-500 text-center py-16">Aucun médecin ne correspond à cette recherche.</p>
+          <p className="text-gray-500 text-center py-16">Aucun professionnel ne correspond à cette recherche.</p>
         ) : (
           <div className="space-y-4">
             {sorted.map((doc) => (
@@ -218,7 +226,7 @@ function nearestFacilityDistance(doctor: Doctor, userPos: { lat: number; lng: nu
 function DoctorCard({ doctor, userPos }: { doctor: Doctor; userPos: { lat: number; lng: number } | null }) {
   const facility = doctor.facilityMemberships[0]?.facility;
   const distance = userPos && facility ? nearestFacilityDistance(doctor, userPos) : null;
-  const name = `Dr ${doctor.user.firstName ?? ""} ${doctor.user.lastName ?? ""}`.trim();
+  const name = (doctor.specialty.name === "Sage-femme" ? "" : "Dr ") + `${doctor.user.firstName ?? ""} ${doctor.user.lastName ?? ""}`.trim();
   const location = facility?.city || doctor.city;
 
   return (
@@ -244,9 +252,24 @@ function DoctorCard({ doctor, userPos }: { doctor: Doctor; userPos: { lat: numbe
             )}
           </div>
         </div>
-        {doctor.consultationFee != null && (
-          <p className="text-sm font-medium whitespace-nowrap">{doctor.consultationFee.toLocaleString("fr-FR")} FCFA</p>
-        )}
+        <div className="text-right whitespace-nowrap">
+          {doctor.consultationFee != null && (
+            <p className="text-sm font-medium">
+              {doctor.consultationFee.toLocaleString("fr-FR")} FCFA
+              {doctor.teleconsultationFee != null && (
+                <span className="text-gray-400 font-normal"> (présentiel)</span>
+              )}
+            </p>
+          )}
+          {doctor.teleconsultationFee != null && (
+            <p className="text-sm font-medium">
+              {doctor.teleconsultationFee.toLocaleString("fr-FR")} FCFA
+              {doctor.consultationFee != null && (
+                <span className="text-gray-400 font-normal"> (télécons.)</span>
+              )}
+            </p>
+          )}
+        </div>
       </div>
     </Link>
   );

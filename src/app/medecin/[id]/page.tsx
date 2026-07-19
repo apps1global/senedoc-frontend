@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { doctors, slots as slotsApi, appointments, auth } from "@/lib/api";
+import { doctors, slots as slotsApi, appointments, auth, type AppointmentType } from "@/lib/api";
 
 type Facility = {
   id: string;
@@ -21,6 +21,7 @@ type Doctor = {
   id: string;
   bio: string | null;
   consultationFee: number | null;
+  teleconsultationFee: number | null;
   consultationDuration: number | null;
   teleconsultation: boolean;
   yearsExperience: number | null;
@@ -61,6 +62,8 @@ export default function FicheMedecin() {
 
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
 
+  const [consultType, setConsultType] = useState<AppointmentType>("PRESENTIEL");
+
   const [visibleMonth, setVisibleMonth] = useState(new Date());
   const [availableDays, setAvailableDays] = useState<Record<string, boolean>>({});
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -74,7 +77,14 @@ export default function FicheMedecin() {
   useEffect(() => {
     doctors
       .getOne(doctorId)
-      .then((d) => setDoctor(d as Doctor))
+      .then((d) => {
+        const doc = d as Doctor;
+        setDoctor(doc);
+        // Si le présentiel n'est pas proposé mais la téléconsultation oui, on bascule par défaut
+        if (doc.consultationFee == null && doc.teleconsultation) {
+          setConsultType("TELECONSULTATION");
+        }
+      })
       .catch((err: any) => setError(err.message))
       .finally(() => setLoading(false));
 
@@ -93,11 +103,16 @@ export default function FicheMedecin() {
   }, [doctorId]);
 
   useEffect(() => {
+    // Le type sélectionné change les jours/créneaux disponibles : on réinitialise la sélection en cours
+    setSelectedDate(null);
+    setDaySlots([]);
+    setBookingError("");
+    setBookingSuccess("");
     slotsApi
-      .getCalendar(doctorId, monthKey(visibleMonth))
+      .getCalendar(doctorId, monthKey(visibleMonth), consultType)
       .then((res: any) => setAvailableDays(res.days || {}))
       .catch(() => setAvailableDays({}));
-  }, [doctorId, visibleMonth]);
+  }, [doctorId, visibleMonth, consultType]);
 
   async function pickDate(date: string) {
     setSelectedDate(date);
@@ -106,7 +121,7 @@ export default function FicheMedecin() {
     setBookingSuccess("");
     setSlotsLoading(true);
     try {
-      const res: any = await slotsApi.getForDate(doctorId, date);
+      const res: any = await slotsApi.getForDate(doctorId, date, consultType);
       setDaySlots(res.slots || []);
     } catch {
       setDaySlots([]);
@@ -124,8 +139,13 @@ export default function FicheMedecin() {
       await appointments.create({
         doctorId,
         appointmentDate: `${selectedDate}T${slot}:00.000Z`,
+        type: consultType,
       });
-      setBookingSuccess("Rendez-vous demandé ! Vous recevrez une confirmation par SMS.");
+      setBookingSuccess(
+        consultType === "TELECONSULTATION"
+          ? "Rendez-vous demandé ! Le lien de téléconsultation vous sera envoyé par SMS à la confirmation."
+          : "Rendez-vous demandé ! Vous recevrez une confirmation par SMS.",
+      );
       setDaySlots((prev) => prev.filter((s) => s !== slot));
     } catch (err: any) {
       setBookingError(err.message);
@@ -161,7 +181,7 @@ export default function FicheMedecin() {
     userPos && facility?.latitude != null && facility?.longitude != null
       ? distanceKm(userPos.lat, userPos.lng, facility.latitude, facility.longitude)
       : null;
-  const name = `Dr ${doctor.user.firstName ?? ""} ${doctor.user.lastName ?? ""}`.trim();
+  const name = (doctor.specialty.name === "Sage-femme" ? "" : "Dr ") + `${doctor.user.firstName ?? ""} ${doctor.user.lastName ?? ""}`.trim();
 
   // Jours du mois visible, pour la grille calendrier
   const year = visibleMonth.getFullYear();
@@ -196,7 +216,16 @@ export default function FicheMedecin() {
                 <span className="bg-teal-light text-teal-dark text-xs font-medium px-2 py-1 rounded-full">Téléconsultation</span>
               )}
               {doctor.consultationFee != null && (
-                <span className="text-sm font-medium">{doctor.consultationFee.toLocaleString("fr-FR")} FCFA</span>
+                <span className="text-sm font-medium">
+                  {doctor.consultationFee.toLocaleString("fr-FR")} FCFA
+                  {doctor.teleconsultationFee != null && " (présentiel)"}
+                </span>
+              )}
+              {doctor.teleconsultationFee != null && (
+                <span className="text-sm font-medium">
+                  {doctor.teleconsultationFee.toLocaleString("fr-FR")} FCFA
+                  {doctor.consultationFee != null && " (téléconsultation)"}
+                </span>
               )}
             </div>
           </div>
@@ -236,6 +265,32 @@ export default function FicheMedecin() {
             </div>
           ) : (
             <div className="bg-white border border-gray-100 rounded-xl p-5">
+              {/* Sélecteur du mode de consultation, uniquement si le médecin propose les deux */}
+              {doctor.teleconsultation && doctor.consultationFee != null && (
+                <div className="flex gap-2 mb-5">
+                  <button
+                    onClick={() => setConsultType("PRESENTIEL")}
+                    className={`flex-1 text-sm font-medium py-2.5 rounded-lg transition-colors ${
+                      consultType === "PRESENTIEL"
+                        ? "bg-teal text-white"
+                        : "bg-gray-50 border border-gray-200 text-gray-600 hover:border-teal"
+                    }`}
+                  >
+                    Présentiel
+                  </button>
+                  <button
+                    onClick={() => setConsultType("TELECONSULTATION")}
+                    className={`flex-1 text-sm font-medium py-2.5 rounded-lg transition-colors ${
+                      consultType === "TELECONSULTATION"
+                        ? "bg-teal text-white"
+                        : "bg-gray-50 border border-gray-200 text-gray-600 hover:border-teal"
+                    }`}
+                  >
+                    Téléconsultation
+                  </button>
+                </div>
+              )}
+
               {/* Calendrier mensuel */}
               <div className="flex items-center justify-between mb-4">
                 <button

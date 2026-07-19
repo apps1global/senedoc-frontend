@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Faq } from "@/components/Faq";
-import { SpecialtyAutocomplete } from "@/components/SpecialtyAutocomplete";
+import { SpecialtySelect } from "@/components/SpecialtySelect";
 import { articles, doctors } from "@/lib/api";
 
 type Article = {
@@ -27,7 +27,8 @@ function authorLabel(author: Article["author"]): string {
   const name = `${author.firstName ?? ""} ${author.lastName ?? ""}`.trim();
   if (author.role === "DOCTOR") {
     const specialty = author.doctorProfile?.specialty.name;
-    return `Dr ${name}${specialty ? ` — ${specialty}` : ""}`;
+    const prefix = specialty === "Sage-femme" ? "" : "Dr ";
+    return `${prefix}${name}${specialty ? ` — ${specialty}` : ""}`;
   }
   return "Équipe senedoc";
 }
@@ -92,7 +93,7 @@ export default function Home() {
               PRENEZ RENDEZ-VOUS AU SÉNÉGAL
             </p>
             <h1 className="font-display text-4xl md:text-5xl font-semibold text-teal-deep leading-tight mb-4">
-              Trouvez votre médecin, réservez en un instant
+              Trouvez votre professionnel de santé, réservez en un instant
             </h1>
             <p className="text-lg text-teal-dark mb-8">
               Des spécialistes près de chez vous, partout au Sénégal.
@@ -102,11 +103,10 @@ export default function Home() {
             <form id="recherche" onSubmit={submitSearch} className="bg-white p-2 rounded-xl shadow-sm">
               <div className="flex items-center gap-2 px-3 py-3 border-b border-gray-100 min-w-0">
                 <SearchIcon />
-                <SpecialtyAutocomplete
+                <SpecialtySelect
                   value={specialty}
                   onChange={setSpecialty}
-                  className="flex-1 min-w-0 outline-none text-[15px] placeholder-gray-400"
-                  placeholder="Spécialité (Cardiologie…)"
+                  className="flex-1 min-w-0 outline-none text-[15px] text-gray-700 bg-transparent"
                 />
               </div>
 
@@ -116,7 +116,7 @@ export default function Home() {
                     <p className="text-xs text-gray-400">Recherche des villes…</p>
                   ) : cities.length === 0 ? (
                     <p className="text-xs text-gray-500">
-                      Aucun médecin disponible en {specialty} pour le moment.
+                      Aucun professionnel disponible en {specialty} pour le moment.
                     </p>
                   ) : (
                     <div className="flex flex-wrap gap-2">
@@ -145,7 +145,7 @@ export default function Home() {
 
           {/* Photo héro */}
           <div className="h-64 md:h-96 rounded-xl overflow-hidden">
-            <img src="/images/hero.jpg" alt="Médecin souriante" className="w-full h-full object-cover" />
+            <img src="/images/hero.jpg" alt="Professionnelle de santé souriante" className="w-full h-full object-cover" />
           </div>
         </div>
       </section>
@@ -154,7 +154,7 @@ export default function Home() {
       <section className="max-w-6xl mx-auto px-6 py-16 text-center">
         <h2 className="font-display text-2xl font-semibold mb-10">Comment ça marche</h2>
         <div className="grid md:grid-cols-3 gap-8">
-          <Step icon={<SearchIcon big />} bg="bg-teal-light" title="1. Cherchez" text="Par spécialité, trouvez le bon médecin" />
+          <Step icon={<SearchIcon big />} bg="bg-teal-light" title="1. Cherchez" text="Par spécialité, trouvez le bon professionnel" />
           <Step icon={<PinIcon big coral />} bg="bg-coral-light" title="2. Choisissez" text="Voyez la distance jusqu'au cabinet" />
           <Step icon={<CalendarIcon />} bg="bg-teal-light" title="3. Réservez" text="Confirmation par SMS, c'est fait" />
         </div>
@@ -167,9 +167,9 @@ export default function Home() {
             <img src="/images/consultation.jpg" alt="Consultation médicale" className="w-full h-full object-contain" />
           </div>
           <div className="order-1 md:order-2 min-w-0">
-            <h2 className="font-display text-2xl font-semibold mb-3">Des médecins vérifiés, près de vous</h2>
+            <h2 className="font-display text-2xl font-semibold mb-3">Des professionnels vérifiés, près de vous</h2>
             <p className="text-gray-600 mb-5 leading-relaxed">
-              Chaque médecin est validé avant d'apparaître. Vous voyez sa spécialité,
+              Chaque professionnel est validé avant d'apparaître. Vous voyez sa spécialité,
               ses lieux de consultation et la distance depuis votre position.
             </p>
             <ul className="space-y-3">
@@ -235,7 +235,7 @@ export default function Home() {
       <section className="bg-teal-deep">
         <div className="max-w-6xl mx-auto px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
           <div className="min-w-0">
-            <h2 className="font-display text-2xl font-semibold text-white mb-3">Vous êtes médecin ?</h2>
+            <h2 className="font-display text-2xl font-semibold text-white mb-3">Vous êtes médecin ou sage-femme ?</h2>
             <p className="text-teal-mid mb-6 leading-relaxed">
               Rejoignez senedoc, gérez vos disponibilités et recevez vos rendez-vous.
               Inscription simple avec votre numéro à l'Ordre.
@@ -245,7 +245,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="h-56 rounded-xl overflow-hidden">
-            <img src="/images/medecin.jpg" alt="Médecin" className="w-full h-full object-cover" />
+            <img src="/images/medecin.jpg" alt="Professionnel de santé" className="w-full h-full object-cover" />
           </div>
         </div>
       </section>

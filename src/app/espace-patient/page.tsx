@@ -70,6 +70,20 @@ export default function EspacePatient() {
 
   async function load() {
     try {
+      // Garde de rôle : cette page ne concerne que les patients. Un
+      // médecin/admin qui clique sur "Mon espace" ou tape l'URL directement
+      // doit être redirigé vers son propre espace, pas voir/modifier des
+      // données patient.
+      const me: any = await auth.me();
+      if (me?.role === "DOCTOR") {
+        router.push("/espace-medecin");
+        return;
+      }
+      if (me?.role === "ADMIN" || me?.role === "SUPERADMIN") {
+        router.push("/admin/tableau-de-bord");
+        return;
+      }
+
       const [profileRes, rdvsRes] = await Promise.all([
         patients.getMe(),
         appointmentsApi.getMine(),

@@ -150,22 +150,34 @@ export const doctors = {
     if (specialty) qs.set('specialty', specialty);
     return apiFetch(`/doctors/cities?${qs.toString()}`, { auth: false });
   },
+
+  searchByName: (q: string) => {
+    const qs = new URLSearchParams();
+    qs.set('q', q);
+    return apiFetch(`/doctors/search?${qs.toString()}`, { auth: false });
+  },
 };
 
 // ── Créneaux ──────────────────────────────────────────
-export const slots = {
-  getCalendar: (doctorId: string, month: string) =>
-    apiFetch(`/slots/doctor/${doctorId}/calendar/${month}`, { auth: false }),
+export type AppointmentType = 'PRESENTIEL' | 'TELECONSULTATION';
 
-  getForDate: (doctorId: string, date: string) =>
-    apiFetch(`/slots/doctor/${doctorId}/date/${date}`, { auth: false }),
+export const slots = {
+  getCalendar: (doctorId: string, month: string, type?: AppointmentType) => {
+    const qs = type ? `?type=${type}` : '';
+    return apiFetch(`/slots/doctor/${doctorId}/calendar/${month}${qs}`, { auth: false });
+  },
+
+  getForDate: (doctorId: string, date: string, type?: AppointmentType) => {
+    const qs = type ? `?type=${type}` : '';
+    return apiFetch(`/slots/doctor/${doctorId}/date/${date}${qs}`, { auth: false });
+  },
 };
 
 // ── Appointments ──────────────────────────────────────
 export const appointments = {
   getMine: () => apiFetch('/appointments/my'),
 
-  create: (body: { doctorId: string; appointmentDate: string; reason?: string }) =>
+  create: (body: { doctorId: string; appointmentDate: string; reason?: string; type?: AppointmentType }) =>
     apiFetch('/appointments', { method: 'POST', body }),
 
   updateStatus: (id: string, status: string, reason?: string) =>

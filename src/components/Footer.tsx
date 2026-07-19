@@ -13,13 +13,13 @@ export function Footer() {
         </div>
         <div className="text-sm text-gray-500 space-y-2">
           <p className="font-medium text-gray-700">Patients</p>
-          <Link href="/#recherche" className="block hover:text-teal transition-colors">Trouver un médecin</Link>
+          <Link href="/#recherche" className="block hover:text-teal transition-colors">Trouver un praticien</Link>
           <Link href="/espace-patient" className="block hover:text-teal transition-colors">Mes rendez-vous</Link>
         </div>
         <div className="text-sm text-gray-500 space-y-2">
-          <p className="font-medium text-gray-700">Médecins</p>
+          <p className="font-medium text-gray-700">Professionnels de santé</p>
           <Link href="/inscription/medecin" className="block hover:text-teal transition-colors">Inscription</Link>
-          <Link href="/inscription/medecin" className="block hover:text-teal transition-colors">Espace médecin</Link>
+          <Link href="/inscription/medecin" className="block hover:text-teal transition-colors">Espace professionnel</Link>
         </div>
         <div className="text-sm text-gray-500 space-y-2">
           <p className="font-medium text-gray-700">Légal</p>

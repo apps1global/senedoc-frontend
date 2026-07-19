@@ -10,15 +10,30 @@ export function Header() {
   const router = useRouter();
   const [checking, setChecking] = useState(true);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [role, setRole] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     auth
       .me()
-      .then(() => setLoggedIn(true))
-      .catch(() => setLoggedIn(false))
+      .then((me: any) => {
+        setLoggedIn(true);
+        setRole(me?.role ?? null);
+      })
+      .catch(() => {
+        setLoggedIn(false);
+        setRole(null);
+      })
       .finally(() => setChecking(false));
   }, []);
+
+  // "Mon espace" doit pointer vers le bon endroit selon le rôle connecté —
+  // sinon un médecin/admin cliquant dessus atterrit sur l'espace patient.
+  function spaceHref(): string {
+    if (role === 'DOCTOR') return '/espace-medecin';
+    if (role === 'ADMIN' || role === 'SUPERADMIN') return '/admin/tableau-de-bord';
+    return '/espace-patient';
+  }
 
   async function handleLogout() {
     try {
@@ -39,13 +54,13 @@ export function Header() {
 
         {/* Nav desktop */}
         <nav className="hidden sm:flex items-center gap-6 text-sm text-gray-600">
-          <Link href="/" className="hover:text-teal">Trouver un médecin</Link>
+          <Link href="/" className="hover:text-teal">Trouver un praticien</Link>
           <Link href="/blog" className="hover:text-teal">Blog</Link>
           {!checking && !loggedIn && (
-            <Link href="/inscription/medecin" className="hover:text-teal">Espace médecin</Link>
+            <Link href="/inscription/medecin" className="hover:text-teal">Espace professionnel</Link>
           )}
           {!checking && loggedIn && (
-            <Link href="/espace-patient" className="hover:text-teal">Mon espace</Link>
+            <Link href={spaceHref()} className="hover:text-teal">Mon espace</Link>
           )}
           {checking ? null : loggedIn ? (
             <button
@@ -81,13 +96,13 @@ export function Header() {
       {/* Menu mobile déroulant */}
       {menuOpen && (
         <nav className="sm:hidden border-t border-gray-100 bg-white px-6 py-4 flex flex-col gap-4 text-sm text-gray-600 absolute top-16 left-0 right-0 z-20 shadow-sm">
-          <Link href="/" onClick={() => setMenuOpen(false)} className="hover:text-teal">Trouver un médecin</Link>
+          <Link href="/" onClick={() => setMenuOpen(false)} className="hover:text-teal">Trouver un praticien</Link>
           <Link href="/blog" onClick={() => setMenuOpen(false)} className="hover:text-teal">Blog</Link>
           {!checking && !loggedIn && (
-            <Link href="/inscription/medecin" onClick={() => setMenuOpen(false)} className="hover:text-teal">Espace médecin</Link>
+            <Link href="/inscription/medecin" onClick={() => setMenuOpen(false)} className="hover:text-teal">Espace professionnel</Link>
           )}
           {!checking && loggedIn && (
-            <Link href="/espace-patient" onClick={() => setMenuOpen(false)} className="hover:text-teal">Mon espace</Link>
+            <Link href={spaceHref()} onClick={() => setMenuOpen(false)} className="hover:text-teal">Mon espace</Link>
           )}
           {checking ? null : loggedIn ? (
             <button
