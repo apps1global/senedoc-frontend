@@ -2,34 +2,23 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { APIProvider } from "@vis.gl/react-google-maps";
 import { Logo } from "@/components/Logo";
 import { apiFetch, auth } from "@/lib/api";
-import { REGIONS, citiesForRegion } from "@/lib/senegal";
 import { SPECIALTIES } from "@/lib/specialties";
-import { FacilityMapPicker } from "@/components/FacilityMapPicker";
+import { FacilityPlaceSearch, type SelectedPlace } from "@/components/FacilityPlaceSearch";
 
 type Step = "form" | "otp" | "pin" | "done";
 
+const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+
 type FacilityDraft = {
   id: string;
-  name: string;
-  address: string;
-  region: string;
-  city: string;
-  latitude: number | null;
-  longitude: number | null;
+  place: SelectedPlace | null;
 };
 
 function emptyFacility(): FacilityDraft {
-  return {
-    id: Math.random().toString(36).slice(2),
-    name: "",
-    address: "",
-    region: "",
-    city: "",
-    latitude: null,
-    longitude: null,
-  };
+  return { id: Math.random().toString(36).slice(2), place: null };
 }
 
 export default function InscriptionMedecin() {
@@ -53,8 +42,12 @@ export default function InscriptionMedecin() {
 
   const finalSpecialite = specialite === "Autre" ? specialiteAutre.trim() : specialite;
 
-  function updateFacility(id: string, patch: Partial<FacilityDraft>) {
-    setFacilities((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));
+  function setFacilityPlace(id: string, place: SelectedPlace) {
+    setFacilities((prev) => prev.map((f) => (f.id === id ? { ...f, place } : f)));
+  }
+
+  function clearFacilityPlace(id: string) {
+    setFacilities((prev) => prev.map((f) => (f.id === id ? { ...f, place: null } : f)));
   }
 
   function addFacility() {
@@ -72,11 +65,9 @@ export default function InscriptionMedecin() {
       setError("Merci de remplir les champs obligatoires.");
       return;
     }
-    for (const f of facilities) {
-      if (!f.name || !f.city || f.latitude == null || f.longitude == null) {
-        setError("Chaque établissement doit avoir un nom, une ville, et un emplacement placé sur la carte.");
-        return;
-      }
+    if (facilities.some((f) => !f.place)) {
+      setError("Sélectionnez chaque établissement dans la liste Google Maps proposée.");
+      return;
     }
     setLoading(true);
     try {
@@ -88,12 +79,13 @@ export default function InscriptionMedecin() {
           specialite: finalSpecialite, numeroOrdre,
           referralCode: referralCode || undefined,
           facilities: facilities.map((f) => ({
-            name: f.name,
-            address: f.address || undefined,
-            city: f.city,
+            name: f.place!.name,
+            address: f.place!.address || undefined,
+            city: f.place!.city || undefined,
             country: "Sénégal",
-            latitude: f.latitude,
-            longitude: f.longitude,
+            latitude: f.place!.latitude,
+            longitude: f.place!.longitude,
+            googlePlaceId: f.place!.googlePlaceId,
           })),
         },
       });
@@ -210,68 +202,38 @@ export default function InscriptionMedecin() {
                 <div className="pt-2">
                   <h2 className="font-medium mb-1">Mes établissements</h2>
                   <p className="text-xs text-gray-500 mb-3">
-                    Ajoutez au moins un lieu de consultation, géolocalisé sur la carte.
+                    Recherchez et sélectionnez votre établissement tel qu'il apparaît sur Google Maps.
                   </p>
 
-                  {facilities.map((f, index) => {
-                    const cities = f.region ? citiesForRegion(f.region) : [];
-                    return (
-                      <div key={f.id} className="bg-gray-50 rounded-xl p-4 mb-3">
-                        <div className="flex items-center justify-between mb-3">
-                          <p className="text-sm font-medium">Établissement {index + 1}</p>
-                          {facilities.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => removeFacility(f.id)}
-                              className="text-xs text-coral font-medium"
-                            >
-                              Retirer
-                            </button>
-                          )}
-                        </div>
-
-                        <div className="space-y-3">
-                          <input
-                            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-sm"
-                            placeholder="Nom de l'établissement *"
-                            value={f.name}
-                            onChange={(e) => updateFacility(f.id, { name: e.target.value })}
-                          />
-                          <input
-                            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-sm"
-                            placeholder="Adresse (optionnel)"
-                            value={f.address}
-                            onChange={(e) => updateFacility(f.id, { address: e.target.value })}
-                          />
-                          <div className="grid grid-cols-2 gap-2">
-                            <select
-                              className="border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-sm"
-                              value={f.region}
-                              onChange={(e) => updateFacility(f.id, { region: e.target.value, city: "" })}
-                            >
-                              <option value="">Région *</option>
-                              {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
-                            </select>
-                            <select
-                              className="border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal text-sm disabled:bg-gray-100"
-                              value={f.city}
-                              onChange={(e) => updateFacility(f.id, { city: e.target.value })}
-                              disabled={!f.region}
-                            >
-                              <option value="">{f.region ? "Ville *" : "Choisir une région"}</option>
-                              {cities.map((c) => <option key={c} value={c}>{c}</option>)}
-                            </select>
+                  {API_KEY ? (
+                    <APIProvider apiKey={API_KEY} libraries={["places"]}>
+                      {facilities.map((f, index) => (
+                        <div key={f.id} className="bg-gray-50 rounded-xl p-4 mb-3">
+                          <div className="flex items-center justify-between mb-3">
+                            <p className="text-sm font-medium">Établissement {index + 1}</p>
+                            {facilities.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removeFacility(f.id)}
+                                className="text-xs text-coral font-medium"
+                              >
+                                Retirer
+                              </button>
+                            )}
                           </div>
-
-                          <FacilityMapPicker
-                            latitude={f.latitude}
-                            longitude={f.longitude}
-                            onChangeLocation={(lat, lng) => updateFacility(f.id, { latitude: lat, longitude: lng })}
+                          <FacilityPlaceSearch
+                            selected={f.place}
+                            onSelect={(place) => setFacilityPlace(f.id, place)}
+                            onClear={() => clearFacilityPlace(f.id)}
                           />
                         </div>
-                      </div>
-                    );
-                  })}
+                      ))}
+                    </APIProvider>
+                  ) : (
+                    <p className="text-sm text-coral">
+                      Clé Google Maps manquante (NEXT_PUBLIC_GOOGLE_MAPS_API_KEY).
+                    </p>
+                  )}
 
                   <button
                     type="button"
