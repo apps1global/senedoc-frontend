@@ -14,6 +14,8 @@ type Appointment = {
   appointmentDate: string;
   status: "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
   cancellationReason: string | null;
+  type?: "PRESENTIEL" | "TELECONSULTATION";
+  videoLink?: string | null;
   doctor: {
     id: string;
     user: { firstName: string | null; lastName: string | null };
@@ -345,6 +347,24 @@ function AppointmentCard({
           {STATUS_LABELS[appointment.status]}
         </span>
       </div>
+
+      {appointment.type === "TELECONSULTATION" && (
+        <div className="mt-2">
+          <span className="text-xs font-medium text-teal-dark bg-teal-light px-2 py-1 rounded-full">
+            Téléconsultation
+          </span>
+          {appointment.status === "CONFIRMED" && appointment.videoLink && (
+            <a
+              href={appointment.videoLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-sm text-teal font-medium underline mt-2"
+            >
+              Rejoindre la téléconsultation
+            </a>
+          )}
+        </div>
+      )}
 
       {appointment.status === "CANCELLED" && appointment.cancellationReason && (
         <p className="text-sm text-gray-500 mt-2">Motif : {appointment.cancellationReason}</p>
