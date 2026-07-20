@@ -63,6 +63,7 @@ export default function FicheMedecin() {
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
 
   const [consultType, setConsultType] = useState<AppointmentType>("PRESENTIEL");
+  const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(null);
 
   const [visibleMonth, setVisibleMonth] = useState(new Date());
   const [availableDays, setAvailableDays] = useState<Record<string, boolean>>({});
@@ -83,6 +84,10 @@ export default function FicheMedecin() {
         // Si le présentiel n'est pas proposé mais la téléconsultation oui, on bascule par défaut
         if (doc.consultationFee == null && doc.teleconsultation) {
           setConsultType("TELECONSULTATION");
+        }
+        // Un seul établissement : pas besoin de demander au patient de choisir.
+        if (doc.facilityMemberships.length === 1) {
+          setSelectedFacilityId(doc.facilityMemberships[0].facility.id);
         }
       })
       .catch((err: any) => setError(err.message))
@@ -140,6 +145,7 @@ export default function FicheMedecin() {
         doctorId,
         appointmentDate: `${selectedDate}T${slot}:00.000Z`,
         type: consultType,
+        facilityId: consultType === "PRESENTIEL" ? selectedFacilityId ?? undefined : undefined,
       });
       setBookingSuccess(
         consultType === "TELECONSULTATION"
@@ -288,6 +294,29 @@ export default function FicheMedecin() {
                   >
                     Téléconsultation
                   </button>
+                </div>
+              )}
+
+              {consultType === "PRESENTIEL" && doctor.facilityMemberships.length > 1 && (
+                <div className="mb-5">
+                  <p className="text-sm font-medium mb-2">Lieu de consultation</p>
+                  <div className="flex flex-col gap-2">
+                    {doctor.facilityMemberships.map(({ facility: f }) => (
+                      <button
+                        key={f.id}
+                        type="button"
+                        onClick={() => setSelectedFacilityId(f.id)}
+                        className={`text-left px-3 py-2.5 rounded-lg text-sm border transition-colors ${
+                          selectedFacilityId === f.id
+                            ? "border-teal bg-teal-light text-teal-dark font-medium"
+                            : "border-gray-200 text-gray-600 hover:border-teal"
+                        }`}
+                      >
+                        {f.name}
+                        {f.city ? ` — ${f.city}` : ""}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
 

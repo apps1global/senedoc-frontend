@@ -178,7 +178,7 @@ export const slots = {
 export const appointments = {
   getMine: () => apiFetch('/appointments/my'),
 
-  create: (body: { doctorId: string; appointmentDate: string; reason?: string; type?: AppointmentType }) =>
+  create: (body: { doctorId: string; appointmentDate: string; reason?: string; type?: AppointmentType; facilityId?: string }) =>
     apiFetch('/appointments', { method: 'POST', body }),
 
   updateStatus: (id: string, status: string, reason?: string) =>

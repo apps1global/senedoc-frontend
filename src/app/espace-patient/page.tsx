@@ -16,6 +16,7 @@ type Appointment = {
   cancellationReason: string | null;
   type?: "PRESENTIEL" | "TELECONSULTATION";
   videoLink?: string | null;
+  facility?: { name: string; address: string | null; city: string | null } | null;
   doctor: {
     id: string;
     user: { firstName: string | null; lastName: string | null };
@@ -347,6 +348,14 @@ function AppointmentCard({
           {STATUS_LABELS[appointment.status]}
         </span>
       </div>
+
+      {appointment.type === "PRESENTIEL" && appointment.facility && (
+        <p className="text-sm text-gray-500 mt-2">
+          {appointment.facility.name}
+          {appointment.facility.address ? ` — ${appointment.facility.address}` : ""}
+          {appointment.facility.city ? `, ${appointment.facility.city}` : ""}
+        </p>
+      )}
 
       {appointment.type === "TELECONSULTATION" && (
         <div className="mt-2">
