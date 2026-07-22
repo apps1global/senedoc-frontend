@@ -333,7 +333,10 @@ function AppointmentCard({
   const dateStr = date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   const timeStr = date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
   const doctorName = `Dr ${appointment.doctor.user.firstName ?? ""} ${appointment.doctor.user.lastName ?? ""}`.trim();
-  const canCancel = !readOnly && (appointment.status === "PENDING" || appointment.status === "CONFIRMED");
+  // Ne dépend que du statut, plus de readOnly (section historique) : un
+  // patient doit pouvoir annuler un RDV encore en attente ou confirmé,
+  // même si sa date est déjà passée sans réponse du médecin.
+  const canCancel = appointment.status === "PENDING" || appointment.status === "CONFIRMED";
   const canRebook = appointment.status === "CANCELLED";
   const isCancellingThis = cancellingId === appointment.id;
 
