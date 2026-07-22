@@ -163,7 +163,10 @@ function AppointmentCard({
   const timeStr = date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
   const patientName = `${appointment.patient.user.firstName ?? ""} ${appointment.patient.user.lastName ?? ""}`.trim();
   const isCancellingThis = cancellingId === appointment.id;
-  const canAct = !readOnly && (appointment.status === "PENDING" || appointment.status === "CONFIRMED");
+  // L'action ne dépend que du statut, plus de la section (à venir / historique) :
+  // un RDV resté "En attente" ne doit jamais être définitivement bloqué
+  // simplement parce que sa date est passée sans que le médecin ait agi à temps.
+  const canAct = appointment.status === "PENDING" || appointment.status === "CONFIRMED";
 
   return (
     <div className="bg-white border border-gray-100 rounded-xl p-5">
