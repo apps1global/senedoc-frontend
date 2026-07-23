@@ -40,12 +40,12 @@ export default function TeleconsultationRoom() {
     if (!appointmentId || !containerRef.current) return;
 
     const script = document.createElement("script");
-    script.src = "https://meet.jit.si/external_api.js";
+    script.src = "https://meet.senedoc.net/external_api.js";
     script.async = true;
     script.onload = () => {
       if (!window.JitsiMeetExternalAPI || !containerRef.current) return;
 
-      const api = new window.JitsiMeetExternalAPI("meet.jit.si", {
+      const api = new window.JitsiMeetExternalAPI("meet.senedoc.net", {
         roomName: `senedoc-${appointmentId}`,
         parentNode: containerRef.current,
         width: "100%",
