@@ -396,14 +396,12 @@ function AppointmentCard({
             Téléconsultation
           </span>
           {appointment.status === "CONFIRMED" && appointment.videoLink && (
-            <a
-              href={appointment.videoLink}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href={`/teleconsultation/${appointment.id}`}
               className="block text-sm text-teal font-medium underline mt-2"
             >
               Rejoindre la téléconsultation
-            </a>
+            </Link>
           )}
         </div>
       )}
