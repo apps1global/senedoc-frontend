@@ -189,7 +189,12 @@ export default function FicheMedecin() {
     );
   }
 
-  const facility = doctor.facilityMemberships[0]?.facility;
+  // Suit l'établissement effectivement sélectionné par le patient (pas
+  // toujours le premier de la liste) — sinon la distance affichée peut
+  // correspondre à un lieu différent de celui réservé.
+  const facility = selectedFacilityId
+    ? doctor.facilityMemberships.find((m) => m.facility.id === selectedFacilityId)?.facility
+    : doctor.facilityMemberships[0]?.facility;
   const distance =
     userPos && facility?.latitude != null && facility?.longitude != null
       ? distanceKm(userPos.lat, userPos.lng, facility.latitude, facility.longitude)

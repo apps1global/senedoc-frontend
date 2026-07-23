@@ -1,6 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
+function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
@@ -16,7 +26,7 @@ type Appointment = {
   cancellationReason: string | null;
   type?: "PRESENTIEL" | "TELECONSULTATION";
   videoLink?: string | null;
-  facility?: { name: string; address: string | null; city: string | null } | null;
+  facility?: { name: string; address: string | null; city: string | null; latitude: number | null; longitude: number | null } | null;
   doctor: {
     id: string;
     user: { firstName: string | null; lastName: string | null };
@@ -60,6 +70,7 @@ export default function EspacePatient() {
   const [error, setError] = useState("");
   const [profile, setProfile] = useState<PatientProfile | null>(null);
   const [rdvs, setRdvs] = useState<Appointment[]>([]);
+  const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
   const [cancelling, setCancelling] = useState<string | null>(null);
   const { toasts, push } = useToasts();
 
@@ -104,6 +115,15 @@ export default function EspacePatient() {
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setUserPos({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => {},
+      { timeout: 8000 },
+    );
   }, []);
 
   // Temps réel : dès que le médecin confirme/annule/termine un rendez-vous,
@@ -218,6 +238,7 @@ export default function EspacePatient() {
                   cancelReason={cancelReason}
                   setCancelReason={setCancelReason}
                   onCancel={cancelAppointment}
+                  userPos={userPos}
                 />
               ))}
             </div>
@@ -238,6 +259,7 @@ export default function EspacePatient() {
                   cancelling={false}
                   cancellingId={cancellingId}
                   setCancellingId={setCancellingId}
+                  userPos={userPos}
                   cancelReason={cancelReason}
                   setCancelReason={setCancelReason}
                   onCancel={cancelAppointment}
@@ -319,6 +341,7 @@ function AppointmentCard({
   setCancelReason,
   onCancel,
   readOnly,
+  userPos,
 }: {
   appointment: Appointment;
   cancelling: boolean;
@@ -328,6 +351,7 @@ function AppointmentCard({
   setCancelReason: (v: string) => void;
   onCancel: (id: string, reason: string) => void;
   readOnly?: boolean;
+  userPos?: { lat: number; lng: number } | null;
 }) {
   const date = new Date(appointment.appointmentDate);
   const dateStr = date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
@@ -357,6 +381,12 @@ function AppointmentCard({
           {appointment.facility.name}
           {appointment.facility.address ? ` — ${appointment.facility.address}` : ""}
           {appointment.facility.city ? `, ${appointment.facility.city}` : ""}
+          {userPos && appointment.facility.latitude != null && appointment.facility.longitude != null && (
+            <span className="text-teal-dark font-medium">
+              {" · "}
+              {distanceKm(userPos.lat, userPos.lng, appointment.facility.latitude, appointment.facility.longitude).toFixed(1)} km
+            </span>
+          )}
         </p>
       )}
 
