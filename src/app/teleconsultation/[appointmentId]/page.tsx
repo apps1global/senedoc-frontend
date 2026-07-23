@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
-import { auth } from "@/lib/api";
+import { auth, appointments } from "@/lib/api";
 
 declare global {
   interface Window {
@@ -22,9 +22,9 @@ export default function TeleconsultationRoom() {
   const [callEnded, setCallEnded] = useState(false);
   const [returnHref, setReturnHref] = useState("/");
   const [loadingApi, setLoadingApi] = useState(true);
+  const [accessError, setAccessError] = useState<string | null>(null);
 
-  // Détermine où renvoyer la personne une fois l'appel terminé, selon son rôle —
-  // même logique que le routage de "Mon espace" dans le Header.
+  // Détermine où renvoyer la personne une fois l'appel terminé, selon son rôle.
   useEffect(() => {
     auth
       .me()
@@ -39,41 +39,90 @@ export default function TeleconsultationRoom() {
   useEffect(() => {
     if (!appointmentId || !containerRef.current) return;
 
-    const script = document.createElement("script");
-    script.src = "https://meet.senedoc.net/external_api.js";
-    script.async = true;
-    script.onload = () => {
-      if (!window.JitsiMeetExternalAPI || !containerRef.current) return;
+    let cancelled = false;
+    let script: HTMLScriptElement | null = null;
 
-      const api = new window.JitsiMeetExternalAPI("meet.senedoc.net", {
-        roomName: `senedoc-${appointmentId}`,
-        parentNode: containerRef.current,
-        width: "100%",
-        height: "100%",
-        configOverwrite: {
-          prejoinPageEnabled: false,
-        },
-        interfaceConfigOverwrite: {
-          SHOW_JITSI_WATERMARK: false,
-          SHOW_WATERMARK_FOR_GUESTS: false,
-          DEFAULT_BACKGROUND: "#0EA5A4",
-        },
+    // Le jeton provient soit du fragment d'URL (WebView mobile : l'app native
+    // l'a déjà obtenu via son Bearer token), soit de l'API via le cookie de
+    // session (navigateur). Le fragment n'est jamais transmis au serveur.
+    const fromHash =
+      typeof window !== "undefined"
+        ? new URLSearchParams(window.location.hash.slice(1)).get("jwt")
+        : null;
+
+    const getJwt: Promise<string> = fromHash
+      ? Promise.resolve(fromHash)
+      : appointments.getVideoToken(appointmentId).then((r) => r.token);
+
+    getJwt
+      .then((jwt) => {
+        if (cancelled || !containerRef.current) return;
+
+        script = document.createElement("script");
+        script.src = "https://meet.senedoc.net/external_api.js";
+        script.async = true;
+        script.onload = () => {
+          if (cancelled || !window.JitsiMeetExternalAPI || !containerRef.current) return;
+
+          const api = new window.JitsiMeetExternalAPI("meet.senedoc.net", {
+            roomName: `senedoc-${appointmentId}`,
+            jwt,
+            parentNode: containerRef.current,
+            width: "100%",
+            height: "100%",
+            configOverwrite: {
+              prejoinPageEnabled: false,
+            },
+            interfaceConfigOverwrite: {
+              SHOW_JITSI_WATERMARK: false,
+              SHOW_WATERMARK_FOR_GUESTS: false,
+              DEFAULT_BACKGROUND: "#0EA5A4",
+            },
+          });
+          apiRef.current = api;
+          setLoadingApi(false);
+
+          api.addEventListener("readyToClose", () => setCallEnded(true));
+          api.addEventListener("videoConferenceLeft", () => setCallEnded(true));
+        };
+        document.body.appendChild(script);
+      })
+      .catch((e: any) => {
+        if (!cancelled) {
+          setAccessError(e?.message || "Accès à cette consultation refusé.");
+          setLoadingApi(false);
+        }
       });
-      apiRef.current = api;
-      setLoadingApi(false);
-
-      // Reprend la main dès que l'appel se termine, avant que Jitsi
-      // n'affiche sa propre page de sortie (promotionnelle, hors de notre contrôle).
-      api.addEventListener("readyToClose", () => setCallEnded(true));
-      api.addEventListener("videoConferenceLeft", () => setCallEnded(true));
-    };
-    document.body.appendChild(script);
 
     return () => {
+      cancelled = true;
       apiRef.current?.dispose?.();
-      document.body.removeChild(script);
+      if (script && script.parentNode) script.parentNode.removeChild(script);
     };
   }, [appointmentId]);
+
+  if (accessError) {
+    return (
+      <div className="min-h-screen bg-teal-light flex flex-col">
+        <div className="p-6"><Link href="/"><Logo /></Link></div>
+        <div className="flex-1 flex items-center justify-center px-6 pb-16">
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-sm p-8 text-center">
+            <h1 className="font-display text-2xl font-semibold mb-3">Consultation indisponible</h1>
+            <p className="text-gray-600 leading-relaxed">{accessError}</p>
+            <p className="text-gray-500 text-sm mt-3">
+              Le salon n&apos;est accessible qu&apos;aux participants du rendez-vous, pendant le créneau réservé.
+            </p>
+            <Link
+              href={returnHref}
+              className="inline-block mt-6 bg-teal text-white px-6 py-2.5 rounded-lg font-medium hover:bg-teal-dark transition-colors"
+            >
+              Retour à mon espace
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (callEnded) {
     return (
@@ -83,7 +132,7 @@ export default function TeleconsultationRoom() {
           <div className="w-full max-w-md bg-white rounded-2xl shadow-sm p-8 text-center">
             <h1 className="font-display text-2xl font-semibold mb-3">Consultation terminée</h1>
             <p className="text-gray-600 leading-relaxed">
-              Merci d'avoir utilisé la téléconsultation SeneDoc.
+              Merci d&apos;avoir utilisé la téléconsultation SeneDoc.
             </p>
             <Link
               href={returnHref}

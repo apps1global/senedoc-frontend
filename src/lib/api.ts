@@ -177,6 +177,11 @@ export const slots = {
 // ── Appointments ──────────────────────────────────────
 export const appointments = {
   getMine: () => apiFetch('/appointments/my'),
+  // Jeton d'accès au salon vidéo — valide uniquement pendant le créneau du RDV.
+  getVideoToken: (id: string) =>
+    apiFetch<{ token: string; room: string; domain: string; moderator: boolean; expiresAt: string }>(
+      `/appointments/${id}/video-token`,
+    ),
 
   create: (body: { doctorId: string; appointmentDate: string; reason?: string; type?: AppointmentType; facilityId?: string }) =>
     apiFetch('/appointments', { method: 'POST', body }),
