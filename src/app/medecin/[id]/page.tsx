@@ -137,6 +137,13 @@ export default function FicheMedecin() {
 
   async function bookSlot(slot: string) {
     if (!selectedDate) return;
+    // Pas de bouton de confirmation séparé : le clic sur le créneau EST
+    // la validation. Il faut donc bloquer ici si un établissement est
+    // requis et n'a pas été choisi, sinon le RDV part sans lieu défini.
+    if (consultType === "PRESENTIEL" && (doctor?.facilityMemberships.length ?? 0) > 1 && !selectedFacilityId) {
+      setBookingError("Choisissez d'abord un lieu de consultation ci-dessus.");
+      return;
+    }
     setBooking(slot);
     setBookingError("");
     setBookingSuccess("");
