@@ -69,6 +69,7 @@ export default function FicheMedecin() {
   const [availableDays, setAvailableDays] = useState<Record<string, boolean>>({});
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [daySlots, setDaySlots] = useState<string[]>([]);
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [slotsLoading, setSlotsLoading] = useState(false);
 
   const [booking, setBooking] = useState<string | null>(null); // slot being booked
@@ -122,6 +123,7 @@ export default function FicheMedecin() {
   async function pickDate(date: string) {
     setSelectedDate(date);
     setDaySlots([]);
+    setSelectedSlot(null);
     setBookingError("");
     setBookingSuccess("");
     setSlotsLoading(true);
@@ -135,22 +137,19 @@ export default function FicheMedecin() {
     }
   }
 
-  async function bookSlot(slot: string) {
-    if (!selectedDate) return;
-    // Pas de bouton de confirmation séparé : le clic sur le créneau EST
-    // la validation. Il faut donc bloquer ici si un établissement est
-    // requis et n'a pas été choisi, sinon le RDV part sans lieu défini.
+  async function confirmBooking() {
+    if (!selectedDate || !selectedSlot) return;
     if (consultType === "PRESENTIEL" && (doctor?.facilityMemberships.length ?? 0) > 1 && !selectedFacilityId) {
       setBookingError("Choisissez d'abord un lieu de consultation ci-dessus.");
       return;
     }
-    setBooking(slot);
+    setBooking(selectedSlot);
     setBookingError("");
     setBookingSuccess("");
     try {
       await appointments.create({
         doctorId,
-        appointmentDate: `${selectedDate}T${slot}:00.000Z`,
+        appointmentDate: `${selectedDate}T${selectedSlot}:00.000Z`,
         type: consultType,
         facilityId: consultType === "PRESENTIEL" ? selectedFacilityId ?? undefined : undefined,
       });
@@ -159,7 +158,8 @@ export default function FicheMedecin() {
           ? "Rendez-vous demandé ! Le lien de téléconsultation vous sera envoyé par SMS à la confirmation."
           : "Rendez-vous demandé ! Vous recevrez une confirmation par SMS.",
       );
-      setDaySlots((prev) => prev.filter((s) => s !== slot));
+      setDaySlots((prev) => prev.filter((s) => s !== selectedSlot));
+      setSelectedSlot(null);
     } catch (err: any) {
       setBookingError(err.message);
     } finally {
@@ -398,15 +398,29 @@ export default function FicheMedecin() {
                       {daySlots.map((slot) => (
                         <button
                           key={slot}
-                          onClick={() => bookSlot(slot)}
-                          disabled={booking === slot}
-                          className="px-4 py-2 border border-teal text-teal-dark rounded-lg text-sm font-medium hover:bg-teal-light transition-colors disabled:opacity-50"
+                          onClick={() => setSelectedSlot(slot)}
+                          className={`px-4 py-2 border rounded-lg text-sm font-medium transition-colors ${
+                            selectedSlot === slot
+                              ? "bg-teal text-white border-teal"
+                              : "border-teal text-teal-dark hover:bg-teal-light"
+                          }`}
                         >
-                          {booking === slot ? "…" : slot}
+                          {slot}
                         </button>
                       ))}
                     </div>
                   )}
+
+                  {selectedSlot && !bookingSuccess && (
+                    <button
+                      onClick={confirmBooking}
+                      disabled={booking === selectedSlot}
+                      className="w-full mt-4 bg-coral text-white py-3 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+                    >
+                      {booking === selectedSlot ? "Envoi…" : `Confirmer le rendez-vous de ${selectedSlot}`}
+                    </button>
+                  )}
+
                   {bookingError && <p className="text-sm text-coral mt-3">{bookingError}</p>}
                   {bookingSuccess && (
                     <div className="mt-3">
