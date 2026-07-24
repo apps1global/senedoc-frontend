@@ -50,9 +50,26 @@ export default function TeleconsultationRoom() {
         ? new URLSearchParams(window.location.hash.slice(1)).get("jwt")
         : null;
 
+    // Trois provenances possibles du jeton :
+    //  1. fragment #jwt= → WebView mobile (l'app native l'a déjà obtenu)
+    //  2. ?acces=       → lien SMS d'un proche sans compte
+    //  3. cookie        → titulaire connecté sur le web
+    const acces =
+      typeof window !== "undefined"
+        ? new URLSearchParams(window.location.search).get("acces")
+        : null;
+
     const getJwt: Promise<string> = fromHash
       ? Promise.resolve(fromHash)
-      : appointments.getVideoToken(appointmentId).then((r) => r.token);
+      : acces
+        ? fetch(
+            `${process.env.NEXT_PUBLIC_API_URL || "https://api.senedoc.net"}/appointments/${appointmentId}/guest-video-token?acces=${encodeURIComponent(acces)}`,
+          ).then(async (r) => {
+            const d = await r.json().catch(() => ({}));
+            if (!r.ok) throw new Error(d?.message || "Lien de consultation invalide.");
+            return d.token as string;
+          })
+        : appointments.getVideoToken(appointmentId).then((r) => r.token);
 
     getJwt
       .then((jwt) => {
