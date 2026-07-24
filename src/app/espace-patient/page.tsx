@@ -18,6 +18,7 @@ import { ToastStack } from "@/components/ToastStack";
 import { useToasts } from "@/lib/useToasts";
 import { getSocket } from "@/lib/socket";
 import { patients, appointments as appointmentsApi, auth } from "@/lib/api";
+import { isInSenegal } from "@/lib/geo";
 
 type Appointment = {
   id: string;
@@ -120,7 +121,11 @@ export default function EspacePatient() {
   useEffect(() => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
-      (pos) => setUserPos({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      (pos) => {
+        // Distance masquée hors du Sénégal : elle n'aurait pas de sens.
+        const { latitude: lat, longitude: lng } = pos.coords;
+        if (isInSenegal(lat, lng)) setUserPos({ lat, lng });
+      },
       () => {},
       { timeout: 8000 },
     );

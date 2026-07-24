@@ -8,6 +8,7 @@ import { Footer } from "@/components/Footer";
 import { SpecialtySelect } from "@/components/SpecialtySelect";
 import { DoctorNameSearch } from "@/components/DoctorNameSearch";
 import { doctors } from "@/lib/api";
+import { isInSenegal, HORS_SENEGAL_MESSAGE } from "@/lib/geo";
 
 type Facility = {
   id: string;
@@ -57,6 +58,7 @@ function RechercheContent() {
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState("");
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
+  const [horsSenegal, setHorsSenegal] = useState(false);
   const [geoDenied, setGeoDenied] = useState(false);
 
   useEffect(() => {
@@ -65,7 +67,13 @@ function RechercheContent() {
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => setUserPos({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      (pos) => {
+        // Hors du Sénégal, la distance (et le tri par proximité) n'ont plus de
+        // sens : on ignore la position et on l'explique. Rien n'est bloqué.
+        const { latitude: lat, longitude: lng } = pos.coords;
+        if (isInSenegal(lat, lng)) setUserPos({ lat, lng });
+        else setHorsSenegal(true);
+      },
       () => setGeoDenied(true),
       { timeout: 8000 },
     );
@@ -188,6 +196,12 @@ function RechercheContent() {
         {geoDenied && (
           <p className="text-xs text-gray-400 mb-6">
             Localisation non disponible — les distances ne sont pas affichées, mais la recherche fonctionne normalement.
+          </p>
+        )}
+
+        {horsSenegal && hasSearched && (
+          <p className="text-xs text-gray-500 mb-4 leading-relaxed bg-gray-50 border border-gray-100 rounded-lg px-3 py-2.5">
+            {HORS_SENEGAL_MESSAGE}
           </p>
         )}
 

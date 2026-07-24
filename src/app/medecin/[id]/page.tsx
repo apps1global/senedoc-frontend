@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { doctors, slots as slotsApi, appointments, auth, type AppointmentType } from "@/lib/api";
+import { isInSenegal, HORS_SENEGAL_MESSAGE } from "@/lib/geo";
 
 type Facility = {
   id: string;
@@ -59,6 +60,7 @@ export default function FicheMedecin() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
+  const [horsSenegal, setHorsSenegal] = useState(false);
 
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
 
@@ -101,7 +103,13 @@ export default function FicheMedecin() {
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => setUserPos({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        (pos) => {
+        // Hors du Sénégal, la distance (et le tri par proximité) n'ont plus de
+        // sens : on ignore la position et on l'explique. Rien n'est bloqué.
+        const { latitude: lat, longitude: lng } = pos.coords;
+        if (isInSenegal(lat, lng)) setUserPos({ lat, lng });
+        else setHorsSenegal(true);
+      },
         () => {},
         { timeout: 8000 },
       );
@@ -259,6 +267,9 @@ export default function FicheMedecin() {
             </p>
             {distance !== null && (
               <p className="text-sm text-teal-dark mt-1">{distance.toFixed(1)} km de chez vous</p>
+            )}
+            {horsSenegal && (
+              <p className="text-xs text-gray-500 mt-2 leading-relaxed">{HORS_SENEGAL_MESSAGE}</p>
             )}
             {facility.phone && <p className="text-sm text-gray-500 mt-1">{facility.phone}</p>}
           </div>
