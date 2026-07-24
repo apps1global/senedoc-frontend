@@ -175,6 +175,28 @@ export const slots = {
 };
 
 // ── Appointments ──────────────────────────────────────
+// ── Proches ───────────────────────────────────────────
+// Personnes pour qui le titulaire peut réserver (enfant, parent âgé…).
+// Elles n'ont pas de compte SeneDoc.
+export type Relative = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  phone: string | null;
+  dateOfBirth: string | null;
+  gender: string | null;
+  relationship: string | null;
+};
+
+export const relatives = {
+  getMine: () => apiFetch<Relative[]>('/relatives'),
+  create: (body: Record<string, unknown>) =>
+    apiFetch<Relative>('/relatives', { method: 'POST', body }),
+  update: (id: string, body: Record<string, unknown>) =>
+    apiFetch<Relative>(`/relatives/${id}`, { method: 'PATCH', body }),
+  remove: (id: string) => apiFetch(`/relatives/${id}`, { method: 'DELETE' }),
+};
+
 export const appointments = {
   getMine: () => apiFetch('/appointments/my'),
   // Jeton d'accès au salon vidéo — valide uniquement pendant le créneau du RDV.
@@ -183,7 +205,7 @@ export const appointments = {
       `/appointments/${id}/video-token`,
     ),
 
-  create: (body: { doctorId: string; appointmentDate: string; reason?: string; type?: AppointmentType; facilityId?: string }) =>
+  create: (body: { doctorId: string; appointmentDate: string; reason?: string; type?: AppointmentType; facilityId?: string; relativeId?: string }) =>
     apiFetch('/appointments', { method: 'POST', body }),
 
   updateStatus: (id: string, status: string, reason?: string) =>

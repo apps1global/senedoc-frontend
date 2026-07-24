@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { doctors, slots as slotsApi, appointments, auth, type AppointmentType } from "@/lib/api";
+import { doctors, slots as slotsApi, appointments, auth, relatives as relativesApi, type Relative, type AppointmentType } from "@/lib/api";
 import { isInSenegal, HORS_SENEGAL_MESSAGE } from "@/lib/geo";
 
 type Facility = {
@@ -65,6 +65,8 @@ export default function FicheMedecin() {
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
 
   const [consultType, setConsultType] = useState<AppointmentType>("PRESENTIEL");
+  const [myRelatives, setMyRelatives] = useState<Relative[]>([]);
+  const [selectedRelativeId, setSelectedRelativeId] = useState<string | null>(null);
   const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(null);
 
   const [visibleMonth, setVisibleMonth] = useState(new Date());
@@ -145,6 +147,10 @@ export default function FicheMedecin() {
     }
   }
 
+  useEffect(() => {
+    relativesApi.getMine().then(setMyRelatives).catch(() => setMyRelatives([]));
+  }, []);
+
   async function confirmBooking() {
     if (!selectedDate || !selectedSlot) return;
     if (consultType === "PRESENTIEL" && (doctor?.facilityMemberships.length ?? 0) > 1 && !selectedFacilityId) {
@@ -159,6 +165,7 @@ export default function FicheMedecin() {
         doctorId,
         appointmentDate: `${selectedDate}T${selectedSlot}:00.000Z`,
         type: consultType,
+        relativeId: selectedRelativeId ?? undefined,
         facilityId: consultType === "PRESENTIEL" ? selectedFacilityId ?? undefined : undefined,
       });
       setBookingSuccess(
@@ -317,6 +324,49 @@ export default function FicheMedecin() {
                   >
                     Téléconsultation
                   </button>
+                </div>
+              )}
+
+              {myRelatives.length > 0 && (
+                <div className="mb-5">
+                  <p className="text-sm font-medium mb-2">Pour qui est ce rendez-vous ?</p>
+                  <div className="flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedRelativeId(null)}
+                      className={`text-left px-3 py-2.5 rounded-lg text-sm border transition-colors ${
+                        selectedRelativeId === null
+                          ? "border-teal bg-teal-light text-teal-dark font-medium"
+                          : "border-gray-200 text-gray-600 hover:border-teal"
+                      }`}
+                    >
+                      Pour moi
+                    </button>
+                    {myRelatives.map((r) => (
+                      <button
+                        key={r.id}
+                        type="button"
+                        onClick={() => setSelectedRelativeId(r.id)}
+                        className={`text-left px-3 py-2.5 rounded-lg text-sm border transition-colors ${
+                          selectedRelativeId === r.id
+                            ? "border-teal bg-teal-light text-teal-dark font-medium"
+                            : "border-gray-200 text-gray-600 hover:border-teal"
+                        }`}
+                      >
+                        {r.firstName} {r.lastName}
+                        {r.relationship ? ` — ${r.relationship}` : ""}
+                      </button>
+                    ))}
+                  </div>
+                  {consultType === "TELECONSULTATION" &&
+                    selectedRelativeId &&
+                    !myRelatives.find((r) => r.id === selectedRelativeId)?.phone && (
+                      <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-2 leading-relaxed">
+                        Ce proche n&apos;a pas de numéro de téléphone : il ne pourra pas
+                        recevoir le lien de connexion à la téléconsultation. Ajoutez-le
+                        depuis « Mes proches ».
+                      </p>
+                    )}
                 </div>
               )}
 
