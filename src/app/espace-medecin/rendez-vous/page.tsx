@@ -160,8 +160,8 @@ function AppointmentCard({
   readOnly?: boolean;
 }) {
   const date = new Date(appointment.appointmentDate);
-  const dateStr = date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-  const timeStr = date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  const dateStr = date.toLocaleDateString("fr-FR", { timeZone: "Africa/Dakar", weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const timeStr = date.toLocaleTimeString("fr-FR", { timeZone: "Africa/Dakar", hour: "2-digit", minute: "2-digit" });
   const patientName = `${appointment.patient.user.firstName ?? ""} ${appointment.patient.user.lastName ?? ""}`.trim();
   const isCancellingThis = cancellingId === appointment.id;
   // L'action ne dépend que du statut, plus de la section (à venir / historique) :

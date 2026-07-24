@@ -354,8 +354,8 @@ function AppointmentCard({
   userPos?: { lat: number; lng: number } | null;
 }) {
   const date = new Date(appointment.appointmentDate);
-  const dateStr = date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-  const timeStr = date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  const dateStr = date.toLocaleDateString("fr-FR", { timeZone: "Africa/Dakar", weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const timeStr = date.toLocaleTimeString("fr-FR", { timeZone: "Africa/Dakar", hour: "2-digit", minute: "2-digit" });
   const doctorName = `Dr ${appointment.doctor.user.firstName ?? ""} ${appointment.doctor.user.lastName ?? ""}`.trim();
   // Ne dépend que du statut, plus de readOnly (section historique) : un
   // patient doit pouvoir annuler un RDV encore en attente ou confirmé,
