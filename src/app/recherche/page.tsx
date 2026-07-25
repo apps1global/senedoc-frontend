@@ -277,6 +277,7 @@ function nearestFacilityDistance(doctor: Doctor, userPos: { lat: number; lng: nu
 
 function DoctorCard({ doctor, userPos }: { doctor: Doctor; userPos: { lat: number; lng: number } | null }) {
   const facility = doctor.facilityMemberships[0]?.facility;
+  const autresLieux = Math.max(0, doctor.facilityMemberships.length - 1);
   const distance = userPos && facility ? nearestFacilityDistance(doctor, userPos) : null;
   const name = (doctor.specialty.name === "Sage-femme" ? "" : "Dr ") + `${doctor.user.firstName ?? ""} ${doctor.user.lastName ?? ""}`.trim();
   const location = facility?.city || doctor.city;
@@ -301,6 +302,9 @@ function DoctorCard({ doctor, userPos }: { doctor: Doctor; userPos: { lat: numbe
           {location && (
             <p className="text-sm text-gray-500 mt-1">
               {facility ? `${facility.name} — ${location}` : location}
+              {autresLieux > 0 && (
+                <span className="text-teal-dark"> · et {autresLieux} autre{autresLieux > 1 ? "s" : ""} lieu{autresLieux > 1 ? "x" : ""}</span>
+              )}
             </p>
           )}
           {distance !== null && (
