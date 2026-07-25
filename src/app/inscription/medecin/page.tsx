@@ -39,6 +39,7 @@ export default function InscriptionMedecin() {
   const [otp, setOtp] = useState("");
   const [pin, setPin] = useState("");
   const [pinConfirm, setPinConfirm] = useState("");
+  const [acceptCGU, setAcceptCGU] = useState(false);
 
   const finalSpecialite = specialite === "Autre" ? specialiteAutre.trim() : specialite;
 
@@ -245,7 +246,21 @@ export default function InscriptionMedecin() {
                 </div>
 
                 {error && <p className="text-sm text-coral">{error}</p>}
-                <button type="submit" disabled={loading} className="w-full bg-teal text-white py-3 rounded-lg font-medium hover:bg-teal-dark transition-colors disabled:opacity-60">
+                <label className="flex items-start gap-2.5 text-sm text-gray-600 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={acceptCGU}
+                    onChange={(e) => setAcceptCGU(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 shrink-0 accent-teal cursor-pointer"
+                  />
+                  <span>
+                    J&apos;accepte les{" "}
+                    <Link href="/cgu" target="_blank" className="text-teal font-medium underline">conditions d&apos;utilisation</Link>{" "}
+                    et la{" "}
+                    <Link href="/confidentialite" target="_blank" className="text-teal font-medium underline">politique de confidentialité</Link>.
+                  </span>
+                </label>
+                <button type="submit" disabled={loading || !acceptCGU} className="w-full bg-teal text-white py-3 rounded-lg font-medium hover:bg-teal-dark transition-colors disabled:opacity-60">
                   {loading ? "Un instant…" : "M'inscrire"}
                 </button>
               </form>

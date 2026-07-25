@@ -32,6 +32,7 @@ function InscriptionContent() {
   const [otp, setOtp] = useState("");
   const [pin, setPin] = useState("");
   const [pinConfirm, setPinConfirm] = useState("");
+  const [acceptCGU, setAcceptCGU] = useState(false);
 
   const cities = region ? citiesForRegion(region) : [];
 
@@ -137,7 +138,21 @@ function InscriptionContent() {
                   </select>
                 </div>
                 {error && <p className="text-sm text-coral">{error}</p>}
-                <Submit loading={loading}>Continuer</Submit>
+                <label className="flex items-start gap-2.5 text-sm text-gray-600 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={acceptCGU}
+                    onChange={(e) => setAcceptCGU(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 shrink-0 accent-teal cursor-pointer"
+                  />
+                  <span>
+                    J&apos;accepte les{" "}
+                    <Link href="/cgu" target="_blank" className="text-teal font-medium underline">conditions d&apos;utilisation</Link>{" "}
+                    et la{" "}
+                    <Link href="/confidentialite" target="_blank" className="text-teal font-medium underline">politique de confidentialité</Link>.
+                  </span>
+                </label>
+                <Submit loading={loading} disabled={!acceptCGU}>Continuer</Submit>
               </form>
               <p className="text-sm text-gray-500 text-center mt-4">
                 Déjà un compte ? <Link href={`/connexion${redirect !== "/espace-patient" ? `?redirect=${encodeURIComponent(redirect)}` : ""}`} className="text-teal font-medium">Se connecter</Link>
@@ -217,11 +232,11 @@ function CodeInput({ value, onChange, length }: { value: string; onChange: (v: s
   );
 }
 
-function Submit({ loading, children }: { loading: boolean; children: React.ReactNode }) {
+function Submit({ loading, children, disabled }: { loading: boolean; children: React.ReactNode; disabled?: boolean }) {
   return (
     <button
       type="submit"
-      disabled={loading}
+      disabled={loading || disabled}
       className="w-full bg-teal text-white py-3 rounded-lg font-medium hover:bg-teal-dark transition-colors disabled:opacity-60"
     >
       {loading ? "Un instant…" : children}
