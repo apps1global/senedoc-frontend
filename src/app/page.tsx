@@ -94,10 +94,10 @@ export default function Home() {
               PRENEZ RENDEZ-VOUS AU SÉNÉGAL
             </p>
             <h1 className="font-display text-4xl md:text-5xl font-semibold text-teal-deep leading-tight mb-4">
-              Trouvez votre professionnel de santé, réservez en un instant
+              Votre médecin, à portée de clic
             </h1>
             <p className="text-lg text-teal-dark mb-8">
-              Des spécialistes près de chez vous, partout au Sénégal.
+              Trouvez un professionnel de santé près de chez vous et réservez en quelques instants — en présentiel ou en téléconsultation.
             </p>
 
             {/* Recherche */}
@@ -106,7 +106,7 @@ export default function Home() {
             </div>
             <p className="text-xs text-teal-dark mb-2">Ou parcourez par spécialité et ville :</p>
 
-            <form id="recherche" onSubmit={submitSearch} className="bg-white p-2 rounded-xl shadow-sm">
+            <form id="recherche" onSubmit={submitSearch} className="bg-white p-2 rounded-2xl shadow-md">
               <div className="flex items-center gap-2 px-3 py-3 border-b border-gray-100 min-w-0">
                 <SearchIcon />
                 <SpecialtySelect
@@ -142,11 +142,22 @@ export default function Home() {
               )}
 
               <div className="flex items-center justify-end px-3 py-3 min-w-0">
-                <button type="submit" className="bg-coral text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity flex-shrink-0">
+                <button type="submit" className="bg-teal text-white px-6 py-2.5 rounded-lg font-medium hover:bg-teal-dark transition-colors flex-shrink-0">
                   Rechercher
                 </button>
               </div>
             </form>
+
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-5 text-sm text-teal-dark">
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                Professionnels vérifiés
+              </span>
+              <span className="flex items-center gap-1.5">
+                <svg className="w-4 h-4 text-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                Présentiel & téléconsultation
+              </span>
+            </div>
           </div>
 
           {/* Photo héro */}
