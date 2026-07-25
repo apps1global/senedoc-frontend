@@ -180,11 +180,9 @@ export default function EspacePatient() {
           Bonjour{profile?.user.firstName ? `, ${profile.user.firstName}` : ""}
         </h1>
 
-        {/* Prendre un nouveau RDV — pointe vers la barre de recherche de
-            l'accueil en attendant la vraie page de recherche/réservation
-            (prochain chantier du backlog). */}
+        {/* Prendre un nouveau RDV — vers la page de recherche/reservation. */}
         <Link
-          href="/#recherche"
+          href="/recherche"
           className="block bg-teal text-white rounded-xl px-6 py-4 mb-10 font-medium hover:bg-teal-dark transition-colors text-center"
         >
           Prendre un nouveau rendez-vous

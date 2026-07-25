@@ -4,10 +4,11 @@ import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
+import { PatientLayout } from "@/components/PatientLayout";
 import { Footer } from "@/components/Footer";
 import { SpecialtySelect } from "@/components/SpecialtySelect";
 import { DoctorNameSearch } from "@/components/DoctorNameSearch";
-import { doctors } from "@/lib/api";
+import { doctors, auth } from "@/lib/api";
 import { isInSenegal, HORS_SENEGAL_MESSAGE } from "@/lib/geo";
 
 type Facility = {
@@ -47,8 +48,17 @@ function RechercheContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  const [isPatient, setIsPatient] = useState<boolean | null>(null);
   const [specialty, setSpecialty] = useState(searchParams.get("specialty") || "");
   const [city, setCity] = useState(searchParams.get("city") || "");
+
+  // Un patient connecté garde son espace (menu patient) ; un visiteur voit
+  // l'en-tete public. Meme page de recherche, habillage adapte.
+  useEffect(() => {
+    auth.me()
+      .then((u: any) => setIsPatient(u?.role === "PATIENT"))
+      .catch(() => setIsPatient(false));
+  }, []);
 
   const [cities, setCities] = useState<string[]>([]);
   const [citiesLoading, setCitiesLoading] = useState(false);
@@ -136,10 +146,8 @@ function RechercheContent() {
     return da - db;
   });
 
-  return (
+  const body = (
     <>
-      <Header />
-
       <div className="bg-teal-light border-b border-teal-mid/30">
         <div className="max-w-4xl mx-auto px-6 py-10 text-center">
           <h1 className="font-display text-3xl font-semibold text-teal-dark mb-2">Trouvez le bon professionnel</h1>
@@ -245,6 +253,14 @@ function RechercheContent() {
           </div>
         )}
       </div>
+    </>
+  );
+
+  if (isPatient) return <PatientLayout>{body}</PatientLayout>;
+  return (
+    <>
+      <Header />
+      {body}
       <Footer />
     </>
   );
