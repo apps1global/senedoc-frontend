@@ -139,17 +139,25 @@ function RechercheContent() {
   return (
     <>
       <Header />
-      <div className="max-w-4xl mx-auto px-6 py-10">
-        <h1 className="font-display text-2xl font-semibold mb-6">Trouver un professionnel de santé</h1>
 
+      <div className="bg-teal-light border-b border-teal-mid/30">
+        <div className="max-w-4xl mx-auto px-6 py-10 text-center">
+          <h1 className="font-display text-3xl font-semibold text-teal-dark mb-2">Trouvez le bon professionnel</h1>
+          <p className="text-teal text-sm">Prenez rendez-vous près de chez vous, en présentiel ou en téléconsultation.</p>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-6 py-10">
         <div className="mb-4">
           <DoctorNameSearch />
         </div>
-        <p className="text-xs text-gray-400 mb-6">
-          Ou parcourez par spécialité et ville ci-dessous :
-        </p>
+        <div className="flex items-center gap-3 my-6">
+          <div className="flex-1 h-px bg-gray-100"></div>
+          <p className="text-xs text-gray-400">ou parcourez par spécialité</p>
+          <div className="flex-1 h-px bg-gray-100"></div>
+        </div>
 
-        <div className="bg-white border border-gray-100 rounded-xl p-4 mb-8">
+        <div className="bg-white border border-gray-100 rounded-xl p-5 mb-8">
           <label className="block text-sm font-medium mb-2">Spécialité</label>
           <SpecialtySelect
             value={specialty}
@@ -206,15 +214,29 @@ function RechercheContent() {
         )}
 
         {!hasSearched ? (
-          <p className="text-gray-500 text-center py-16">
-            Choisissez une spécialité pour voir les villes disponibles.
-          </p>
+          <div className="text-center py-16">
+            <div className="w-16 h-16 rounded-2xl bg-teal-light flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.2-5.2m0 0A7.5 7.5 0 105.2 5.2a7.5 7.5 0 0010.6 10.6z" />
+              </svg>
+            </div>
+            <p className="font-display text-lg font-semibold text-gray-700">Choisissez une spécialité pour commencer</p>
+            <p className="text-sm text-gray-500 mt-1">Nous vous montrerons les professionnels disponibles près de chez vous.</p>
+          </div>
         ) : loading ? (
           <p className="text-gray-400 text-center py-16">Recherche en cours…</p>
         ) : error ? (
           <p className="text-coral text-center py-16">{error}</p>
         ) : sorted.length === 0 ? (
-          <p className="text-gray-500 text-center py-16">Aucun professionnel ne correspond à cette recherche.</p>
+          <div className="text-center py-16">
+            <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.2-5.2m0 0A7.5 7.5 0 105.2 5.2a7.5 7.5 0 0010.6 10.6z" />
+              </svg>
+            </div>
+            <p className="font-medium text-gray-600">Aucun professionnel ne correspond</p>
+            <p className="text-sm text-gray-500 mt-1">Essayez une autre spécialité ou une autre ville.</p>
+          </div>
         ) : (
           <div className="space-y-4">
             {sorted.map((doc) => (
@@ -242,14 +264,22 @@ function DoctorCard({ doctor, userPos }: { doctor: Doctor; userPos: { lat: numbe
   const distance = userPos && facility ? nearestFacilityDistance(doctor, userPos) : null;
   const name = (doctor.specialty.name === "Sage-femme" ? "" : "Dr ") + `${doctor.user.firstName ?? ""} ${doctor.user.lastName ?? ""}`.trim();
   const location = facility?.city || doctor.city;
+  const initials = `${doctor.user.firstName?.[0] ?? ""}${doctor.user.lastName?.[0] ?? ""}`.toUpperCase() || "?";
 
   return (
     <Link
       href={`/medecin/${doctor.id}`}
       className="block bg-white border border-gray-100 rounded-xl p-5 hover:border-teal hover:shadow-sm transition-all"
     >
-      <div className="flex items-start justify-between gap-4">
-        <div>
+      <div className="flex items-start gap-4">
+        {doctor.photoUrl ? (
+          <img src={doctor.photoUrl} alt={name} className="w-14 h-14 rounded-full object-cover shrink-0" />
+        ) : (
+          <div className="w-14 h-14 rounded-full bg-teal-light flex items-center justify-center shrink-0">
+            <span className="text-teal-dark font-semibold">{initials}</span>
+          </div>
+        )}
+        <div className="flex-1 min-w-0">
           <p className="font-medium">{name}</p>
           <p className="text-sm text-teal-dark">{doctor.specialty.name}</p>
           {location && (
