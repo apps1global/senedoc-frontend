@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Header } from "@/components/Header";
+import { PatientLayout } from "@/components/PatientLayout";
 import { Footer } from "@/components/Footer";
 import { doctors, slots as slotsApi, appointments, auth, relatives as relativesApi, type Relative, type AppointmentType } from "@/lib/api";
 import { isInSenegal, HORS_SENEGAL_MESSAGE } from "@/lib/geo";
@@ -56,10 +57,23 @@ export default function FicheMedecin() {
   const router = useRouter();
   const doctorId = params.id as string;
 
+  // Un patient connecté garde son espace (menu patient) ; un visiteur voit
+  // l'en-tete public.
+  useEffect(() => {
+    auth.me()
+      .then((u: any) => setIsPatient(u?.role === "PATIENT"))
+      .catch(() => setIsPatient(false));
+  }, []);
+
   const [doctor, setDoctor] = useState<Doctor | null>(null);
+  const [isPatient, setIsPatient] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
+  const Wrap = ({ children }: { children: React.ReactNode }) =>
+    isPatient
+      ? <PatientLayout>{children}</PatientLayout>
+      : <><Header />{children}<Footer /></>;
   const [horsSenegal, setHorsSenegal] = useState(false);
 
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
@@ -184,23 +198,19 @@ export default function FicheMedecin() {
 
   if (loading) {
     return (
-      <>
-        <Header />
+      <Wrap>
         <div className="max-w-3xl mx-auto px-6 py-16 text-center text-gray-400">Chargement…</div>
-        <Footer />
-      </>
+      </Wrap>
     );
   }
 
   if (error || !doctor) {
     return (
-      <>
-        <Header />
+      <Wrap>
         <div className="max-w-3xl mx-auto px-6 py-16 text-center text-gray-500">
           {error || "Médecin introuvable."}
         </div>
-        <Footer />
-      </>
+      </Wrap>
     );
   }
 
@@ -224,45 +234,48 @@ export default function FicheMedecin() {
   const today = todayISO();
 
   return (
-    <>
-      <Header />
+    <Wrap>
       <div className="max-w-3xl mx-auto px-6 py-10">
         {/* En-tête profil */}
         <div className="flex items-start gap-5 mb-6">
-          <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
+          <div className="w-20 h-20 rounded-full overflow-hidden bg-teal-light flex-shrink-0">
             {doctor.photoUrl ? (
               <img src={doctor.photoUrl} alt={name} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-300 text-2xl">
-                {doctor.user.firstName?.[0] ?? "D"}
+              <div className="w-full h-full flex items-center justify-center text-teal-dark font-semibold text-xl">
+                {`${doctor.user.firstName?.[0] ?? ""}${doctor.user.lastName?.[0] ?? ""}`.toUpperCase() || "?"}
               </div>
             )}
           </div>
-          <div>
+          <div className="min-w-0">
             <h1 className="font-display text-2xl font-semibold">{name}</h1>
             <p className="text-teal-dark">{doctor.specialty.name}</p>
             {doctor.yearsExperience != null && (
-              <p className="text-sm text-gray-500">{doctor.yearsExperience} ans d'expérience</p>
+              <p className="text-sm text-gray-500 mt-0.5">{doctor.yearsExperience} ans d'expérience</p>
             )}
-            <div className="flex items-center gap-2 mt-2 flex-wrap">
-              {doctor.teleconsultation && (
-                <span className="bg-teal-light text-teal-dark text-xs font-medium px-2 py-1 rounded-full">Téléconsultation</span>
-              )}
-              {doctor.consultationFee != null && (
-                <span className="text-sm font-medium">
-                  {doctor.consultationFee.toLocaleString("fr-FR")} FCFA
-                  {doctor.teleconsultationFee != null && " (présentiel)"}
-                </span>
-              )}
-              {doctor.teleconsultationFee != null && (
-                <span className="text-sm font-medium">
-                  {doctor.teleconsultationFee.toLocaleString("fr-FR")} FCFA
-                  {doctor.consultationFee != null && " (téléconsultation)"}
-                </span>
-              )}
-            </div>
+            {doctor.teleconsultation && (
+              <span className="inline-block bg-teal-light text-teal-dark text-xs font-medium px-2.5 py-1 rounded-full mt-2">Téléconsultation possible</span>
+            )}
           </div>
         </div>
+
+        {/* Tarifs */}
+        {(doctor.consultationFee != null || doctor.teleconsultationFee != null) && (
+          <div className="flex flex-wrap gap-x-6 gap-y-1 mb-6 pb-6 border-b border-gray-100">
+            {doctor.consultationFee != null && (
+              <div>
+                <p className="text-xs text-gray-400">Présentiel</p>
+                <p className="text-lg font-semibold text-teal-dark">{doctor.consultationFee.toLocaleString("fr-FR")} FCFA</p>
+              </div>
+            )}
+            {doctor.teleconsultationFee != null && (
+              <div>
+                <p className="text-xs text-gray-400">Téléconsultation</p>
+                <p className="text-lg font-semibold text-teal-dark">{doctor.teleconsultationFee.toLocaleString("fr-FR")} FCFA</p>
+              </div>
+            )}
+          </div>
+        )}
 
         {doctor.bio && <p className="text-gray-600 mb-6 leading-relaxed">{doctor.bio}</p>}
 
@@ -497,7 +510,6 @@ export default function FicheMedecin() {
           )}
         </section>
       </div>
-      <Footer />
-    </>
+    </Wrap>
   );
 }
