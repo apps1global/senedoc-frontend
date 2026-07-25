@@ -169,10 +169,10 @@ export default function Home() {
 
       {/* COMMENT ÇA MARCHE */}
       <section className="max-w-6xl mx-auto px-6 py-16 text-center">
-        <h2 className="font-display text-2xl font-semibold mb-10">Comment ça marche</h2>
+        <h2 className="font-display text-3xl font-semibold mb-10">Comment ça marche</h2>
         <div className="grid md:grid-cols-3 gap-8">
           <Step icon={<SearchIcon big />} bg="bg-teal-light" title="1. Cherchez" text="Par spécialité, trouvez le bon professionnel" />
-          <Step icon={<PinIcon big coral />} bg="bg-coral-light" title="2. Choisissez" text="Voyez la distance jusqu'au cabinet" />
+          <Step icon={<CalendarIcon />} bg="bg-teal-light" title="2. Choisissez" text="Présentiel ou téléconsultation, selon vos besoins" />
           <Step icon={<CalendarIcon />} bg="bg-teal-light" title="3. Réservez" text="Confirmation par SMS, c'est fait" />
         </div>
       </section>
@@ -184,7 +184,7 @@ export default function Home() {
             <img src="/images/consultation.jpg" alt="Consultation médicale" className="w-full h-full object-contain" />
           </div>
           <div className="order-1 md:order-2 min-w-0">
-            <h2 className="font-display text-2xl font-semibold mb-3">Des professionnels vérifiés, près de vous</h2>
+            <h2 className="font-display text-3xl font-semibold mb-3">Des professionnels vérifiés, près de vous</h2>
             <p className="text-gray-600 mb-5 leading-relaxed">
               Chaque professionnel est validé avant d'apparaître. Vous voyez sa spécialité,
               ses lieux de consultation et la distance depuis votre position.
@@ -200,10 +200,10 @@ export default function Home() {
 
       {/* SPÉCIALITÉS */}
       <section className="max-w-6xl mx-auto px-6 py-16 text-center">
-        <h2 className="font-display text-2xl font-semibold mb-2">Spécialités populaires</h2>
+        <h2 className="font-display text-3xl font-semibold mb-2">Spécialités populaires</h2>
         <p className="text-gray-500 mb-8">Prenez rendez-vous dans la spécialité qu'il vous faut</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {["Cardiologie", "Pédiatrie", "Ophtalmologie", "Dentaire"].map((s) => (
+          {["Cardiologie", "Pédiatrie", "Ophtalmologie", "Dentaire", "Dermatologie", "Gynécologie-Obstétrique", "ORL (Oto-Rhino-Laryngologie)", "Urologie"].map((s) => (
             <button
               key={s}
               onClick={() => router.push(`/recherche?specialty=${encodeURIComponent(s)}`)}
