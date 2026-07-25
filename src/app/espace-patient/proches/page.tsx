@@ -35,8 +35,8 @@ export default function MesProches() {
   }, []);
 
   async function save() {
-    if (!form.firstName.trim() || !form.lastName.trim()) {
-      setError("Le prénom et le nom sont obligatoires.");
+    if (!form.firstName.trim() || !form.lastName.trim() || !form.phone.trim()) {
+      setError("Le prénom, le nom et le téléphone sont obligatoires.");
       return;
     }
     setSaving(true);
@@ -44,7 +44,7 @@ export default function MesProches() {
     const body = {
       firstName: form.firstName.trim(),
       lastName: form.lastName.trim(),
-      phone: form.phone.trim() || undefined,
+      phone: form.phone.trim(),
       dateOfBirth: form.dateOfBirth || undefined,
       relationship: form.relationship.trim() || undefined,
     };
@@ -88,9 +88,9 @@ export default function MesProches() {
     <PatientLayout>
       <h1 className="font-display text-2xl font-semibold mb-2">Mes proches</h1>
       <p className="text-gray-600 text-sm mb-6 leading-relaxed">
-        Enregistrez les personnes pour qui vous réservez — un enfant, un parent,
-        un conjoint. Elles n&apos;ont pas besoin de compte SeneDoc. Si vous
-        indiquez leur téléphone, elles reçoivent aussi les confirmations par SMS.
+        Enregistrez les personnes pour qui vous réservez — un parent, un conjoint,
+        un proche resté au pays. Elles n&apos;ont pas besoin de compte SeneDoc :
+        elles reçoivent leurs rendez-vous et leur lien de téléconsultation par SMS.
       </p>
 
       {error && <p className="text-coral text-sm mb-4">{error}</p>}
@@ -111,11 +111,11 @@ export default function MesProches() {
               onChange={(e) => setForm({ ...form, lastName: e.target.value })} />
           </div>
           <div>
-            <label className="block text-xs text-gray-600 mb-1">Téléphone</label>
+            <label className="block text-xs text-gray-600 mb-1">Téléphone *</label>
             <input className={champ} placeholder="+221 77 123 45 67" value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })} />
             <p className="text-xs text-gray-400 mt-1">
-              Nécessaire pour la téléconsultation : le lien de connexion lui est envoyé par SMS.
+              Votre proche recevra la confirmation du rendez-vous et, pour une téléconsultation, son lien de connexion par SMS.
             </p>
           </div>
           <div>
