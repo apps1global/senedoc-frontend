@@ -6,7 +6,7 @@ export const metadata = {
 export default function CguPage() {
   return (
     <main style={{ maxWidth: 800, margin: "0 auto", padding: "40px 20px 80px", lineHeight: 1.6, color: "#1a1a1a" }}>
-      <h1 style={{ color: "#0EA5A4", fontSize: 28, borderBottom: "3px solid #0EA5A4", paddingBottom: 12 }}>
+      <h1 style={{ color: "#1D9E75", fontSize: 28, borderBottom: "3px solid #1D9E75", paddingBottom: 12 }}>
         Conditions Générales d&apos;Utilisation — SeneDoc
       </h1>
       <p style={{ color: "#666", fontStyle: "italic" }}>Dernière mise à jour : 14 juillet 2026</p>
@@ -45,7 +45,7 @@ export default function CguPage() {
         </strong>{" "}
         Le contenu de la consultation relève exclusivement de la relation entre le Patient et le Médecin, et ne
         transite à aucun moment par la Plateforme (voir notre{" "}
-        <a href="/confidentialite" style={{ color: "#0EA5A4" }}>Politique de confidentialité</a>).
+        <a href="/confidentialite" style={{ color: "#1D9E75" }}>Politique de confidentialité</a>).
       </p>
 
       <h2 style={sectionStyle}>4. Inscription et compte utilisateur</h2>
@@ -122,7 +122,7 @@ export default function CguPage() {
       <h2 style={sectionStyle}>10. Protection des données personnelles</h2>
       <p>
         Le traitement de vos données personnelles est décrit dans notre{" "}
-        <a href="/confidentialite" style={{ color: "#0EA5A4" }}>Politique de confidentialité</a>, qui fait partie
+        <a href="/confidentialite" style={{ color: "#1D9E75" }}>Politique de confidentialité</a>, qui fait partie
         intégrante des présentes CGU.
       </p>
 
@@ -150,4 +150,4 @@ export default function CguPage() {
   );
 }
 
-const sectionStyle = { color: "#0EA5A4", fontSize: 20, marginTop: 36 };
+const sectionStyle = { color: "#1D9E75", fontSize: 20, marginTop: 36 };

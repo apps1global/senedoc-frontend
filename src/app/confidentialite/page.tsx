@@ -6,7 +6,7 @@ export const metadata = {
 export default function PolitiqueConfidentialitePage() {
   return (
     <main style={{ maxWidth: 800, margin: "0 auto", padding: "40px 20px 80px", lineHeight: 1.6, color: "#1a1a1a" }}>
-      <h1 style={{ color: "#0EA5A4", fontSize: 28, borderBottom: "3px solid #0EA5A4", paddingBottom: 12 }}>
+      <h1 style={{ color: "#1D9E75", fontSize: 28, borderBottom: "3px solid #1D9E75", paddingBottom: 12 }}>
         Politique de confidentialité — SeneDoc
       </h1>
       <p style={{ color: "#666", fontStyle: "italic" }}>Dernière mise à jour : 14 juillet 2026</p>
@@ -157,7 +157,7 @@ export default function PolitiqueConfidentialitePage() {
   );
 }
 
-const sectionStyle = { color: "#0EA5A4", fontSize: 20, marginTop: 36 };
+const sectionStyle = { color: "#1D9E75", fontSize: 20, marginTop: 36 };
 
 function Table({ rows }: { rows: [string, string][] }) {
   return (

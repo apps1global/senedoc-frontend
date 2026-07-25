@@ -6,7 +6,7 @@ export const metadata = {
 export default function SuppressionComptePage() {
   return (
     <main style={{ maxWidth: 800, margin: "0 auto", padding: "40px 20px 80px", lineHeight: 1.6, color: "#1a1a1a" }}>
-      <h1 style={{ color: "#0EA5A4", fontSize: 28, borderBottom: "3px solid #0EA5A4", paddingBottom: 12 }}>
+      <h1 style={{ color: "#1D9E75", fontSize: 28, borderBottom: "3px solid #1D9E75", paddingBottom: 12 }}>
         Suppression de compte
       </h1>
       <p style={{ color: "#666", fontStyle: "italic" }}>Dernière mise à jour : 14 juillet 2026</p>
@@ -14,7 +14,7 @@ export default function SuppressionComptePage() {
       <h2 style={sectionStyle}>Comment demander la suppression de votre compte</h2>
       <p>
         Pour demander la suppression de votre compte SeneDoc (patient ou médecin) et des données associées, envoyez
-        un email à <a href="mailto:doctafrik@gmail.com" style={{ color: "#0EA5A4" }}>doctafrik@gmail.com</a> depuis
+        un email à <a href="mailto:doctafrik@gmail.com" style={{ color: "#1D9E75" }}>doctafrik@gmail.com</a> depuis
         l&apos;adresse email associée à votre compte (ou en précisant votre numéro de téléphone d&apos;inscription),
         avec pour objet : « Demande de suppression de compte ».
       </p>
@@ -32,7 +32,7 @@ export default function SuppressionComptePage() {
       <h2 style={sectionStyle}>Ce qui peut être conservé temporairement</h2>
       <p>
         Conformément à notre{" "}
-        <a href="/confidentialite" style={{ color: "#0EA5A4" }}>Politique de confidentialité</a>, certaines données
+        <a href="/confidentialite" style={{ color: "#1D9E75" }}>Politique de confidentialité</a>, certaines données
         peuvent être conservées jusqu&apos;à 12 mois après la suppression de votre compte, uniquement lorsque la loi
         l&apos;exige (par exemple, à des fins de lutte contre la fraude), avant suppression ou anonymisation
         définitive.
@@ -48,4 +48,4 @@ export default function SuppressionComptePage() {
   );
 }
 
-const sectionStyle = { color: "#0EA5A4", fontSize: 20, marginTop: 36 };
+const sectionStyle = { color: "#1D9E75", fontSize: 20, marginTop: 36 };

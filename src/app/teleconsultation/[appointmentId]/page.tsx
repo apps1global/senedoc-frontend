@@ -93,7 +93,7 @@ export default function TeleconsultationRoom() {
             interfaceConfigOverwrite: {
               SHOW_JITSI_WATERMARK: false,
               SHOW_WATERMARK_FOR_GUESTS: false,
-              DEFAULT_BACKGROUND: "#0EA5A4",
+              DEFAULT_BACKGROUND: "#1D9E75",
             },
           });
           apiRef.current = api;
