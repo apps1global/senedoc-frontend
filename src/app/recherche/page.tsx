@@ -303,31 +303,28 @@ function DoctorCard({ doctor, userPos }: { doctor: Doctor; userPos: { lat: numbe
               {facility ? `${facility.name} — ${location}` : location}
             </p>
           )}
-          <div className="flex items-center gap-3 mt-2 text-xs">
-            {doctor.teleconsultation && (
-              <span className="bg-teal-light text-teal-dark px-2 py-1 rounded-full font-medium">Téléconsultation</span>
-            )}
-            {distance !== null && (
-              <span className="text-gray-400">{distance.toFixed(1)} km</span>
-            )}
-          </div>
         </div>
-        <div className="text-right whitespace-nowrap">
-          {doctor.consultationFee != null && (
-            <p className="text-sm font-medium">
-              {doctor.consultationFee.toLocaleString("fr-FR")} FCFA
-              {doctor.teleconsultationFee != null && (
-                <span className="text-gray-400 font-normal"> (présentiel)</span>
-              )}
-            </p>
+      </div>
+
+      <div className="mt-3 pt-3 border-t border-gray-50 flex flex-wrap items-center gap-x-4 gap-y-2">
+        {doctor.consultationFee != null && (
+          <span className="text-sm font-medium">
+            {doctor.consultationFee.toLocaleString("fr-FR")} FCFA
+            <span className="text-gray-400 font-normal"> · présentiel</span>
+          </span>
+        )}
+        {doctor.teleconsultationFee != null && (
+          <span className="text-sm font-medium">
+            {doctor.teleconsultationFee.toLocaleString("fr-FR")} FCFA
+            <span className="text-gray-400 font-normal"> · téléconsultation</span>
+          </span>
+        )}
+        <div className="flex items-center gap-3 text-xs ml-auto">
+          {doctor.teleconsultation && (
+            <span className="bg-teal-light text-teal-dark px-2.5 py-1 rounded-full font-medium">Téléconsultation possible</span>
           )}
-          {doctor.teleconsultationFee != null && (
-            <p className="text-sm font-medium">
-              {doctor.teleconsultationFee.toLocaleString("fr-FR")} FCFA
-              {doctor.consultationFee != null && (
-                <span className="text-gray-400 font-normal"> (télécons.)</span>
-              )}
-            </p>
+          {distance !== null && (
+            <span className="text-gray-400 whitespace-nowrap">{distance.toFixed(1)} km</span>
           )}
         </div>
       </div>
