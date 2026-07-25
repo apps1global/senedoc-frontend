@@ -100,15 +100,17 @@ function InscriptionContent() {
 
   return (
     <div className="min-h-screen bg-teal-light flex flex-col">
-      <div className="p-6"><Link href="/"><Logo /></Link></div>
-      <div className="flex-1 flex items-center justify-center px-6 pb-16">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-sm p-8">
+      <div className="flex-1 flex items-center justify-center px-6 py-10">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-sm overflow-hidden">
 
           {step === "form" && (
             <>
-              <h1 className="font-display text-2xl font-semibold mb-1">Créer mon compte</h1>
-              <p className="text-sm text-gray-500 mb-6">Prenez rendez-vous en quelques instants.</p>
-              <form onSubmit={submitForm} className="space-y-4">
+              <div className="bg-[#E1F5EE] px-8 pt-7 pb-6 text-center">
+                <Link href="/" className="inline-block mb-3"><Logo size={26} /></Link>
+                <h1 className="font-display text-xl font-semibold text-teal-dark">Créer mon compte</h1>
+                <p className="text-sm text-teal mt-1">Prenez rendez-vous avec un professionnel de santé.</p>
+              </div>
+              <form onSubmit={submitForm} className="space-y-4 p-8 pt-6">
                 <div className="grid grid-cols-2 gap-3">
                   <Field label="Prénom" value={firstName} onChange={setFirstName} />
                   <Field label="Nom" value={lastName} onChange={setLastName} />
@@ -162,9 +164,12 @@ function InscriptionContent() {
 
           {step === "otp" && (
             <>
-              <h1 className="font-display text-2xl font-semibold mb-1">Vérifiez votre téléphone</h1>
-              <p className="text-sm text-gray-500 mb-6">Nous avons envoyé un code à 6 chiffres au {phone}.</p>
-              <form onSubmit={submitOtp} className="space-y-4">
+              <div className="bg-[#E1F5EE] px-8 pt-7 pb-6 text-center">
+                <Logo size={26} />
+                <h1 className="font-display text-xl font-semibold text-teal-dark mt-3">Vérifiez votre téléphone</h1>
+                <p className="text-sm text-teal mt-1">Un code à 6 chiffres a été envoyé au {phone}.</p>
+              </div>
+              <form onSubmit={submitOtp} className="space-y-4 p-8 pt-6">
                 <CodeInput value={otp} onChange={setOtp} length={6} />
                 {error && <p className="text-sm text-coral">{error}</p>}
                 <Submit loading={loading}>Vérifier</Submit>
@@ -174,9 +179,12 @@ function InscriptionContent() {
 
           {step === "pin" && (
             <>
-              <h1 className="font-display text-2xl font-semibold mb-1">Créez votre code PIN</h1>
-              <p className="text-sm text-gray-500 mb-6">4 chiffres pour vous reconnecter facilement, sans SMS.</p>
-              <form onSubmit={submitPin} className="space-y-4">
+              <div className="bg-[#E1F5EE] px-8 pt-7 pb-6 text-center">
+                <Logo size={26} />
+                <h1 className="font-display text-xl font-semibold text-teal-dark mt-3">Créez votre code PIN</h1>
+                <p className="text-sm text-teal mt-1">4 chiffres pour vous reconnecter, sans SMS.</p>
+              </div>
+              <form onSubmit={submitPin} className="space-y-4 p-8 pt-6">
                 <div>
                   <label className="block text-sm font-medium mb-2">Votre PIN</label>
                   <CodeInput value={pin} onChange={setPin} length={4} />
