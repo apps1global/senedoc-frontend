@@ -41,6 +41,7 @@ export const auth = {
     phone: string;
     region?: string;
     city?: string;
+    country?: string;
     email?: string;
     password?: string;
   }) => apiFetch('/auth/register', { method: 'POST', body, auth: false }),

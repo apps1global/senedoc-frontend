@@ -26,6 +26,9 @@ function InscriptionContent() {
   const [phone, setPhone] = useState("");
   const [region, setRegion] = useState("");
   const [city, setCity] = useState("");
+  const [residesAbroad, setResidesAbroad] = useState(false);
+  const [country, setCountry] = useState("");
+  const [abroadCity, setAbroadCity] = useState("");
 
   // État du flux
   const [userId, setUserId] = useState("");
@@ -39,13 +42,20 @@ function InscriptionContent() {
   async function submitForm(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    if (!firstName || !lastName || !phone || !region || !city) {
+    if (!firstName || !lastName || !phone || (!residesAbroad && (!region || !city))) {
       setError("Merci de remplir tous les champs.");
       return;
     }
     setLoading(true);
     try {
-      const res: any = await auth.register({ firstName, lastName, phone, region, city });
+      const res: any = await auth.register({
+        firstName,
+        lastName,
+        phone,
+        region: residesAbroad ? "" : region,
+        city: residesAbroad ? (abroadCity.trim() || "") : city,
+        country: residesAbroad ? (country.trim() || undefined) : undefined,
+      });
       setUserId(res.id);
       setStep("otp");
     } catch (err: any) {
@@ -116,29 +126,48 @@ function InscriptionContent() {
                   <Field label="Nom" value={lastName} onChange={setLastName} />
                 </div>
                 <Field label="Téléphone" value={phone} onChange={setPhone} placeholder="+221 77 123 45 67" />
-                <div>
-                  <label className="block text-sm font-medium mb-1">Région</label>
-                  <select
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal"
-                    value={region}
-                    onChange={(e) => { setRegion(e.target.value); setCity(""); }}
-                  >
-                    <option value="">Choisir une région</option>
-                    {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Ville</label>
-                  <select
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal disabled:bg-gray-50"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    disabled={!region}
-                  >
-                    <option value="">{region ? "Choisir une ville" : "Choisissez d'abord une région"}</option>
-                    {cities.map((c) => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </div>
+                <label className="flex items-center gap-2.5 text-sm text-gray-600 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={residesAbroad}
+                    onChange={(e) => { setResidesAbroad(e.target.checked); setRegion(""); setCity(""); setCountry(""); setAbroadCity(""); }}
+                    className="h-4 w-4 shrink-0 accent-teal cursor-pointer"
+                  />
+                  <span>Je réside hors du Sénégal</span>
+                </label>
+
+                {residesAbroad ? (
+                  <div className="grid grid-cols-2 gap-3">
+                    <Field label="Pays de résidence (facultatif)" value={country} onChange={setCountry} placeholder="Ex : France, Italie…" />
+                    <Field label="Ville (facultatif)" value={abroadCity} onChange={setAbroadCity} placeholder="Ex : Paris, Milan…" />
+                  </div>
+                ) : (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Région</label>
+                      <select
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal"
+                        value={region}
+                        onChange={(e) => { setRegion(e.target.value); setCity(""); }}
+                      >
+                        <option value="">Choisir une région</option>
+                        {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Ville</label>
+                      <select
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal disabled:bg-gray-50"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        disabled={!region}
+                      >
+                        <option value="">{region ? "Choisir une ville" : "Choisissez d'abord une région"}</option>
+                        {cities.map((c) => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    </div>
+                  </>
+                )}
                 {error && <p className="text-sm text-coral">{error}</p>}
                 <label className="flex items-start gap-2.5 text-sm text-gray-600 cursor-pointer">
                   <input
