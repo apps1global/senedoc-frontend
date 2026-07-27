@@ -332,7 +332,7 @@ function AppointmentCard({
 
       {canCancel && isCancellingThis && (
         <div className="mt-3 space-y-2">
-          <label className="block text-xs text-gray-500">Motif de l'annulation (facultatif)</label>
+          <label className="block text-xs text-gray-500">Motif de l'annulation <span className="text-coral">*</span></label>
           <textarea
             value={cancelReason}
             onChange={(e) => setCancelReason(e.target.value)}
@@ -343,7 +343,7 @@ function AppointmentCard({
           <div className="flex gap-2">
             <button
               onClick={() => onCancel(appointment.id, cancelReason)}
-              disabled={cancelling}
+              disabled={cancelling || !cancelReason.trim()}
               className="text-sm bg-coral text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {cancelling ? "Annulation…" : "Confirmer l'annulation"}
