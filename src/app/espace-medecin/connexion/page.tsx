@@ -135,7 +135,7 @@ export default function ConnexionMedecin() {
           )}
 
           <p className="text-sm text-gray-500 text-center mt-6">
-            Pas encore inscrit ? <Link href="/inscription/medecin" className="text-teal font-medium">Inscrire mon cabinet</Link>
+            Pas encore inscrit ? <Link href="/inscription/medecin" className="text-teal font-medium">Je m'inscris en qualité de médecin</Link>
           </p>
         </div>
       </div>

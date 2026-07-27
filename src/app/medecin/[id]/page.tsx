@@ -168,7 +168,7 @@ export default function FicheMedecin() {
   async function confirmBooking() {
     if (!selectedDate || !selectedSlot) return;
     if (consultType === "PRESENTIEL" && (doctor?.facilityMemberships.length ?? 0) > 1 && !selectedFacilityId) {
-      setBookingError("Choisissez d'abord un lieu de consultation ci-dessus.");
+      setBookingError("Choisissez d'abord un établissement ci-dessus.");
       return;
     }
     setBooking(selectedSlot);
@@ -217,9 +217,15 @@ export default function FicheMedecin() {
   // Suit l'établissement effectivement sélectionné par le patient (pas
   // toujours le premier de la liste) — sinon la distance affichée peut
   // correspondre à un lieu différent de celui réservé.
+  // Un seul établissement en haut de fiche seulement si le patient l'a
+  // choisi, OU si le médecin n'en a qu'un seul (aucune ambiguïté possible).
+  // Avec plusieurs établissements et aucun choix fait, on n'affiche rien —
+  // jamais "le premier" comme s'il était l'établissement du médecin.
   const facility = selectedFacilityId
     ? doctor.facilityMemberships.find((m) => m.facility.id === selectedFacilityId)?.facility
-    : doctor.facilityMemberships[0]?.facility;
+    : doctor.facilityMemberships.length === 1
+    ? doctor.facilityMemberships[0]?.facility
+    : undefined;
   const distance =
     userPos && facility?.latitude != null && facility?.longitude != null
       ? distanceKm(userPos.lat, userPos.lng, facility.latitude, facility.longitude)
@@ -385,7 +391,7 @@ export default function FicheMedecin() {
 
               {consultType === "PRESENTIEL" && doctor.facilityMemberships.length > 1 && (
                 <div className="mb-5">
-                  <p className="text-sm font-medium mb-2">Lieu de consultation</p>
+                  <p className="text-sm font-medium mb-2">Établissement</p>
                   <div className="flex flex-col gap-2">
                     {doctor.facilityMemberships.map(({ facility: f }) => (
                       <button

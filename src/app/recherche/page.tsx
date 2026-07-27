@@ -277,7 +277,9 @@ function nearestFacilityDistance(doctor: Doctor, userPos: { lat: number; lng: nu
 
 function DoctorCard({ doctor, userPos }: { doctor: Doctor; userPos: { lat: number; lng: number } | null }) {
   const facility = doctor.facilityMemberships[0]?.facility;
-  const autresLieux = Math.max(0, doctor.facilityMemberships.length - 1);
+  const allFacilities = doctor.facilityMemberships
+    .map((m) => m.facility?.name)
+    .filter((n): n is string => !!n);
   const distance = userPos && facility ? nearestFacilityDistance(doctor, userPos) : null;
   const name = (doctor.specialty.name === "Sage-femme" ? "" : "Dr ") + `${doctor.user.firstName ?? ""} ${doctor.user.lastName ?? ""}`.trim();
   const location = facility?.city || doctor.city;
@@ -299,14 +301,15 @@ function DoctorCard({ doctor, userPos }: { doctor: Doctor; userPos: { lat: numbe
         <div className="flex-1 min-w-0">
           <p className="font-medium">{name}</p>
           <p className="text-sm text-teal-dark">{doctor.specialty.name}</p>
-          {location && (
-            <p className="text-sm text-gray-500 mt-1">
-              {facility ? `${facility.name} — ${location}` : location}
-              {autresLieux > 0 && (
-                <span className="text-teal-dark"> · et {autresLieux} autre{autresLieux > 1 ? "s" : ""} lieu{autresLieux > 1 ? "x" : ""}</span>
-              )}
-            </p>
-          )}
+          {allFacilities.length > 0 ? (
+            <div className="text-sm text-gray-500 mt-1">
+              {allFacilities.map((fname, i) => (
+                <p key={i}>{fname}</p>
+              ))}
+            </div>
+          ) : location ? (
+            <p className="text-sm text-gray-500 mt-1">{location}</p>
+          ) : null}
           {distance !== null && (
             <p className="text-xs text-gray-400 mt-1">À {distance.toFixed(1).replace(".", ",")} km de vous</p>
           )}
