@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/Logo";
@@ -34,6 +34,29 @@ function InscriptionContent() {
 
   // État du flux
   const [userId, setUserId] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resending, setResending] = useState(false);
+
+  // Compte a rebours de renvoi : empeche de redemander un SMS en boucle
+  // (evite les tentatives paniques -> comptes en double -> couts Twilio).
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setInterval(() => setResendCooldown((c) => Math.max(0, c - 1)), 1000);
+    return () => clearInterval(t);
+  }, [resendCooldown]);
+
+  async function handleResendOtp() {
+    setResending(true);
+    setError("");
+    try {
+      await auth.resendOtp({ userId });
+      setResendCooldown(60);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setResending(false);
+    }
+  }
   const [otp, setOtp] = useState("");
   const [pin, setPin] = useState("");
   const [pinConfirm, setPinConfirm] = useState("");
@@ -62,6 +85,7 @@ function InscriptionContent() {
       });
       setUserId(res.id);
       setStep("otp");
+      setResendCooldown(60);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -218,6 +242,20 @@ function InscriptionContent() {
                 {error && <p className="text-sm text-coral">{error}</p>}
                 <Submit loading={loading}>Vérifier</Submit>
               </form>
+              <div className="text-center mt-4">
+                {resendCooldown > 0 ? (
+                  <p className="text-sm text-gray-400">Renvoyer le code dans {resendCooldown}s</p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={resending}
+                    className="text-sm text-teal font-medium disabled:opacity-50"
+                  >
+                    {resending ? "Envoi…" : "Renvoyer le code"}
+                  </button>
+                )}
+              </div>
             </>
           )}
 

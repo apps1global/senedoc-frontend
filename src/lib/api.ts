@@ -49,6 +49,9 @@ export const auth = {
   verifyOtp: (body: { userId: string; otp: string }) =>
     apiFetch('/auth/verify-otp', { method: 'POST', body }),
 
+  resendOtp: (body: { userId: string }) =>
+    apiFetch('/auth/resend-otp', { method: 'POST', body }),
+
   setPin: (body: { pin: string }) =>
     apiFetch('/auth/set-pin', { method: 'POST', body }),
 
