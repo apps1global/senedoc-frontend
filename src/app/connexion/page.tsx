@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { auth } from "@/lib/api";
 
-type Mode = "pin" | "reset-request" | "reset-confirm";
+type Mode = "pin" | "email" | "reset-request" | "reset-confirm";
 
 const REMEMBERED_PHONE_KEY = "senedoc_phone";
 
@@ -24,6 +24,8 @@ function ConnexionContent() {
   const [pin, setPin] = useState("");
   const [otp, setOtp] = useState("");
   const [newPin, setNewPin] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   // Numéro déjà connu sur cet appareil : on ne le redemande plus, seul le
   // PIN est saisi. Le téléphone reste envoyé au backend (obligatoire côté
@@ -55,6 +57,20 @@ function ConnexionContent() {
       // Connexion réussie : on mémorise le numéro sur cet appareil pour
       // les prochaines fois (plus jamais redemandé, seul le PIN le sera).
       window.localStorage.setItem(REMEMBERED_PHONE_KEY, phone);
+      router.push(redirect);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function submitEmail(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      await auth.login({ email, password });
       router.push(redirect);
     } catch (err: any) {
       setError(err.message);
@@ -127,12 +143,31 @@ function ConnexionContent() {
               <button onClick={() => { setMode("reset-request"); setError(""); }} className="text-sm text-teal font-medium mt-4 block mx-auto">
                 PIN oublié ?
               </button>
+              <button onClick={() => { setMode("email"); setError(""); }} className="text-sm text-gray-400 mt-2 block mx-auto">
+                Se connecter avec email et mot de passe
+              </button>
               <p className="text-sm text-gray-500 text-center mt-4">
                 Pas encore de compte ? <Link href={`/inscription${redirect !== "/espace-patient" ? `?redirect=${encodeURIComponent(redirect)}` : ""}`} className="text-teal font-medium">S'inscrire</Link>
               </p>
               <div className="border-t border-gray-100 mt-6 pt-4 text-center">
                 <Link href="/admin" className="text-xs text-gray-400 hover:text-gray-600">Accès administrateur</Link>
               </div>
+            </>
+          )}
+
+          {mode === "email" && (
+            <>
+              <h1 className="font-display text-2xl font-semibold mb-1">Se connecter</h1>
+              <p className="text-sm text-gray-500 mb-6">Avec votre email et votre mot de passe.</p>
+              <form onSubmit={submitEmail} className="space-y-4">
+                <Field label="Email" value={email} onChange={setEmail} placeholder="vous@exemple.com" type="email" />
+                <Field label="Mot de passe" value={password} onChange={setPassword} placeholder="Votre mot de passe" type="password" />
+                {error && <p className="text-sm text-coral">{error}</p>}
+                <Submit loading={loading}>Se connecter</Submit>
+              </form>
+              <button onClick={() => { setMode("pin"); setError(""); }} className="text-sm text-teal font-medium mt-4 block mx-auto">
+                Se connecter avec téléphone et PIN
+              </button>
             </>
           )}
 
@@ -183,11 +218,11 @@ export default function Connexion() {
   );
 }
 
-function Field({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
+function Field({ label, value, onChange, placeholder, type = "text" }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
   return (
     <div>
       <label className="block text-sm font-medium mb-1">{label}</label>
-      <input className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
+      <input type={type} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
     </div>
   );
 }

@@ -55,6 +55,9 @@ export const auth = {
   loginPin: (body: { phone: string; pin: string }) =>
     apiFetch('/auth/login-pin', { method: 'POST', body }),
 
+  login: (body: { email: string; password: string }) =>
+    apiFetch('/auth/login', { method: 'POST', body }),
+
   requestPinReset: (body: { phone: string }) =>
     apiFetch('/auth/request-pin-reset', { method: 'POST', body, auth: false }),
 
