@@ -29,6 +29,8 @@ function InscriptionContent() {
   const [residesAbroad, setResidesAbroad] = useState(false);
   const [country, setCountry] = useState("");
   const [abroadCity, setAbroadCity] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   // État du flux
   const [userId, setUserId] = useState("");
@@ -55,6 +57,8 @@ function InscriptionContent() {
         region: residesAbroad ? "" : region,
         city: residesAbroad ? (abroadCity.trim() || "") : city,
         country: residesAbroad ? (country.trim() || undefined) : undefined,
+        email: email.trim() || undefined,
+        password: password || undefined,
       });
       setUserId(res.id);
       setStep("otp");
@@ -168,6 +172,17 @@ function InscriptionContent() {
                     </div>
                   </>
                 )}
+
+                <div className="pt-2 border-t border-gray-100">
+                  <p className="text-xs text-gray-500 mb-2">
+                    Facultatif — utile si votre téléphone est temporairement injoignable, ou pour recevoir des informations importantes.
+                  </p>
+                  <div className="space-y-3">
+                    <Field label="Email (facultatif)" value={email} onChange={setEmail} placeholder="vous@exemple.com" type="email" />
+                    <Field label="Mot de passe (facultatif)" value={password} onChange={setPassword} placeholder="Au moins 8 caractères" type="password" />
+                  </div>
+                </div>
+
                 {error && <p className="text-sm text-coral">{error}</p>}
                 <label className="flex items-start gap-2.5 text-sm text-gray-600 cursor-pointer">
                   <input
@@ -242,11 +257,12 @@ export default function Inscription() {
   );
 }
 
-function Field({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
+function Field({ label, value, onChange, placeholder, type = "text" }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
   return (
     <div>
       <label className="block text-sm font-medium mb-1">{label}</label>
       <input
+        type={type}
         className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal"
         value={value}
         placeholder={placeholder}
