@@ -33,6 +33,8 @@ export default function InscriptionMedecin() {
   const [specialiteAutre, setSpecialiteAutre] = useState("");
   const [numeroOrdre, setNumeroOrdre] = useState("");
   const [referralCode, setReferralCode] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [facilities, setFacilities] = useState<FacilityDraft[]>([emptyFacility()]);
 
   const [userId, setUserId] = useState("");
@@ -79,6 +81,8 @@ export default function InscriptionMedecin() {
           firstName, lastName, phone,
           specialite: finalSpecialite, numeroOrdre,
           referralCode: referralCode || undefined,
+          email: email.trim() || undefined,
+          password: password || undefined,
           facilities: facilities.map((f) => ({
             name: f.place!.name,
             address: f.place!.address || undefined,
@@ -170,8 +174,8 @@ export default function InscriptionMedecin() {
 
           {step === "form" && (
             <>
-              <h1 className="font-display text-2xl font-semibold mb-1">Inscrire mon cabinet</h1>
-              <p className="text-sm text-gray-500 mb-6">Rejoignez senedoc en tant que médecin.</p>
+              <h1 className="font-display text-2xl font-semibold mb-1">Créer mon compte médecin</h1>
+              <p className="text-sm text-gray-500 mb-6">Rejoignez SeneDoc et gérez vos rendez-vous en ligne.</p>
               <form onSubmit={submit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <F label="Prénom *" value={firstName} onChange={setFirstName} />
@@ -199,6 +203,16 @@ export default function InscriptionMedecin() {
                 </div>
                 <F label="Numéro à l'Ordre *" value={numeroOrdre} onChange={setNumeroOrdre} />
                 <F label="Code de parrainage (facultatif)" value={referralCode} onChange={setReferralCode} placeholder="Si un administrateur vous en a donné un" />
+
+                <div className="pt-2 border-t border-gray-100">
+                  <p className="text-xs text-gray-500 mb-2">
+                    Facultatif — utile si votre téléphone est temporairement injoignable, ou pour recevoir des informations importantes.
+                  </p>
+                  <div className="space-y-3">
+                    <F label="Email (facultatif)" value={email} onChange={setEmail} placeholder="vous@exemple.com" type="email" />
+                    <F label="Mot de passe (facultatif)" value={password} onChange={setPassword} placeholder="Au moins 8 caractères" type="password" />
+                  </div>
+                </div>
 
                 <div className="pt-2">
                   <h2 className="font-medium mb-1">Mes établissements</h2>
