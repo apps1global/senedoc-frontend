@@ -70,7 +70,7 @@ export default function CguPage() {
       <h3>4.4 Sécurité du compte</h3>
       <p>
         Vous êtes seul responsable de la confidentialité de votre code PIN et de toute activité effectuée depuis
-        votre compte. Contactez-nous immédiatement à doctafrik@gmail.com en cas de suspicion d&apos;accès non
+        votre compte. Contactez-nous immédiatement à support@senedoc.net en cas de suspicion d&apos;accès non
         autorisé.
       </p>
 
@@ -112,6 +112,18 @@ export default function CguPage() {
         La responsabilité de SeneDoc, si elle devait être engagée, est limitée aux dommages directs et prévisibles
         résultant d&apos;un manquement avéré à ses propres obligations de mise en relation technique.
       </p>
+      <p><strong>SeneDoc n&apos;est en aucun cas un service d&apos;urgence médicale.</strong> En cas d&apos;urgence,
+        n&apos;utilisez pas la plateforme : contactez immédiatement le SAMU (15) ou les Sapeurs-Pompiers (18).
+        Aucun rendez-vous pris via SeneDoc, y compris en téléconsultation, ne peut se substituer à une prise en
+        charge d&apos;urgence.</p>
+      <p>La téléconsultation se déroule via un service de visioconférence (Jitsi) chiffré de bout en bout : SeneDoc
+        n&apos;accède à aucun moment au contenu des échanges entre le Patient et le Médecin, et n&apos;en conserve
+        aucun enregistrement. Le secret médical demeure entièrement de la responsabilité du Médecin, comme pour
+        toute consultation.</p>
+      <p>Dès lors qu&apos;un Médecin reçoit ou consulte des informations relatives à un Patient — dans le cadre
+        d&apos;un rendez-vous, d&apos;un message, ou d&apos;une téléconsultation — il en devient seul responsable
+        au titre de sa pratique professionnelle et de ses obligations déontologiques. SeneDoc n&apos;intervient à
+        aucun stade dans le contenu, la conservation, ou l&apos;usage de ces informations par le Médecin.</p>
 
       <h2 style={sectionStyle}>9. Propriété intellectuelle</h2>
       <p>
@@ -128,7 +140,7 @@ export default function CguPage() {
 
       <h2 style={sectionStyle}>11. Résiliation</h2>
       <p>
-        Vous pouvez supprimer votre compte à tout moment en nous contactant à doctafrik@gmail.com. SeneDoc peut
+        Vous pouvez supprimer votre compte à tout moment en nous contactant à support@senedoc.net. SeneDoc peut
         suspendre ou résilier un compte en cas de manquement aux présentes CGU.
       </p>
 
@@ -145,7 +157,7 @@ export default function CguPage() {
       </p>
 
       <h2 style={sectionStyle}>14. Contact</h2>
-      <p>Pour toute question relative aux présentes CGU : doctafrik@gmail.com — +221 77 157 36 23</p>
+      <p>Pour toute question relative aux présentes CGU : support@senedoc.net — +221 77 157 36 23</p>
     </main>
   );
 }

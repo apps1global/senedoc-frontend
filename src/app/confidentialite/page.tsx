@@ -34,7 +34,7 @@ export default function PolitiqueConfidentialitePage() {
         <strong>Responsable du traitement :</strong> Apps 1 Global SAU, au capital de 10 000 000 F CFA — RCCM SN DKR
         2023 B 16270
         <br />
-        <strong>Contact :</strong> doctafrik@gmail.com — +221 77 157 36 23
+        <strong>Contact :</strong> support@senedoc.net — +221 77 157 36 23
         <br />
         <strong>Adresse :</strong> Jaxaay 1, unité 23, Villa 243, Région de Dakar, Sénégal
       </p>
@@ -112,7 +112,19 @@ export default function PolitiqueConfidentialitePage() {
       />
       <p>Nous ne partageons vos données avec aucune autre entreprise à des fins commerciales.</p>
 
-      <h2 style={sectionStyle}>5. Comment nous protégeons vos données</h2>
+      <h2 style={sectionStyle}>5. Transfert de vos données hors du Sénégal</h2>
+      <p>
+        Nos serveurs sont hébergés aux Pays-Bas, chez un prestataire d&apos;hébergement reconnu. Vos données
+        quittent donc le territoire sénégalais pour y être stockées et traitées.
+      </p>
+      <p>
+        Les Pays-Bas font partie de l&apos;Union européenne et appliquent le Règlement Général sur la Protection
+        des Données (RGPD), reconnu comme offrant un niveau de protection adéquat pour les données personnelles.
+        Ce transfert est donc encadré par des garanties équivalentes, sinon supérieures, à celles prévues par la
+        loi sénégalaise n° 2008-12 du 25 janvier 2008.
+      </p>
+
+      <h2 style={sectionStyle}>6. Comment nous protégeons vos données</h2>
       <ul>
         <li>Votre PIN et votre mot de passe (médecins) sont chiffrés (hachage bcrypt) — même notre équipe ne peut pas les lire.</li>
         <li>Les connexions entre l&apos;application et nos serveurs sont chiffrées (HTTPS).</li>
@@ -120,39 +132,39 @@ export default function PolitiqueConfidentialitePage() {
         <li>Votre compte est protégé contre les tentatives de connexion abusives (blocage temporaire après plusieurs échecs).</li>
       </ul>
 
-      <h2 style={sectionStyle}>6. Combien de temps conservons-nous vos données</h2>
+      <h2 style={sectionStyle}>7. Combien de temps conservons-nous vos données</h2>
       <p>
         Nous conservons vos données tant que votre compte reste actif. Si vous supprimez votre compte, vos données
         personnelles sont supprimées ou anonymisées dans un délai de 12 mois, sauf obligation légale de conservation
         plus longue (par exemple en cas de nécessité de lutte contre la fraude).
       </p>
 
-      <h2 style={sectionStyle}>7. Vos droits</h2>
+      <h2 style={sectionStyle}>8. Vos droits</h2>
       <p>
         Conformément à la loi sénégalaise n° 2008-12 du 25 janvier 2008 sur la protection des données à caractère
         personnel, vous disposez d&apos;un droit d&apos;accès, de rectification, et de suppression de vos données.
-        Pour exercer ces droits, contactez-nous à doctafrik@gmail.com.
+        Pour exercer ces droits, contactez-nous à support@senedoc.net.
       </p>
       <p>
         Vous pouvez également adresser une réclamation à la Commission de Protection des Données Personnelles (CDP)
         du Sénégal.
       </p>
 
-      <h2 style={sectionStyle}>8. Mineurs</h2>
+      <h2 style={sectionStyle}>9. Mineurs</h2>
       <p>
         SeneDoc est accessible aux personnes âgées de 18 ans et plus. Si vous êtes mineur, un parent ou tuteur légal
         doit créer et gérer votre compte, y compris pour la prise de rendez-vous en votre nom.
       </p>
 
-      <h2 style={sectionStyle}>9. Modifications de cette politique</h2>
+      <h2 style={sectionStyle}>10. Modifications de cette politique</h2>
       <p>
         Nous pouvons mettre à jour cette politique de confidentialité. La date de dernière mise à jour est indiquée
         en haut de cette page. En cas de changement important, nous vous en informerons via l&apos;application ou
         par SMS.
       </p>
 
-      <h2 style={sectionStyle}>10. Contact</h2>
-      <p>Pour toute question sur cette politique de confidentialité : doctafrik@gmail.com</p>
+      <h2 style={sectionStyle}>11. Contact</h2>
+      <p>Pour toute question sur cette politique de confidentialité : support@senedoc.net</p>
     </main>
   );
 }
