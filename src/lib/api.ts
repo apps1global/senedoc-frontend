@@ -48,6 +48,16 @@ export const support = {
     apiFetch(`/support/tickets/${id}/messages`, { method: 'POST', body: { body } }),
 };
 
+export const adminContact = {
+  listMessages: (status?: string) =>
+    apiFetch(`/admin-portal/contact/messages${status ? `?status=${status}` : ""}`),
+  getMessage: (id: string) => apiFetch(`/admin-portal/contact/messages/${id}`),
+  reply: (id: string, body: string) =>
+    apiFetch(`/admin-portal/contact/messages/${id}/reply`, { method: "POST", body: { body } }),
+  close: (id: string) =>
+    apiFetch(`/admin-portal/contact/messages/${id}/close`, { method: "POST" }),
+};
+
 export const adminSupport = {
   listTickets: (status?: string) =>
     apiFetch(`/admin-portal/support/tickets${status ? `?status=${status}` : ""}`),

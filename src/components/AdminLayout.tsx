@@ -7,7 +7,7 @@ import { Logo } from "./Logo";
 import { ToastStack } from "./ToastStack";
 import { useToasts } from "@/lib/useToasts";
 import { getSocket } from "@/lib/socket";
-import { auth, adminPortal, articles, comments, adminSupport } from "@/lib/api";
+import { auth, adminPortal, articles, comments, adminSupport, adminContact } from "@/lib/api";
 
 type Me = { sub: string; email: string; role: string };
 
@@ -22,6 +22,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [pendingArticles, setPendingArticles] = useState(0);
   const [pendingComments, setPendingComments] = useState(0);
   const [pendingSupport, setPendingSupport] = useState(0);
+  const [pendingContact, setPendingContact] = useState(0);
 
   useEffect(() => {
     auth
@@ -46,6 +47,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     articles.getPendingReview().then((list: any) => setPendingArticles(list.length)).catch(() => {});
     comments.getPending().then((list: any) => setPendingComments(list.length)).catch(() => {});
     adminSupport.listTickets("OPEN").then((list: any) => setPendingSupport(list.length)).catch(() => {});
+    adminContact.listMessages("OPEN").then((list: any) => setPendingContact(list.length)).catch(() => {});
   }, [me, pathname]);
 
   // Temps réel : connexion WebSocket authentifiée via le même cookie de
@@ -75,13 +77,20 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     socket.on("doctor:pending", onDoctorPending);
     socket.on("article:pending", onArticlePending);
     socket.on("comment:pending", onCommentPending);
+    const onContactPending = (data: any) => {
+      setPendingContact((n) => n + 1);
+      push(`Nouveau message de contact de ${data.name}`);
+    };
+
     socket.on("support:pending", onSupportPending);
+    socket.on("contact:pending", onContactPending);
 
     return () => {
       socket.off("doctor:pending", onDoctorPending);
       socket.off("article:pending", onArticlePending);
       socket.off("comment:pending", onCommentPending);
       socket.off("support:pending", onSupportPending);
+      socket.off("contact:pending", onContactPending);
     };
   }, [me, push]);
 
@@ -108,6 +117,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     { href: "/admin/articles/relecture", label: "Relecture", badge: pendingArticles },
     { href: "/admin/commentaires", label: "Commentaires", badge: pendingComments },
     { href: "/admin/support", label: "Support", badge: pendingSupport },
+    { href: "/admin/contact", label: "Contact", badge: pendingContact },
     ...(isSuperAdmin ? [{ href: "/admin/utilisateurs", label: "Utilisateurs" }] : []),
     { href: "/admin/parametres", label: "Paramètres" },
   ];
