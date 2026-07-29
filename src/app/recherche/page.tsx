@@ -252,6 +252,11 @@ function RechercheContent() {
             ))}
           </div>
         )}
+
+        <div className="mt-10 bg-coral-light border border-coral/20 rounded-xl p-4 text-sm text-gray-700">
+          <strong className="text-coral">En cas d&apos;urgence,</strong> ne prenez pas de rendez-vous sur SeneDoc.
+          Appelez immédiatement le <strong>SAMU au 15</strong> ou les <strong>Sapeurs-Pompiers au 18</strong>.
+        </div>
       </div>
     </>
   );
