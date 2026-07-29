@@ -7,7 +7,7 @@ import { Logo } from "./Logo";
 import { ToastStack } from "./ToastStack";
 import { useToasts } from "@/lib/useToasts";
 import { getSocket } from "@/lib/socket";
-import { auth, adminPortal, articles, comments } from "@/lib/api";
+import { auth, adminPortal, articles, comments, adminSupport } from "@/lib/api";
 
 type Me = { sub: string; email: string; role: string };
 
@@ -21,6 +21,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [pendingDoctors, setPendingDoctors] = useState(0);
   const [pendingArticles, setPendingArticles] = useState(0);
   const [pendingComments, setPendingComments] = useState(0);
+  const [pendingSupport, setPendingSupport] = useState(0);
 
   useEffect(() => {
     auth
@@ -44,6 +45,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     adminPortal.dashboard().then((d: any) => setPendingDoctors(d?.doctors?.pending ?? 0)).catch(() => {});
     articles.getPendingReview().then((list: any) => setPendingArticles(list.length)).catch(() => {});
     comments.getPending().then((list: any) => setPendingComments(list.length)).catch(() => {});
+    adminSupport.listTickets("OPEN").then((list: any) => setPendingSupport(list.length)).catch(() => {});
   }, [me, pathname]);
 
   // Temps réel : connexion WebSocket authentifiée via le même cookie de
@@ -99,6 +101,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     { href: "/admin/articles", label: "Blog" },
     { href: "/admin/articles/relecture", label: "Relecture", badge: pendingArticles },
     { href: "/admin/commentaires", label: "Commentaires", badge: pendingComments },
+    { href: "/admin/support", label: "Support", badge: pendingSupport },
     ...(isSuperAdmin ? [{ href: "/admin/utilisateurs", label: "Utilisateurs" }] : []),
     { href: "/admin/parametres", label: "Paramètres" },
   ];
