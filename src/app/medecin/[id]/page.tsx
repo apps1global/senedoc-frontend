@@ -497,7 +497,7 @@ export default function FicheMedecin() {
                       disabled={booking === selectedSlot}
                       className="w-full mt-4 bg-coral text-white py-3 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
                     >
-                      {booking === selectedSlot ? "Envoi…" : `Confirmer le rendez-vous de ${selectedSlot}`}
+                      {booking === selectedSlot ? "Envoi…" : `Envoyer la demande pour ${selectedSlot}`}
                     </button>
                   )}
 
