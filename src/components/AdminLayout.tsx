@@ -67,15 +67,21 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       setPendingComments((n) => n + 1);
       push(`Nouveau commentaire à modérer sur « ${data.articleTitle} »`);
     };
+    const onSupportPending = (data: any) => {
+      setPendingSupport((n) => n + 1);
+      push(`Nouveau message support : « ${data.subject} »`);
+    };
 
     socket.on("doctor:pending", onDoctorPending);
     socket.on("article:pending", onArticlePending);
     socket.on("comment:pending", onCommentPending);
+    socket.on("support:pending", onSupportPending);
 
     return () => {
       socket.off("doctor:pending", onDoctorPending);
       socket.off("article:pending", onArticlePending);
       socket.off("comment:pending", onCommentPending);
+      socket.off("support:pending", onSupportPending);
     };
   }, [me, push]);
 
