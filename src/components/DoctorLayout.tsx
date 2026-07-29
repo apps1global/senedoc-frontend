@@ -113,6 +113,7 @@ export function DoctorLayout({ children }: { children: React.ReactNode }) {
     { href: "/espace-medecin/disponibilites", label: "Disponibilités" },
     { href: "/espace-medecin/etablissements", label: "Établissements" },
     { href: "/espace-medecin/articles", label: "Blog" },
+    { href: "/espace-medecin/support", label: "Support" },
     { href: "/espace-medecin/profil", label: "Profil" },
   ];
 
