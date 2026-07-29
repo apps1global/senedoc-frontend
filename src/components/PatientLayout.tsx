@@ -54,6 +54,7 @@ export function PatientLayout({ children }: { children: React.ReactNode }) {
   const NAV = [
     { href: "/espace-patient", label: "Mes rendez-vous" },
     { href: "/espace-patient/proches", label: "Mes proches" },
+    { href: "/espace-patient/support", label: "Support" },
     { href: "/espace-patient/profil", label: "Mon profil" },
   ];
 

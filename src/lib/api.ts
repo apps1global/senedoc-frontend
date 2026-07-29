@@ -39,6 +39,15 @@ export const contact = {
     apiFetch('/contact', { method: 'POST', body, auth: false }),
 };
 
+export const support = {
+  createTicket: (body: { subject: string; message: string }) =>
+    apiFetch('/support/tickets', { method: 'POST', body }),
+  listMyTickets: () => apiFetch('/support/tickets'),
+  getTicket: (id: string) => apiFetch(`/support/tickets/${id}`),
+  addMessage: (id: string, body: string) =>
+    apiFetch(`/support/tickets/${id}/messages`, { method: 'POST', body: { body } }),
+};
+
 export const auth = {
   register: (body: {
     firstName: string;
