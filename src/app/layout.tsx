@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { CookieBanner } from "@/components/CookieBanner";
 
 export const metadata: Metadata = {
   title: "senedoc — Prenez rendez-vous avec un médecin au Sénégal",
@@ -19,7 +20,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body>{children}</body>
+      <body>
+        {children}
+        <CookieBanner />
+      </body>
     </html>
   );
 }
