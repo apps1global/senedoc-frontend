@@ -35,7 +35,7 @@ export async function apiFetch<T = any>(
 
 // ── Auth ──────────────────────────────────────────────
 export const contact = {
-  send: (body: { name: string; email: string; message: string }) =>
+  send: (body: { name: string; email: string; phone?: string; message: string; recaptchaToken: string }) =>
     apiFetch('/contact', { method: 'POST', body, auth: false }),
 };
 
