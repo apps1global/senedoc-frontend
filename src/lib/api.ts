@@ -34,6 +34,11 @@ export async function apiFetch<T = any>(
 }
 
 // ── Auth ──────────────────────────────────────────────
+export const contact = {
+  send: (body: { name: string; email: string; message: string }) =>
+    apiFetch('/contact', { method: 'POST', body, auth: false }),
+};
+
 export const auth = {
   register: (body: {
     firstName: string;
