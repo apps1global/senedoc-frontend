@@ -5,8 +5,9 @@ import { DoctorLayout } from "@/components/DoctorLayout";
 import { doctorPortal } from "@/lib/api";
 
 type AvailType = "PRESENTIEL" | "TELECONSULTATION";
-type Availability = { id: string; dayOfWeek: number; startTime: string; endTime: string; type: AvailType };
+type Availability = { id: string; dayOfWeek: number; startTime: string; endTime: string; type: AvailType; facility?: { id: string; name: string } | null };
 type ExceptionDate = { id: string; exceptionDate: string; reason: string | null };
+type Facility = { id: string; name: string; city: string | null };
 
 const DAYS = ["", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
 
@@ -21,6 +22,8 @@ export default function DisponibilitesMedecin() {
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("17:00");
   const [adding, setAdding] = useState(false);
+  const [facilities, setFacilities] = useState<Facility[]>([]);
+  const [selectedFacilityId, setSelectedFacilityId] = useState<string>("");
 
   const [exceptionDate, setExceptionDate] = useState("");
   const [exceptionReason, setExceptionReason] = useState("");
@@ -28,10 +31,13 @@ export default function DisponibilitesMedecin() {
 
   async function loadAll() {
     try {
-      const [avail, exc] = await Promise.all([
+      const [avail, exc, facs] = await Promise.all([
         doctorPortal.getAvailability(),
         doctorPortal.getExceptions(),
+        doctorPortal.getFacilities(),
       ]);
+      setFacilities(facs as Facility[]);
+      if ((facs as Facility[]).length === 1) setSelectedFacilityId((facs as Facility[])[0].id);
       setAvailabilities(
         (avail as Availability[]).sort(
           (a, b) => a.dayOfWeek - b.dayOfWeek || a.startTime.localeCompare(b.startTime)
@@ -58,9 +64,19 @@ export default function DisponibilitesMedecin() {
       setError("L'heure de fin doit être après l'heure de début.");
       return;
     }
+    if (tab === "PRESENTIEL" && facilities.length > 1 && !selectedFacilityId) {
+      setError("Choisissez à quel établissement ce créneau appartient.");
+      return;
+    }
     setAdding(true);
     try {
-      await doctorPortal.createAvailability({ dayOfWeek, startTime, endTime, type: tab });
+      await doctorPortal.createAvailability({
+        dayOfWeek,
+        startTime,
+        endTime,
+        type: tab,
+        facilityId: tab === "PRESENTIEL" ? selectedFacilityId || undefined : undefined,
+      });
       await loadAll();
     } catch (err: any) {
       setError(err.message);
@@ -145,7 +161,10 @@ export default function DisponibilitesMedecin() {
                 <div className="space-y-2">
                   {filteredAvailabilities.map((a) => (
                     <div key={a.id} className="flex items-center justify-between text-sm py-2 border-b border-gray-50 last:border-0">
-                      <span>{DAYS[a.dayOfWeek]} — {a.startTime} à {a.endTime}</span>
+                      <span>
+                        {DAYS[a.dayOfWeek]} — {a.startTime} à {a.endTime}
+                        {a.facility && <span className="text-gray-400"> · {a.facility.name}</span>}
+                      </span>
                       <button onClick={() => removeAvailability(a.id)} className="text-gray-400 hover:text-coral transition-colors">Retirer</button>
                     </div>
                   ))}
@@ -154,6 +173,21 @@ export default function DisponibilitesMedecin() {
             </div>
 
             <form onSubmit={addAvailability} className="bg-white border border-gray-100 rounded-xl p-5 flex flex-wrap items-end gap-3">
+              {tab === "PRESENTIEL" && facilities.length > 1 && (
+                <div>
+                  <label className="block text-xs font-medium mb-1">Établissement</label>
+                  <select
+                    value={selectedFacilityId}
+                    onChange={(e) => setSelectedFacilityId(e.target.value)}
+                    className="border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-teal text-sm"
+                  >
+                    <option value="">Choisir…</option>
+                    {facilities.map((f) => (
+                      <option key={f.id} value={f.id}>{f.name}{f.city ? ` — ${f.city}` : ""}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div>
                 <label className="block text-xs font-medium mb-1">Jour</label>
                 <select

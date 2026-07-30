@@ -260,7 +260,7 @@ export const doctorPortal = {
   getAppointments: () => apiFetch('/doctor/me/appointments'),
 
   getAvailability: () => apiFetch('/doctor/me/availability'),
-  createAvailability: (body: { dayOfWeek: number; startTime: string; endTime: string; type?: 'PRESENTIEL' | 'TELECONSULTATION' }) =>
+  createAvailability: (body: { dayOfWeek: number; startTime: string; endTime: string; type?: 'PRESENTIEL' | 'TELECONSULTATION'; facilityId?: string }) =>
     apiFetch('/doctor/me/availability', { method: 'POST', body }),
   deleteAvailability: (id: string) =>
     apiFetch(`/doctor/me/availability/${id}`, { method: 'DELETE' }),
