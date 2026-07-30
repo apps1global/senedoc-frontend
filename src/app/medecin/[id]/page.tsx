@@ -182,13 +182,19 @@ export default function FicheMedecin() {
         relativeId: selectedRelativeId ?? undefined,
         facilityId: consultType === "PRESENTIEL" ? selectedFacilityId ?? undefined : undefined,
       });
-      setBookingSuccess(
-        consultType === "TELECONSULTATION"
-          ? "Rendez-vous demandé ! Le lien de téléconsultation vous sera envoyé par SMS à la confirmation."
-          : "Rendez-vous demandé ! Vous recevrez une confirmation par SMS.",
-      );
-      setDaySlots((prev) => prev.filter((s) => s !== selectedSlot));
-      setSelectedSlot(null);
+      const dateLabel = new Date(`${selectedDate}T${selectedSlot}:00.000Z`).toLocaleDateString("fr-FR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      });
+      const params = new URLSearchParams({
+        doctor: name,
+        date: dateLabel,
+        time: selectedSlot,
+        type: consultType,
+      });
+      router.push(`/rendez-vous-envoye?${params.toString()}`);
+      return;
     } catch (err: any) {
       setBookingError(err.message);
     } finally {
