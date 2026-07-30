@@ -8,7 +8,6 @@ const CHAMPS_VIDES = {
   firstName: "",
   lastName: "",
   phone: "",
-  dateOfBirth: "",
   relationship: "",
 };
 
@@ -45,7 +44,6 @@ export default function MesProches() {
       firstName: form.firstName.trim(),
       lastName: form.lastName.trim(),
       phone: form.phone.trim(),
-      dateOfBirth: form.dateOfBirth || undefined,
       relationship: form.relationship.trim() || undefined,
     };
     try {
@@ -77,7 +75,6 @@ export default function MesProches() {
       firstName: r.firstName,
       lastName: r.lastName,
       phone: r.phone ?? "",
-      dateOfBirth: r.dateOfBirth ? r.dateOfBirth.slice(0, 10) : "",
       relationship: r.relationship ?? "",
     });
   }
@@ -124,9 +121,6 @@ export default function MesProches() {
               onChange={(e) => setForm({ ...form, relationship: e.target.value })} />
           </div>
           <div>
-            <label className="block text-xs text-gray-600 mb-1">Date de naissance</label>
-            <input type="date" className={champ} value={form.dateOfBirth}
-              onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })} />
           </div>
         </div>
         <div className="flex gap-3 mt-4">
