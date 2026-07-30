@@ -86,7 +86,7 @@ export default function FicheMedecin() {
   const [visibleMonth, setVisibleMonth] = useState(new Date());
   const [availableDays, setAvailableDays] = useState<Record<string, boolean>>({});
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [daySlots, setDaySlots] = useState<string[]>([]);
+  const [daySlots, setDaySlots] = useState<{ time: string; facilityId: string | null; facilityName: string | null }[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [slotsLoading, setSlotsLoading] = useState(false);
 
@@ -168,7 +168,7 @@ export default function FicheMedecin() {
   async function confirmBooking() {
     if (!selectedDate || !selectedSlot) return;
     if (consultType === "PRESENTIEL" && (doctor?.facilityMemberships.length ?? 0) > 1 && !selectedFacilityId) {
-      setBookingError("Choisissez d'abord un établissement ci-dessus.");
+      setBookingError("Ce créneau n'a pas d'établissement associé. Contactez le support.");
       return;
     }
     setBooking(selectedSlot);
@@ -395,29 +395,6 @@ export default function FicheMedecin() {
                 </div>
               )}
 
-              {consultType === "PRESENTIEL" && doctor.facilityMemberships.length > 1 && (
-                <div className="mb-5">
-                  <p className="text-sm font-medium mb-2">Établissement</p>
-                  <div className="flex flex-col gap-2">
-                    {doctor.facilityMemberships.map(({ facility: f }) => (
-                      <button
-                        key={f.id}
-                        type="button"
-                        onClick={() => setSelectedFacilityId(f.id)}
-                        className={`text-left px-3 py-2.5 rounded-lg text-sm border transition-colors ${
-                          selectedFacilityId === f.id
-                            ? "border-teal bg-teal-light text-teal-dark font-medium"
-                            : "border-gray-200 text-gray-600 hover:border-teal"
-                        }`}
-                      >
-                        {f.name}
-                        {f.city ? ` — ${f.city}` : ""}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               {/* Calendrier mensuel */}
               <div className="flex items-center justify-between mb-4">
                 <button
@@ -483,15 +460,23 @@ export default function FicheMedecin() {
                     <div className="flex flex-wrap gap-2">
                       {daySlots.map((slot) => (
                         <button
-                          key={slot}
-                          onClick={() => setSelectedSlot(slot)}
-                          className={`px-4 py-2 border rounded-lg text-sm font-medium transition-colors ${
-                            selectedSlot === slot
+                          key={slot.time}
+                          onClick={() => {
+                            setSelectedSlot(slot.time);
+                            if (slot.facilityId) setSelectedFacilityId(slot.facilityId);
+                          }}
+                          className={`px-4 py-2 border rounded-lg text-sm font-medium transition-colors flex flex-col items-center ${
+                            selectedSlot === slot.time
                               ? "bg-teal text-white border-teal"
                               : "border-teal text-teal-dark hover:bg-teal-light"
                           }`}
                         >
-                          {slot}
+                          <span>{slot.time}</span>
+                          {slot.facilityName && doctor.facilityMemberships.length > 1 && (
+                            <span className={`text-[11px] font-normal mt-0.5 ${selectedSlot === slot.time ? "text-white/80" : "text-gray-500"}`}>
+                              {slot.facilityName}
+                            </span>
+                          )}
                         </button>
                       ))}
                     </div>
