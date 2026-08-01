@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { PatientLayout } from "@/components/PatientLayout";
 import { Footer } from "@/components/Footer";
-import { doctors, slots as slotsApi, appointments, auth, relatives as relativesApi, type Relative, type AppointmentType } from "@/lib/api";
+import { doctors, slots as slotsApi, appointments, auth, patients, payments, relatives as relativesApi, type Relative, type AppointmentType } from "@/lib/api";
 import { isInSenegal, HORS_SENEGAL_MESSAGE } from "@/lib/geo";
 
 type Facility = {
@@ -61,12 +61,18 @@ export default function FicheMedecin() {
   // l'en-tete public.
   useEffect(() => {
     auth.me()
-      .then((u: any) => setIsPatient(u?.role === "PATIENT"))
+      .then((u: any) => {
+        setIsPatient(u?.role === "PATIENT");
+        if (u?.role === "PATIENT") {
+          patients.getMe().then((p: any) => setResidesAbroad(!!p?.country)).catch(() => {});
+        }
+      })
       .catch(() => setIsPatient(false));
   }, []);
 
   const [doctor, setDoctor] = useState<Doctor | null>(null);
   const [isPatient, setIsPatient] = useState<boolean | null>(null);
+  const [residesAbroad, setResidesAbroad] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
@@ -175,13 +181,24 @@ export default function FicheMedecin() {
     setBookingError("");
     setBookingSuccess("");
     try {
-      await appointments.create({
+      const created: any = await appointments.create({
         doctorId,
         appointmentDate: `${selectedDate}T${selectedSlot}:00.000Z`,
         type: consultType,
         relativeId: selectedRelativeId ?? undefined,
         facilityId: consultType === "PRESENTIEL" ? selectedFacilityId ?? undefined : undefined,
       });
+
+      // Patient résidant à l'étranger : la demande n'est envoyée qu'après
+      // paiement du frais de 5€, via une session Stripe Checkout.
+      if (residesAbroad && created?.id) {
+        const checkout: any = await payments.createAppointmentFeeCheckout(created.id);
+        if (checkout.url) {
+          window.location.href = checkout.url;
+          return;
+        }
+      }
+
       const dateLabel = new Date(`${selectedDate}T${selectedSlot}:00.000Z`).toLocaleDateString("fr-FR", {
         weekday: "long",
         day: "numeric",
@@ -488,7 +505,11 @@ export default function FicheMedecin() {
                       disabled={booking === selectedSlot}
                       className="w-full mt-4 bg-coral text-white py-3 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
                     >
-                      {booking === selectedSlot ? "Envoi…" : `Envoyer la demande pour ${selectedSlot}`}
+                      {booking === selectedSlot
+                        ? "Redirection…"
+                        : residesAbroad
+                        ? `Cette demande vous coûtera 5 €. Payer maintenant →`
+                        : `Envoyer la demande pour ${selectedSlot}`}
                     </button>
                   )}
 
