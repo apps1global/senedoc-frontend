@@ -83,7 +83,11 @@ export default function RendezVousMedecin() {
 
   return (
     <DoctorLayout>
-      <h1 className="font-display text-2xl font-semibold mb-6">Mes rendez-vous</h1>
+      <h1 className="font-display text-2xl font-semibold mb-2">Mes rendez-vous</h1>
+      <p className="text-xs text-gray-400 mb-6">
+        Certaines demandes sont pré-payées par le patient. Sans réponse de votre part sous 24h, elles sont
+        automatiquement annulées et le patient est remboursé.
+      </p>
       {error && <p className="text-sm text-coral mb-4">{error}</p>}
 
       {loading ? (

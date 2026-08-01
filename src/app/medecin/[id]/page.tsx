@@ -513,6 +513,12 @@ export default function FicheMedecin() {
                     </button>
                   )}
 
+                  {selectedSlot && !bookingSuccess && residesAbroad && (
+                    <p className="text-xs text-gray-400 mt-2 text-center leading-relaxed">
+                      Si le professionnel ne répond pas sous 24h, la demande est automatiquement annulée et vous êtes remboursé automatiquement.
+                    </p>
+                  )}
+
                   {bookingError && <p className="text-sm text-coral mt-3">{bookingError}</p>}
                   {bookingSuccess && (
                     <div className="mt-3">
