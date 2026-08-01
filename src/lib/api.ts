@@ -254,6 +254,13 @@ export const appointments = {
 };
 
 // ── Espace médecin ────────────────────────────────────
+export const payments = {
+  createSubscriptionCheckout: (plan: "MONTHLY" | "SEMIANNUAL" | "ANNUAL") =>
+    apiFetch("/payments/subscription-checkout", { method: "POST", body: { plan } }),
+  createAppointmentFeeCheckout: (appointmentId: string) =>
+    apiFetch("/payments/appointment-fee-checkout", { method: "POST", body: { appointmentId } }),
+};
+
 export const doctorPortal = {
   getMe: () => apiFetch('/doctor/me'),
   getDashboard: () => apiFetch('/doctor/me/dashboard'),

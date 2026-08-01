@@ -12,6 +12,7 @@ import { doctorPortal, auth } from "@/lib/api";
 type DoctorInfo = {
   id: string;
   validationStatus: "PENDING" | "VALIDATED" | "REJECTED";
+  subscriptionStatus: "INACTIVE" | "ACTIVE" | "PAST_DUE" | "CANCELLED";
   user: { firstName: string | null; lastName: string | null };
   specialty: { name: string };
 };
@@ -27,10 +28,18 @@ export function DoctorLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     doctorPortal
       .getMe()
-      .then((d) => setDoctor(d as DoctorInfo))
+      .then((d) => {
+        const doc = d as DoctorInfo;
+        setDoctor(doc);
+        // Espace médecin verrouillé tant que l'abonnement n'est pas actif —
+        // sauf sur la page d'abonnement elle-même, sinon impossible d'y payer.
+        if (doc.subscriptionStatus !== "ACTIVE" && pathname !== "/espace-medecin/abonnement") {
+          router.replace("/espace-medecin/abonnement");
+        }
+      })
       .catch(() => router.push("/espace-medecin/connexion"))
       .finally(() => setLoading(false));
-  }, [router]);
+  }, [router, pathname]);
 
   // Compteur de RDV en attente — chargement initial à chaque navigation,
   // puis incrémenté en temps réel via WebSocket ci-dessous.
