@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { PatientLayout } from "@/components/PatientLayout";
 import { Footer } from "@/components/Footer";
-import { doctors, slots as slotsApi, appointments, auth, patients, payments, relatives as relativesApi, type Relative, type AppointmentType } from "@/lib/api";
+import { doctors, slots as slotsApi, appointments, auth, patients, payments, relatives as relativesApi, favorites, type Relative, type AppointmentType } from "@/lib/api";
 import { isInSenegal, HORS_SENEGAL_MESSAGE } from "@/lib/geo";
 
 type Facility = {
@@ -65,13 +65,33 @@ export default function FicheMedecin() {
         setIsPatient(u?.role === "PATIENT");
         if (u?.role === "PATIENT") {
           patients.getMe().then((p: any) => setResidesAbroad(!!p?.country)).catch(() => {});
+          favorites.getMine().then((list: any) => setIsFavorite(list.some((d: any) => d.id === doctorId))).catch(() => {});
         }
       })
       .catch(() => setIsPatient(false));
-  }, []);
+  }, [doctorId]);
+
+  async function toggleFavorite() {
+    setFavoriteLoading(true);
+    try {
+      if (isFavorite) {
+        await favorites.remove(doctorId);
+        setIsFavorite(false);
+      } else {
+        await favorites.add(doctorId);
+        setIsFavorite(true);
+      }
+    } catch (e) {
+      console.error("Erreur favoris:", e);
+    } finally {
+      setFavoriteLoading(false);
+    }
+  }
 
   const [doctor, setDoctor] = useState<Doctor | null>(null);
   const [isPatient, setIsPatient] = useState<boolean | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
   const [residesAbroad, setResidesAbroad] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -266,26 +286,38 @@ export default function FicheMedecin() {
     <Wrap>
       <div className="max-w-3xl mx-auto px-6 py-10">
         {/* En-tête profil */}
-        <div className="flex items-start gap-5 mb-6">
-          <div className="w-20 h-20 rounded-full overflow-hidden bg-teal-light flex-shrink-0">
-            {doctor.photoUrl ? (
-              <img src={doctor.photoUrl} alt={name} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-teal-dark font-semibold text-xl">
-                {`${doctor.user.firstName?.[0] ?? ""}${doctor.user.lastName?.[0] ?? ""}`.toUpperCase() || "?"}
-              </div>
-            )}
+        <div className="flex items-start justify-between gap-5 mb-6">
+          <div className="flex items-start gap-5 min-w-0">
+            <div className="w-20 h-20 rounded-full overflow-hidden bg-teal-light flex-shrink-0">
+              {doctor.photoUrl ? (
+                <img src={doctor.photoUrl} alt={name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-teal-dark font-semibold text-xl">
+                  {`${doctor.user.firstName?.[0] ?? ""}${doctor.user.lastName?.[0] ?? ""}`.toUpperCase() || "?"}
+                </div>
+              )}
+            </div>
+            <div className="min-w-0">
+              <h1 className="font-display text-2xl font-semibold">{name}</h1>
+              <p className="text-teal-dark">{doctor.specialty.name}</p>
+              {doctor.yearsExperience != null && (
+                <p className="text-sm text-gray-500 mt-0.5">{doctor.yearsExperience} ans d'expérience</p>
+              )}
+              {doctor.teleconsultation && (
+                <span className="inline-block bg-teal-light text-teal-dark text-xs font-medium px-2.5 py-1 rounded-full mt-2">Téléconsultation possible</span>
+              )}
+            </div>
           </div>
-          <div className="min-w-0">
-            <h1 className="font-display text-2xl font-semibold">{name}</h1>
-            <p className="text-teal-dark">{doctor.specialty.name}</p>
-            {doctor.yearsExperience != null && (
-              <p className="text-sm text-gray-500 mt-0.5">{doctor.yearsExperience} ans d'expérience</p>
-            )}
-            {doctor.teleconsultation && (
-              <span className="inline-block bg-teal-light text-teal-dark text-xs font-medium px-2.5 py-1 rounded-full mt-2">Téléconsultation possible</span>
-            )}
-          </div>
+          {isPatient && (
+            <button
+              onClick={toggleFavorite}
+              disabled={favoriteLoading}
+              aria-label={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
+              className="flex-shrink-0 text-2xl leading-none disabled:opacity-50"
+            >
+              <span className={isFavorite ? "text-coral" : "text-gray-300"}>{isFavorite ? "♥" : "♡"}</span>
+            </button>
+          )}
         </div>
 
         {/* Tarifs */}

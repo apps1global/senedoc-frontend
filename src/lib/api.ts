@@ -117,6 +117,13 @@ export const patients = {
   getMe: () => apiFetch('/patients/me'),
 };
 
+// ── Favoris ───────────────────────────────────────────
+export const favorites = {
+  getMine: () => apiFetch('/favorites'),
+  add: (doctorId: string) => apiFetch(`/favorites/${doctorId}`, { method: 'POST' }),
+  remove: (doctorId: string) => apiFetch(`/favorites/${doctorId}`, { method: 'DELETE' }),
+};
+
 // ── Spécialités (autocomplétion) ─────────────────────
 export const specialties = {
   getAll: (): Promise<{ id: string; name: string }[]> =>
