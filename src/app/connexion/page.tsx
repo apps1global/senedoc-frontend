@@ -114,19 +114,13 @@ function ConnexionContent() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Panneau signature — masqué sur mobile, motif de pulsation cardiaque en écho au logo */}
+      {/* Panneau signature — masqué sur mobile, motif du stéthoscope en écho au logo */}
       <div
-        className="hidden md:flex md:w-[42%] relative overflow-hidden flex-col justify-between p-12"
+        className="hidden md:flex md:w-[42%] relative overflow-hidden flex-col justify-center p-12"
         style={{ background: "linear-gradient(160deg, #0B4A3B 0%, #0F6E56 100%)" }}
       >
-        <PulseTexture />
-        <Link href="/" className="relative z-10">
-          <span className="font-display text-2xl font-bold text-white">
-            Se<span className="text-teal-200">●</span>edoc
-          </span>
-        </Link>
         <div className="relative z-10">
-          <PulseHero />
+          <StethoscopeMark size={180} />
           <h2 className="font-display text-3xl font-semibold text-white mt-8 leading-tight">
             Votre santé,<br />à portée de clic.
           </h2>
@@ -134,23 +128,14 @@ function ConnexionContent() {
             Patients et médecins déjà connectés à travers le Sénégal.
           </p>
         </div>
-        <p className="relative z-10 text-xs text-white/40">© SeneDoc</p>
+        <p className="absolute bottom-8 left-12 text-xs text-white/40">© SeneDoc</p>
       </div>
 
       <div className="flex-1 flex flex-col bg-gray-50">
-        <div
-          className="md:hidden px-6 pt-8 pb-10 relative overflow-hidden"
-          style={{ background: "linear-gradient(160deg, #0B4A3B 0%, #0F6E56 100%)" }}
-        >
-          <PulseTexture />
-          <Link href="/" className="relative z-10 block">
-            <span className="font-display text-xl font-bold text-white">
-              Se<span className="text-teal-200">●</span>edoc
-            </span>
-          </Link>
-          <div className="relative z-10 mt-4">
-            <PulseHero />
-          </div>
+        <div className="p-6"><Link href="/"><Logo /></Link></div>
+        <div className="md:hidden px-6 pb-2 flex items-center gap-2 text-teal-dark">
+          <StethoscopeMark size={22} />
+          <p className="text-xs font-medium">Votre santé, à portée de clic.</p>
         </div>
         <div className="flex-1 flex items-center justify-center px-6 pb-16">
           <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
@@ -276,61 +261,26 @@ function Submit({ loading, children }: { loading: boolean; children: React.React
   return <button type="submit" disabled={loading} className="w-full bg-teal text-white py-3 rounded-lg font-medium hover:bg-teal-dark transition-colors disabled:opacity-60">{loading ? "Un instant…" : children}</button>;
 }
 
-// Motif de fond en filigrane : plusieurs lignes de pulsation cardiaque
-// dupliquées à faible opacité, en écho au point de pulsation du logo.
-function PulseTexture() {
-  const spike = "L20,0 L28,-20 L36,20 L44,-12 L52,0 L120,0";
-  const path = `M0,0 ${spike} ${spike.replace(/(-?\d+),(-?\d+)/g, (_, x, y) => `${Number(x) + 120},${y}`)} ${spike.replace(/(-?\d+),(-?\d+)/g, (_, x, y) => `${Number(x) + 240},${y}`)} L400,0`;
+// Motif signature : silhouette de stéthoscope, en écho au logo (dont le
+// "n" et l'un des "o" sont dessinés comme un stéthoscope). Taille modulable :
+// grande version pour le panneau desktop, petite pour l'accent mobile.
+function StethoscopeMark({ size = 180 }: { size?: number }) {
+  const height = size * (260 / 200);
   return (
-    <svg
-      className="absolute inset-0 w-full h-full"
-      viewBox="0 0 400 400"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      {[60, 140, 220, 300].map((y, i) => (
-        <path
-          key={y}
-          d={path}
-          transform={`translate(-40, ${y})`}
-          fill="none"
-          stroke="white"
-          strokeWidth="1.5"
-          opacity={0.06 + (i % 2) * 0.03}
-        />
-      ))}
+    <svg width={size} height={height} viewBox="0 0 200 260" fill="none" aria-hidden="true">
+      <rect x="28" y="8" width="16" height="26" rx="8" fill="#F2A488" />
+      <rect x="156" y="8" width="16" height="26" rx="8" fill="#F2A488" />
+      <path
+        d="M36,32 C36,70 55,85 92,118 C100,125 100,135 100,148"
+        stroke="#F2A488" strokeWidth="7" fill="none" strokeLinecap="round"
+      />
+      <path
+        d="M164,32 C164,70 145,85 108,118 C100,125 100,135 100,148"
+        stroke="#F2A488" strokeWidth="7" fill="none" strokeLinecap="round"
+      />
+      <path d="M100,148 L100,178" stroke="#F2A488" strokeWidth="7" strokeLinecap="round" />
+      <circle cx="100" cy="216" r="34" fill="none" stroke="#F2A488" strokeWidth="7" />
+      <circle cx="100" cy="216" r="16" fill="#5EEAD4" opacity="0.85" />
     </svg>
-  );
-}
-
-// Élément signature : une ligne de pulsation cardiaque plus marquée,
-// tracée au chargement de la page (respecte prefers-reduced-motion).
-function PulseHero() {
-  return (
-    <>
-      <style>{`
-        @keyframes senedoc-pulse-draw {
-          from { stroke-dashoffset: 300; }
-          to { stroke-dashoffset: 0; }
-        }
-        .senedoc-pulse-line {
-          stroke-dasharray: 300;
-          animation: senedoc-pulse-draw 1.8s ease-out forwards;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .senedoc-pulse-line { animation: none; stroke-dashoffset: 0; }
-        }
-      `}</style>
-      <svg width="140" height="40" viewBox="0 0 140 40" fill="none" aria-hidden="true">
-        <path
-          className="senedoc-pulse-line"
-          d="M0,20 L35,20 L44,4 L53,36 L62,10 L71,20 L140,20"
-          stroke="#5EEAD4"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </>
   );
 }
