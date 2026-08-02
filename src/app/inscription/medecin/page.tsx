@@ -170,7 +170,7 @@ export default function InscriptionMedecin() {
     <div className="min-h-screen bg-teal-light flex flex-col">
       <div className="p-6"><Link href="/"><Logo /></Link></div>
       <div className="flex-1 flex items-center justify-center px-6 pb-16">
-        <div className="w-full max-w-lg bg-white rounded-2xl shadow-sm p-8">
+        <div className={`w-full ${step === "tarifs" ? "max-w-3xl" : "max-w-lg"} bg-white rounded-2xl shadow-sm p-8`}>
 
           {step === "tarifs" && (
             <>
@@ -198,39 +198,27 @@ export default function InscriptionMedecin() {
               </div>
 
               <h2 className="font-medium mb-3">Choisissez votre formule</h2>
-              <div className="space-y-3 mb-2">
-                <div className="border border-gray-200 rounded-xl p-4 flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Mensuel</p>
-                    <p className="text-xs text-gray-500">Sans engagement</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-display text-xl font-semibold text-teal-dark">15 000 FCFA<span className="text-sm font-normal text-gray-400"> /mois</span></p>
-                    <p className="text-xs text-gray-400">(23 € /mois)</p>
-                  </div>
+              <div className="grid gap-4 sm:grid-cols-3 mb-2">
+                <div className="border border-gray-200 rounded-xl p-5 flex flex-col">
+                  <p className="font-medium">Mensuel</p>
+                  <p className="text-xs text-gray-500 mt-1 flex-1">Sans engagement</p>
+                  <p className="font-display text-xl font-semibold text-teal-dark mt-3">15 000 FCFA</p>
+                  <p className="text-xs text-gray-400">/mois &middot; (23 € /mois)</p>
                 </div>
-                <div className="border border-gray-200 rounded-xl p-4 flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Semestriel</p>
-                    <p className="text-xs text-gray-500">Soit environ 7 500 FCFA (11,50 €)/mois</p>
-                    <p className="text-xs text-teal-dark font-medium mt-1">Économisez environ 45 000 FCFA (69 €) sur 6 mois</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-display text-xl font-semibold text-teal-dark">45 000 FCFA<span className="text-sm font-normal text-gray-400"> /6 mois</span></p>
-                    <p className="text-xs text-gray-400">(69 € /6 mois)</p>
-                  </div>
+                <div className="border border-gray-200 rounded-xl p-5 flex flex-col">
+                  <p className="font-medium">Semestriel</p>
+                  <p className="text-xs text-gray-500 mt-1">Soit environ 7 500 FCFA (11,50 €)/mois</p>
+                  <p className="text-xs text-teal-dark font-medium mt-1 flex-1">Économisez environ 45 000 FCFA (69 €) sur 6 mois</p>
+                  <p className="font-display text-xl font-semibold text-teal-dark mt-3">45 000 FCFA</p>
+                  <p className="text-xs text-gray-400">/6 mois &middot; (69 €)</p>
                 </div>
-                <div className="relative border-2 border-coral rounded-xl p-4 flex items-center justify-between bg-orange-50">
+                <div className="relative border-2 border-coral rounded-xl p-5 flex flex-col bg-orange-50">
                   <span className="absolute -top-2.5 right-4 bg-coral text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">LE PLUS AVANTAGEUX</span>
-                  <div>
-                    <p className="font-medium">Annuel</p>
-                    <p className="text-xs text-gray-500">Soit environ 5 000 FCFA (7,67 €)/mois</p>
-                    <p className="text-xs text-teal-dark font-medium mt-1">Économisez environ 120 000 FCFA (184 €) sur l'année</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-display text-xl font-semibold text-teal-dark">60 000 FCFA<span className="text-sm font-normal text-gray-400"> /an</span></p>
-                    <p className="text-xs text-gray-400">(92 € /an)</p>
-                  </div>
+                  <p className="font-medium">Annuel</p>
+                  <p className="text-xs text-gray-500 mt-1">Soit environ 5 000 FCFA (7,67 €)/mois</p>
+                  <p className="text-xs text-teal-dark font-medium mt-1 flex-1">Économisez environ 120 000 FCFA (184 €) sur l'année</p>
+                  <p className="font-display text-xl font-semibold text-teal-dark mt-3">60 000 FCFA</p>
+                  <p className="text-xs text-gray-400">/an &middot; (92 €)</p>
                 </div>
               </div>
               <p className="text-xs text-gray-400 mb-2">
