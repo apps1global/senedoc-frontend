@@ -174,35 +174,70 @@ export default function InscriptionMedecin() {
 
           {step === "tarifs" && (
             <>
-              <h1 className="font-display text-2xl font-semibold mb-1">Rejoindre SeneDoc</h1>
-              <p className="text-sm text-gray-500 mb-6">
-                Un abonnement est nécessaire pour activer votre espace médecin. Voici nos formules — vous choisirez la vôtre une fois votre compte créé.
-              </p>
-              <div className="space-y-3 mb-6">
+              <div className="text-center mb-5">
+                <span className="text-4xl">🩺</span>
+                <h1 className="font-display text-2xl font-semibold mt-2">Développez votre patientèle</h1>
+                <p className="text-sm text-gray-500 mt-2">
+                  Rejoignez le réseau de médecins SeneDoc et simplifiez la gestion de vos rendez-vous.
+                </p>
+              </div>
+
+              <div className="bg-teal-light rounded-xl p-5 mb-6 space-y-2.5">
+                {[
+                  "Recevez des demandes de rendez-vous de patients qui vous recherchent activement",
+                  "Réduisez les rendez-vous manqués grâce aux rappels SMS automatiques (24h et 1h avant)",
+                  "Suivez les statistiques de visibilité de votre profil",
+                  "Gérez votre agenda et vos disponibilités à tout moment, depuis votre téléphone",
+                  "Aucune commission sur vos consultations — un forfait fixe, point",
+                ].map((b) => (
+                  <div key={b} className="flex items-start gap-2">
+                    <span className="text-teal-dark font-bold text-sm mt-0.5">✓</span>
+                    <p className="text-sm text-teal-dark leading-snug">{b}</p>
+                  </div>
+                ))}
+              </div>
+
+              <h2 className="font-medium mb-3">Choisissez votre formule</h2>
+              <div className="space-y-3 mb-2">
                 <div className="border border-gray-200 rounded-xl p-4 flex items-center justify-between">
                   <div>
                     <p className="font-medium">Mensuel</p>
                     <p className="text-xs text-gray-500">Sans engagement</p>
                   </div>
-                  <p className="font-display text-xl font-semibold text-teal-dark">23 €<span className="text-sm font-normal text-gray-400"> /mois</span></p>
+                  <div className="text-right">
+                    <p className="font-display text-xl font-semibold text-teal-dark">15 000 FCFA<span className="text-sm font-normal text-gray-400"> /mois</span></p>
+                    <p className="text-xs text-gray-400">(23 € /mois)</p>
+                  </div>
                 </div>
                 <div className="border border-gray-200 rounded-xl p-4 flex items-center justify-between">
                   <div>
                     <p className="font-medium">Semestriel</p>
-                    <p className="text-xs text-gray-500">Soit 11,50 €/mois</p>
+                    <p className="text-xs text-gray-500">Soit environ 7 500 FCFA (11,50 €)/mois</p>
+                    <p className="text-xs text-teal-dark font-medium mt-1">Économisez environ 45 000 FCFA (69 €) sur 6 mois</p>
                   </div>
-                  <p className="font-display text-xl font-semibold text-teal-dark">69 €<span className="text-sm font-normal text-gray-400"> /6 mois</span></p>
+                  <div className="text-right">
+                    <p className="font-display text-xl font-semibold text-teal-dark">45 000 FCFA<span className="text-sm font-normal text-gray-400"> /6 mois</span></p>
+                    <p className="text-xs text-gray-400">(69 € /6 mois)</p>
+                  </div>
                 </div>
-                <div className="border border-gray-200 rounded-xl p-4 flex items-center justify-between">
+                <div className="relative border-2 border-coral rounded-xl p-4 flex items-center justify-between bg-orange-50">
+                  <span className="absolute -top-2.5 right-4 bg-coral text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">LE PLUS AVANTAGEUX</span>
                   <div>
                     <p className="font-medium">Annuel</p>
-                    <p className="text-xs text-gray-500">Soit 7,67 €/mois — la formule la plus avantageuse</p>
+                    <p className="text-xs text-gray-500">Soit environ 5 000 FCFA (7,67 €)/mois</p>
+                    <p className="text-xs text-teal-dark font-medium mt-1">Économisez environ 120 000 FCFA (184 €) sur l'année</p>
                   </div>
-                  <p className="font-display text-xl font-semibold text-teal-dark">92 €<span className="text-sm font-normal text-gray-400"> /an</span></p>
+                  <div className="text-right">
+                    <p className="font-display text-xl font-semibold text-teal-dark">60 000 FCFA<span className="text-sm font-normal text-gray-400"> /an</span></p>
+                    <p className="text-xs text-gray-400">(92 € /an)</p>
+                  </div>
                 </div>
               </div>
+              <p className="text-xs text-gray-400 mb-2">
+                Montants en FCFA arrondis, à titre indicatif (taux fixe : 1 € = 655,957 FCFA). La facturation réelle par Stripe s&apos;effectue en euros.
+              </p>
               <p className="text-xs text-gray-400 mb-6">
-                Votre compte reste consultable même en attente de validation par nos équipes (vérification de votre numéro à l'Ordre). L'abonnement conditionne uniquement l'accès complet à votre espace médecin.
+                Votre compte reste consultable même en attente de validation par nos équipes (vérification de votre numéro à l&apos;Ordre). L&apos;abonnement conditionne uniquement l&apos;accès complet à votre espace médecin.
               </p>
               <button
                 type="button"

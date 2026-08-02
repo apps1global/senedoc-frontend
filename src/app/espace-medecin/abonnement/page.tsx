@@ -59,6 +59,16 @@ export default function AbonnementMedecin() {
 
           {error && <p className="text-sm text-coral text-center pb-6">{error}</p>}
 
+          <div className="mx-8 mb-6 bg-amber-50 border border-amber-200 rounded-lg p-3">
+            <p className="text-xs font-semibold text-amber-800 mb-1">Phase de test — carte fictive</p>
+            <p className="text-xs text-amber-800 leading-relaxed">
+              Numéro de carte : 4242 4242 4242 4242<br />
+              Date d&apos;expiration : n&apos;importe quelle date future (ex : 12/34)<br />
+              CVC : n&apos;importe quel code à 3 chiffres<br />
+              Les autres champs : n&apos;importe quelle valeur
+            </p>
+          </div>
+
           <p className="text-xs text-gray-400 text-center pb-8 px-8">
             Paiement sécurisé par Stripe. Vous serez redirigé vers une page de paiement, puis renvoyé automatiquement vers votre espace une fois l&apos;abonnement activé.
           </p>
