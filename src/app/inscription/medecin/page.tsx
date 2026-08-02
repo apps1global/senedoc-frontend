@@ -8,7 +8,7 @@ import { apiFetch, auth } from "@/lib/api";
 import { SPECIALTIES } from "@/lib/specialties";
 import { FacilityPlaceSearch, type SelectedPlace } from "@/components/FacilityPlaceSearch";
 
-type Step = "form" | "otp" | "pin" | "done";
+type Step = "tarifs" | "form" | "otp" | "pin" | "done";
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -22,7 +22,7 @@ function emptyFacility(): FacilityDraft {
 }
 
 export default function InscriptionMedecin() {
-  const [step, setStep] = useState<Step>("form");
+  const [step, setStep] = useState<Step>("tarifs");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -171,6 +171,48 @@ export default function InscriptionMedecin() {
       <div className="p-6"><Link href="/"><Logo /></Link></div>
       <div className="flex-1 flex items-center justify-center px-6 pb-16">
         <div className="w-full max-w-lg bg-white rounded-2xl shadow-sm p-8">
+
+          {step === "tarifs" && (
+            <>
+              <h1 className="font-display text-2xl font-semibold mb-1">Rejoindre SeneDoc</h1>
+              <p className="text-sm text-gray-500 mb-6">
+                Un abonnement est nécessaire pour activer votre espace médecin. Voici nos formules — vous choisirez la vôtre une fois votre compte créé.
+              </p>
+              <div className="space-y-3 mb-6">
+                <div className="border border-gray-200 rounded-xl p-4 flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Mensuel</p>
+                    <p className="text-xs text-gray-500">Sans engagement</p>
+                  </div>
+                  <p className="font-display text-xl font-semibold text-teal-dark">23 €<span className="text-sm font-normal text-gray-400"> /mois</span></p>
+                </div>
+                <div className="border border-gray-200 rounded-xl p-4 flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Semestriel</p>
+                    <p className="text-xs text-gray-500">Soit 11,50 €/mois</p>
+                  </div>
+                  <p className="font-display text-xl font-semibold text-teal-dark">69 €<span className="text-sm font-normal text-gray-400"> /6 mois</span></p>
+                </div>
+                <div className="border border-gray-200 rounded-xl p-4 flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Annuel</p>
+                    <p className="text-xs text-gray-500">Soit 7,67 €/mois — la formule la plus avantageuse</p>
+                  </div>
+                  <p className="font-display text-xl font-semibold text-teal-dark">92 €<span className="text-sm font-normal text-gray-400"> /an</span></p>
+                </div>
+              </div>
+              <p className="text-xs text-gray-400 mb-6">
+                Votre compte reste consultable même en attente de validation par nos équipes (vérification de votre numéro à l'Ordre). L'abonnement conditionne uniquement l'accès complet à votre espace médecin.
+              </p>
+              <button
+                type="button"
+                onClick={() => setStep("form")}
+                className="w-full bg-teal text-white py-3 rounded-lg font-medium hover:bg-teal-dark transition-colors"
+              >
+                Continuer mon inscription
+              </button>
+            </>
+          )}
 
           {step === "form" && (
             <>
