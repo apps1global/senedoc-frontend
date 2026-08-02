@@ -9,6 +9,7 @@ type Dashboard = {
   doctor: { firstName: string | null; lastName: string | null; specialty: string };
   todayAppointments: number;
   upcomingAppointments: number;
+  profileViews: number;
   validationStatus: "PENDING" | "VALIDATED" | "REJECTED";
   isVisibleToPatients: boolean;
   missingForBooking: string[];
@@ -78,9 +79,10 @@ export default function EspaceMedecin() {
               </div>
             )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             <StatCard label="Rendez-vous aujourd'hui" value={dashboard?.todayAppointments ?? 0} />
             <StatCard label="Rendez-vous à venir" value={dashboard?.upcomingAppointments ?? 0} />
+            <StatCard label="Vues de mon profil" value={dashboard?.profileViews ?? 0} />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
