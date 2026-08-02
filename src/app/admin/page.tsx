@@ -37,11 +37,11 @@ export default function AdminLogin() {
           <form onSubmit={submit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">Email</label>
-              <input type="email" className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <input type="email" name="email" autoComplete="username" className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Mot de passe</label>
-              <input type="password" className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <input type="password" name="password" autoComplete="current-password" className="w-full border border-gray-200 rounded-lg px-3 py-2.5 outline-none focus:border-teal" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             {error && <p className="text-sm text-coral">{error}</p>}
             <button type="submit" disabled={loading} className="w-full bg-teal text-white py-3 rounded-lg font-medium hover:bg-teal-dark transition-colors disabled:opacity-60">

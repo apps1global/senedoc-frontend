@@ -100,7 +100,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     } catch {
       // on nettoie même en cas d'erreur réseau
     }
-    router.push("/");
+    router.push("/admin");
   }
 
   if (loading) {
