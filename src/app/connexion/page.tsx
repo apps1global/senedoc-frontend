@@ -114,7 +114,8 @@ function ConnexionContent() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 md:p-8">
+    <div className="w-full max-w-6xl flex rounded-3xl overflow-hidden shadow-xl md:min-h-[640px]">
       {/* Panneau signature — masqué sur mobile, motif du stéthoscope en écho au logo */}
       <div
         className="hidden md:flex md:w-[42%] relative overflow-hidden flex-col justify-center p-12"
@@ -230,6 +231,7 @@ function ConnexionContent() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { auth } from "@/lib/api";
 import { REGIONS, citiesForRegion } from "@/lib/senegal";
+import { StethoscopeMark } from "@/components/StethoscopeMark";
 
 type Step = "form" | "otp" | "pin";
 
@@ -137,8 +138,24 @@ function InscriptionContent() {
   }
 
   return (
-    <div className="min-h-screen bg-teal-light flex flex-col">
-      <div className="flex-1 flex items-center justify-center px-6 py-10">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 md:p-8">
+    <div className="w-full max-w-5xl flex rounded-3xl overflow-hidden shadow-xl md:min-h-[600px]">
+      <div
+        className="hidden md:flex md:w-[38%] relative overflow-hidden flex-col justify-center p-10"
+        style={{ background: "linear-gradient(160deg, #04342C 0%, #0F6E56 100%)" }}
+      >
+        <div className="absolute -right-10 -bottom-10 opacity-[0.08] pointer-events-none">
+          <StethoscopeMark size={200} />
+        </div>
+        <StethoscopeMark size={70} />
+        <h2 className="relative font-display text-2xl font-semibold text-white leading-tight mt-6">
+          Votre santé,<br />à portée de clic.
+        </h2>
+        <p className="relative text-white/70 mt-3 text-sm max-w-xs">
+          Créez votre compte pour prendre rendez-vous avec un professionnel de santé.
+        </p>
+      </div>
+      <div className="flex-1 flex items-center justify-center bg-gray-50 px-6 py-10">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-sm overflow-hidden">
 
           {step === "form" && (
@@ -283,6 +300,7 @@ function InscriptionContent() {
 
         </div>
       </div>
+    </div>
     </div>
   );
 }

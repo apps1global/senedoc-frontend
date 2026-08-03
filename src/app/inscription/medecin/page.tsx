@@ -7,6 +7,7 @@ import { Logo } from "@/components/Logo";
 import { apiFetch, auth } from "@/lib/api";
 import { SPECIALTIES } from "@/lib/specialties";
 import { FacilityPlaceSearch, type SelectedPlace } from "@/components/FacilityPlaceSearch";
+import { StethoscopeMark } from "@/components/StethoscopeMark";
 
 type Step = "tarifs" | "form" | "otp" | "pin" | "done";
 
@@ -146,9 +147,24 @@ export default function InscriptionMedecin() {
 
   if (step === "done") {
     return (
-      <div className="min-h-screen bg-teal-light flex flex-col">
-        <div className="p-6"><Link href="/"><Logo /></Link></div>
-        <div className="flex-1 flex items-center justify-center px-6 pb-16">
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 md:p-8">
+      <div className="w-full max-w-4xl flex rounded-3xl overflow-hidden shadow-xl md:min-h-[500px]">
+        <div
+          className="hidden md:flex md:w-[38%] relative overflow-hidden flex-col justify-center p-10"
+          style={{ background: "linear-gradient(160deg, #04342C 0%, #0F6E56 100%)" }}
+        >
+          <div className="absolute -right-10 -bottom-10 opacity-[0.08] pointer-events-none">
+            <StethoscopeMark size={200} />
+          </div>
+          <Link href="/" className="absolute top-6 left-6 md:top-8 md:left-8 font-display text-base font-bold text-white/90 hover:text-white transition-colors">
+            ‹ SeneDoc
+          </Link>
+          <StethoscopeMark size={70} />
+          <h2 className="relative font-display text-2xl font-semibold text-white leading-tight mt-6">
+            Bienvenue dans le réseau SeneDoc.
+          </h2>
+        </div>
+        <div className="flex-1 flex items-center justify-center bg-gray-50 px-6 py-10">
           <div className="w-full max-w-md bg-white rounded-2xl shadow-sm p-8 text-center">
             <h1 className="font-display text-2xl font-semibold mb-3">Inscription reçue</h1>
             <p className="text-gray-600 leading-relaxed">
@@ -163,13 +179,29 @@ export default function InscriptionMedecin() {
           </div>
         </div>
       </div>
+      </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-teal-light flex flex-col">
-      <div className="p-6"><Link href="/"><Logo /></Link></div>
-      <div className="flex-1 flex items-center justify-center px-6 pb-16">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 md:p-8">
+    <div className={`w-full ${step === "tarifs" ? "max-w-6xl" : "max-w-4xl"} flex rounded-3xl overflow-hidden shadow-xl md:min-h-[500px]`}>
+      <div
+        className="hidden md:flex md:w-[32%] relative overflow-hidden flex-col justify-center p-10 shrink-0"
+        style={{ background: "linear-gradient(160deg, #04342C 0%, #0F6E56 100%)" }}
+      >
+        <div className="absolute -right-10 -bottom-10 opacity-[0.08] pointer-events-none">
+          <StethoscopeMark size={180} />
+        </div>
+        <Link href="/" className="absolute top-6 left-6 md:top-8 md:left-8 font-display text-base font-bold text-white/90 hover:text-white transition-colors">
+          ‹ SeneDoc
+        </Link>
+        <StethoscopeMark size={60} />
+        <h2 className="relative font-display text-2xl font-semibold text-white leading-tight mt-6">
+          Rejoignez le réseau SeneDoc.
+        </h2>
+      </div>
+      <div className="flex-1 flex items-center justify-center bg-gray-50 px-6 py-10 min-w-0">
         <div className={`w-full ${step === "tarifs" ? "max-w-3xl" : "max-w-lg"} bg-white rounded-2xl shadow-sm p-8`}>
 
           {step === "tarifs" && (
@@ -379,6 +411,7 @@ export default function InscriptionMedecin() {
 
         </div>
       </div>
+    </div>
     </div>
   );
 }

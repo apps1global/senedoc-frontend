@@ -10,6 +10,7 @@ import { SpecialtySelect } from "@/components/SpecialtySelect";
 import { DoctorNameSearch } from "@/components/DoctorNameSearch";
 import { articles, doctors } from "@/lib/api";
 import { StethoscopeMark } from "@/components/StethoscopeMark";
+import { SectionWave } from "@/components/SectionWave";
 
 type Article = {
   id: string;
@@ -175,14 +176,28 @@ export default function Home() {
       </section>
 
       {/* COMMENT ÇA MARCHE */}
-      <section className="max-w-6xl mx-auto px-6 py-16 text-center">
-        <h2 className="font-display text-3xl font-semibold mb-10">Comment ça marche</h2>
-        <div className="relative grid md:grid-cols-3 gap-8">
-          <div className="hidden md:block absolute top-7 left-[16.5%] right-[16.5%] border-t-2 border-dashed" style={{ borderColor: "#04342C", opacity: 0.3 }} />
-          <Step icon={<SearchIcon big deep />} bg="bg-teal-light" title="1. Cherchez" text="Par spécialité, trouvez le bon professionnel" />
-          <Step icon={<CalendarIcon coral />} bg="bg-coral-light" title="2. Choisissez" text="Présentiel ou téléconsultation, selon vos besoins" />
-          <Step icon={<CalendarIcon deep />} bg="bg-teal-light" title="3. Réservez" text="Confirmation par SMS, c'est fait" />
+      <section className="max-w-6xl mx-auto px-6 my-10">
+      <div className="grid md:grid-cols-2 rounded-3xl overflow-hidden shadow-lg">
+        <div
+          className="relative overflow-hidden flex flex-col justify-center p-12 py-16"
+          style={{ background: "linear-gradient(160deg, #04342C 0%, #0F6E56 100%)" }}
+        >
+          <div className="absolute -left-10 -bottom-10 opacity-[0.08] pointer-events-none hidden md:block">
+            <StethoscopeMark size={200} />
+          </div>
+          <h2 className="relative font-display text-3xl font-semibold text-white leading-tight">
+            Comment ça marche
+          </h2>
+          <p className="relative text-white/70 mt-3 max-w-xs">
+            Trois étapes suffisent pour prendre rendez-vous, sans détour.
+          </p>
         </div>
+        <div className="bg-white p-12 py-16 flex flex-col justify-center gap-8">
+          <StepRow icon={<SearchIcon big deep />} bg="bg-teal-light" title="1. Cherchez" text="Par spécialité, trouvez le bon professionnel" />
+          <StepRow icon={<CalendarIcon coral />} bg="bg-coral-light" title="2. Choisissez" text="Présentiel ou téléconsultation, selon vos besoins" />
+          <StepRow icon={<CalendarIcon deep />} bg="bg-teal-light" title="3. Réservez" text="Confirmation par SMS, c'est fait" />
+        </div>
+      </div>
       </section>
 
       {/* MÉDECINS VÉRIFIÉS */}
@@ -207,30 +222,46 @@ export default function Home() {
       </section>
 
       {/* SPÉCIALITÉS */}
-      <section className="max-w-6xl mx-auto px-6 py-16 text-center">
-        <h2 className="font-display text-3xl font-semibold mb-2">Spécialités populaires</h2>
-        <p className="text-gray-500 mb-8">Prenez rendez-vous dans la spécialité qu'il vous faut</p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <section className="max-w-6xl mx-auto px-6 my-10">
+      <div className="grid md:grid-cols-2 rounded-3xl overflow-hidden shadow-lg">
+        <div
+          className="relative overflow-hidden flex flex-col justify-center p-12 py-16 order-2 md:order-1"
+          style={{ background: "linear-gradient(160deg, #04342C 0%, #0F6E56 100%)" }}
+        >
+          <div className="absolute -right-10 -top-10 opacity-[0.08] pointer-events-none hidden md:block">
+            <StethoscopeMark size={200} />
+          </div>
+          <h2 className="relative font-display text-3xl font-semibold text-white leading-tight">
+            Spécialités populaires
+          </h2>
+          <p className="relative text-white/70 mt-3 max-w-xs">
+            Prenez rendez-vous dans la spécialité qu'il vous faut.
+          </p>
+        </div>
+        <div className="bg-white p-12 py-16 order-1 md:order-2">
+        <div className="grid grid-cols-2 gap-4">
           {[
-            { name: "Cardiologie", icon: "❤️" },
-            { name: "Pédiatrie", icon: "🧸" },
-            { name: "Ophtalmologie", icon: "👁️" },
-            { name: "Dentaire", icon: "🦷" },
-            { name: "Dermatologie", icon: "🩹" },
-            { name: "Gynécologie-Obstétrique", icon: "🤰" },
-            { name: "ORL (Oto-Rhino-Laryngologie)", icon: "👂" },
-            { name: "Urologie", icon: "🩺" },
-          ].map((s) => (
+            { name: "Cardiologie", icon: "heart" },
+            { name: "Pédiatrie", icon: "baby" },
+            { name: "Ophtalmologie", icon: "eye" },
+            { name: "Dentaire", icon: "tooth" },
+            { name: "Dermatologie", icon: "drop" },
+            { name: "Gynécologie-Obstétrique", icon: "family" },
+            { name: "ORL (Oto-Rhino-Laryngologie)", icon: "ear" },
+            { name: "Urologie", icon: "kidney" },
+          ].map((s, i) => (
             <button
               key={s.name}
               onClick={() => router.push(`/recherche?specialty=${encodeURIComponent(s.name)}`)}
-              className="p-5 border border-gray-100 rounded-xl hover:border-teal hover:shadow-sm transition-all cursor-pointer text-left flex items-center gap-3"
+              className="p-5 bg-white border border-white rounded-xl hover:border-teal hover:shadow-md transition-all cursor-pointer text-left flex items-center gap-3"
             >
-              <span className="text-2xl" aria-hidden="true">{s.icon}</span>
+              <SpecialtyIcon kind={s.icon as any} coral={i % 2 === 1} />
               <p className="text-sm font-medium">{s.name}</p>
             </button>
           ))}
         </div>
+        </div>
+      </div>
       </section>
 
       {/* FAQ / BESOIN D'AIDE */}
@@ -296,6 +327,18 @@ function Step({ icon, bg, title, text }: { icon: React.ReactNode; bg: string; ti
       <div className={`w-14 h-14 rounded-full ${bg} flex items-center justify-center mx-auto mb-4`}>{icon}</div>
       <p className="font-medium mb-1">{title}</p>
       <p className="text-sm text-gray-600">{text}</p>
+    </div>
+  );
+}
+
+function StepRow({ icon, bg, title, text }: { icon: React.ReactNode; bg: string; title: string; text: string }) {
+  return (
+    <div className="flex items-start gap-4">
+      <div className={`w-12 h-12 rounded-full ${bg} flex items-center justify-center shrink-0`}>{icon}</div>
+      <div>
+        <p className="font-medium mb-0.5">{title}</p>
+        <p className="text-sm text-gray-600">{text}</p>
+      </div>
     </div>
   );
 }

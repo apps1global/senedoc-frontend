@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { StethoscopeMark } from "@/components/StethoscopeMark";
 
 const QUESTIONS = [
   {
@@ -33,21 +34,10 @@ export function Faq() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section className="max-w-3xl mx-auto px-6 py-16">
-      <div className="flex items-center justify-center gap-3 mb-2">
-        <span className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: "#04342C" }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M12 18h.01M9.5 9a2.5 2.5 0 015 0c0 1.5-1 2-2 3s-1 1.5-1 2" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </span>
-        <h2 className="font-display text-2xl font-semibold text-center">
-          Besoin d'aide ?
-        </h2>
-      </div>
-      <p className="text-gray-500 text-center mb-10">
-        Les questions les plus fréquentes sur senedoc.
-      </p>
-      <div className="divide-y divide-gray-100 border-y border-gray-100">
+    <section className="max-w-6xl mx-auto px-6 my-10">
+    <div className="grid md:grid-cols-2 rounded-3xl overflow-hidden shadow-lg">
+      <div className="bg-white p-12 py-16 order-2 md:order-1">
+      <div className="divide-y divide-gray-100">
         {QUESTIONS.map((item, i) => (
           <div key={i}>
             <button
@@ -70,6 +60,22 @@ export function Faq() {
           </div>
         ))}
       </div>
+      </div>
+      <div
+        className="relative overflow-hidden flex flex-col justify-center p-12 py-16 order-1 md:order-2"
+        style={{ background: "linear-gradient(160deg, #04342C 0%, #0F6E56 100%)" }}
+      >
+        <div className="absolute -right-10 -bottom-10 opacity-[0.08] pointer-events-none hidden md:block">
+          <StethoscopeMark size={200} />
+        </div>
+        <h2 className="relative font-display text-3xl font-semibold text-white leading-tight">
+          Besoin d'aide ?
+        </h2>
+        <p className="relative text-white/70 mt-3 max-w-xs">
+          Les questions les plus fréquentes sur senedoc.
+        </p>
+      </div>
+    </div>
     </section>
   );
 }
