@@ -177,9 +177,10 @@ export default function Home() {
       {/* COMMENT ÇA MARCHE */}
       <section className="max-w-6xl mx-auto px-6 py-16 text-center">
         <h2 className="font-display text-3xl font-semibold mb-10">Comment ça marche</h2>
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="relative grid md:grid-cols-3 gap-8">
+          <div className="hidden md:block absolute top-7 left-[16.5%] right-[16.5%] border-t-2 border-dashed border-teal-mid" />
           <Step icon={<SearchIcon big />} bg="bg-teal-light" title="1. Cherchez" text="Par spécialité, trouvez le bon professionnel" />
-          <Step icon={<CalendarIcon />} bg="bg-teal-light" title="2. Choisissez" text="Présentiel ou téléconsultation, selon vos besoins" />
+          <Step icon={<CalendarIcon coral />} bg="bg-coral-light" title="2. Choisissez" text="Présentiel ou téléconsultation, selon vos besoins" />
           <Step icon={<CalendarIcon />} bg="bg-teal-light" title="3. Réservez" text="Confirmation par SMS, c'est fait" />
         </div>
       </section>
@@ -210,13 +211,23 @@ export default function Home() {
         <h2 className="font-display text-3xl font-semibold mb-2">Spécialités populaires</h2>
         <p className="text-gray-500 mb-8">Prenez rendez-vous dans la spécialité qu'il vous faut</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {["Cardiologie", "Pédiatrie", "Ophtalmologie", "Dentaire", "Dermatologie", "Gynécologie-Obstétrique", "ORL (Oto-Rhino-Laryngologie)", "Urologie"].map((s) => (
+          {[
+            { name: "Cardiologie", icon: "❤️" },
+            { name: "Pédiatrie", icon: "🧸" },
+            { name: "Ophtalmologie", icon: "👁️" },
+            { name: "Dentaire", icon: "🦷" },
+            { name: "Dermatologie", icon: "🩹" },
+            { name: "Gynécologie-Obstétrique", icon: "🤰" },
+            { name: "ORL (Oto-Rhino-Laryngologie)", icon: "👂" },
+            { name: "Urologie", icon: "🩺" },
+          ].map((s) => (
             <button
-              key={s}
-              onClick={() => router.push(`/recherche?specialty=${encodeURIComponent(s)}`)}
-              className="p-5 border border-gray-100 rounded-xl hover:border-teal hover:shadow-sm transition-all cursor-pointer text-left"
+              key={s.name}
+              onClick={() => router.push(`/recherche?specialty=${encodeURIComponent(s.name)}`)}
+              className="p-5 border border-gray-100 rounded-xl hover:border-teal hover:shadow-sm transition-all cursor-pointer text-left flex items-center gap-3"
             >
-              <p className="text-sm font-medium">{s}</p>
+              <span className="text-2xl" aria-hidden="true">{s.icon}</span>
+              <p className="text-sm font-medium">{s.name}</p>
             </button>
           ))}
         </div>
@@ -307,8 +318,9 @@ function PinIcon({ big, coral }: { big?: boolean; coral?: boolean }) {
   const c = coral ? "#D85A30" : big ? "#1D9E75" : "#9CA3AF";
   return <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.6 7-11a7 7 0 10-14 0c0 5.4 7 11 7 11z" stroke={c} strokeWidth="2"/><circle cx="12" cy="10" r="2.5" stroke={c} strokeWidth="2"/></svg>;
 }
-function CalendarIcon() {
-  return <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="#1D9E75" strokeWidth="2"/><path d="M3 9h18M8 3v4M16 3v4M9 14l2 2 4-4" stroke="#1D9E75" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+function CalendarIcon({ coral }: { coral?: boolean }) {
+  const c = coral ? "#D85A30" : "#1D9E75";
+  return <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke={c} strokeWidth="2"/><path d="M3 9h18M8 3v4M16 3v4M9 14l2 2 4-4" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 }
 function PhotoIcon() {
   return <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.5"/><circle cx="8.5" cy="10" r="1.5" fill="currentColor"/><path d="M21 16l-5-5-8 8" stroke="currentColor" strokeWidth="1.5"/></svg>;

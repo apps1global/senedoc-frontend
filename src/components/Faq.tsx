@@ -48,17 +48,17 @@ export function Faq() {
               className="w-full flex items-center justify-between text-left py-5 gap-4"
               aria-expanded={open === i}
             >
-              <span className="font-medium text-teal-deep">{item.q}</span>
+              <span className={`font-medium ${open === i ? "text-coral" : "text-teal-deep"}`}>{item.q}</span>
               <svg
                 width="20" height="20" viewBox="0 0 24 24" fill="none"
                 className="shrink-0 transition-transform"
                 style={{ transform: open === i ? "rotate(180deg)" : "none" }}
               >
-                <path d="M6 9l6 6 6-6" stroke="#1D9E75" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M6 9l6 6 6-6" stroke={open === i ? "#D85A30" : "#1D9E75"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
             {open === i && (
-              <p className="text-gray-600 leading-relaxed pb-5 -mt-1">{item.a}</p>
+              <p className="text-gray-600 leading-relaxed pb-5 -mt-1 border-l-2 border-coral-soft pl-4">{item.a}</p>
             )}
           </div>
         ))}
