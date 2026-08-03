@@ -178,10 +178,10 @@ export default function Home() {
       <section className="max-w-6xl mx-auto px-6 py-16 text-center">
         <h2 className="font-display text-3xl font-semibold mb-10">Comment ça marche</h2>
         <div className="relative grid md:grid-cols-3 gap-8">
-          <div className="hidden md:block absolute top-7 left-[16.5%] right-[16.5%] border-t-2 border-dashed border-teal-mid" />
-          <Step icon={<SearchIcon big />} bg="bg-teal-light" title="1. Cherchez" text="Par spécialité, trouvez le bon professionnel" />
+          <div className="hidden md:block absolute top-7 left-[16.5%] right-[16.5%] border-t-2 border-dashed" style={{ borderColor: "#04342C", opacity: 0.3 }} />
+          <Step icon={<SearchIcon big deep />} bg="bg-teal-light" title="1. Cherchez" text="Par spécialité, trouvez le bon professionnel" />
           <Step icon={<CalendarIcon coral />} bg="bg-coral-light" title="2. Choisissez" text="Présentiel ou téléconsultation, selon vos besoins" />
-          <Step icon={<CalendarIcon />} bg="bg-teal-light" title="3. Réservez" text="Confirmation par SMS, c'est fait" />
+          <Step icon={<CalendarIcon deep />} bg="bg-teal-light" title="3. Réservez" text="Confirmation par SMS, c'est fait" />
         </div>
       </section>
 
@@ -309,19 +309,42 @@ function Check({ text }: { text: string }) {
   );
 }
 
-function SearchIcon({ big }: { big?: boolean }) {
+function SearchIcon({ big, deep }: { big?: boolean; deep?: boolean }) {
   const s = big ? 24 : 18;
-  return <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke={big ? "#1D9E75" : "#9CA3AF"} strokeWidth="2"/><path d="M21 21l-4-4" stroke={big ? "#1D9E75" : "#9CA3AF"} strokeWidth="2" strokeLinecap="round"/></svg>;
+  const c = deep ? "#04342C" : big ? "#1D9E75" : "#9CA3AF";
+  return <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke={c} strokeWidth="2"/><path d="M21 21l-4-4" stroke={c} strokeWidth="2" strokeLinecap="round"/></svg>;
 }
 function PinIcon({ big, coral }: { big?: boolean; coral?: boolean }) {
   const s = big ? 24 : 18;
   const c = coral ? "#D85A30" : big ? "#1D9E75" : "#9CA3AF";
   return <svg width={s} height={s} viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.6 7-11a7 7 0 10-14 0c0 5.4 7 11 7 11z" stroke={c} strokeWidth="2"/><circle cx="12" cy="10" r="2.5" stroke={c} strokeWidth="2"/></svg>;
 }
-function CalendarIcon({ coral }: { coral?: boolean }) {
-  const c = coral ? "#D85A30" : "#1D9E75";
+function CalendarIcon({ coral, deep }: { coral?: boolean; deep?: boolean }) {
+  const c = coral ? "#D85A30" : deep ? "#04342C" : "#1D9E75";
   return <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke={c} strokeWidth="2"/><path d="M3 9h18M8 3v4M16 3v4M9 14l2 2 4-4" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 }
+type SpecialtyKind = "heart" | "baby" | "eye" | "tooth" | "drop" | "family" | "ear" | "kidney";
+
+function SpecialtyIcon({ kind, coral }: { kind: SpecialtyKind; coral?: boolean }) {
+  const c = coral ? "#D85A30" : "#04342C";
+  const bg = coral ? "bg-coral-light" : "bg-teal-light";
+  const paths: Record<SpecialtyKind, React.ReactNode> = {
+    heart: <path d="M12 20s-7-4.4-7-10a4.5 4.5 0 018-2.8A4.5 4.5 0 0119 10c0 5.6-7 10-7 10z" stroke={c} strokeWidth="1.8" strokeLinejoin="round" />,
+    baby: <><circle cx="12" cy="9" r="4" stroke={c} strokeWidth="1.8" /><path d="M8 20c0-3 1.8-5 4-5s4 2 4 5" stroke={c} strokeWidth="1.8" strokeLinecap="round" /></>,
+    eye: <><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z" stroke={c} strokeWidth="1.8" strokeLinejoin="round" /><circle cx="12" cy="12" r="2.8" stroke={c} strokeWidth="1.8" /></>,
+    tooth: <path d="M8 3c1.5 0 2 1 4 1s2.5-1 4-1 3 1.5 3 4c0 3-1 4-1.5 8-.3 2.5-1 5-2.5 5s-1.5-3-2-5-.5-3-1-3-.5 1-1 3-.5 5-2 5-2.2-2.5-2.5-5C6.5 11 5.5 10 5.5 7 5.5 4.5 6.5 3 8 3z" stroke={c} strokeWidth="1.6" strokeLinejoin="round" />,
+    drop: <path d="M12 3s6 7 6 11a6 6 0 01-12 0c0-4 6-11 6-11z" stroke={c} strokeWidth="1.8" strokeLinejoin="round" />,
+    family: <><circle cx="9" cy="7" r="3" stroke={c} strokeWidth="1.8" /><circle cx="16" cy="8" r="2.4" stroke={c} strokeWidth="1.8" /><path d="M4 20c0-3.3 2.2-6 5-6s5 2.7 5 6M14 20c0-2.5 1.6-4.6 3.6-5.3" stroke={c} strokeWidth="1.8" strokeLinecap="round" /></>,
+    ear: <path d="M15 4a6 6 0 00-6 6c0 2 1 3 1 5a2 2 0 01-2 2M15 4a6 6 0 016 6c0 4-3 5-3 8a3 3 0 01-3 3c-1.7 0-3-1-3-3" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />,
+    kidney: <path d="M9 3C6 3 4 6 4 10c0 5 3 8 3 11h2c0-2-2-4-2-7 0-2 1-3 2.5-3s2 1.5 2 3.5c0 3.5-1.5 5-1.5 6.5h2c0-2 2-4 2-9 0-6-2.5-9-5.5-9z" stroke={c} strokeWidth="1.6" strokeLinejoin="round" />,
+  };
+  return (
+    <span className={`w-9 h-9 rounded-full ${bg} flex items-center justify-center shrink-0`}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">{paths[kind]}</svg>
+    </span>
+  );
+}
+
 function PhotoIcon() {
   return <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.5"/><circle cx="8.5" cy="10" r="1.5" fill="currentColor"/><path d="M21 16l-5-5-8 8" stroke="currentColor" strokeWidth="1.5"/></svg>;
 }

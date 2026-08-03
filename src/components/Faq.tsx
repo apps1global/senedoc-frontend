@@ -34,9 +34,16 @@ export function Faq() {
 
   return (
     <section className="max-w-3xl mx-auto px-6 py-16">
-      <h2 className="font-display text-2xl font-semibold text-center mb-2">
-        Besoin d'aide ?
-      </h2>
+      <div className="flex items-center justify-center gap-3 mb-2">
+        <span className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: "#04342C" }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M12 18h.01M9.5 9a2.5 2.5 0 015 0c0 1.5-1 2-2 3s-1 1.5-1 2" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
+        <h2 className="font-display text-2xl font-semibold text-center">
+          Besoin d'aide ?
+        </h2>
+      </div>
       <p className="text-gray-500 text-center mb-10">
         Les questions les plus fréquentes sur senedoc.
       </p>
