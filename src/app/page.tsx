@@ -9,6 +9,7 @@ import { Faq } from "@/components/Faq";
 import { SpecialtySelect } from "@/components/SpecialtySelect";
 import { DoctorNameSearch } from "@/components/DoctorNameSearch";
 import { articles, doctors } from "@/lib/api";
+import { StethoscopeMark } from "@/components/StethoscopeMark";
 
 type Article = {
   id: string;
@@ -87,16 +88,22 @@ export default function Home() {
       <Header />
 
       {/* HÉRO */}
-      <section className="bg-teal-light">
-        <div className="max-w-6xl mx-auto px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
+      <section
+        className="relative overflow-hidden"
+        style={{ background: "linear-gradient(160deg, #04342C 0%, #0F6E56 100%)" }}
+      >
+        <div className="absolute -right-10 -bottom-16 opacity-[0.07] pointer-events-none hidden md:block">
+          <StethoscopeMark size={260} />
+        </div>
+        <div className="relative max-w-6xl mx-auto px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
           <div className="min-w-0">
-            <p className="text-xs font-semibold tracking-wide text-teal-dark mb-3">
+            <p className="text-xs font-semibold tracking-wide text-teal-mid mb-3">
               PRENEZ RENDEZ-VOUS AU SÉNÉGAL
             </p>
-            <h1 className="font-display text-4xl md:text-5xl font-semibold text-teal-deep leading-tight mb-4">
+            <h1 className="font-display text-4xl md:text-5xl font-semibold text-white leading-tight mb-4">
               Votre médecin, à portée de clic
             </h1>
-            <p className="text-lg text-teal-dark mb-8">
+            <p className="text-lg text-white/80 mb-8">
               Trouvez un professionnel de santé près de chez vous et réservez en quelques instants — en présentiel ou en téléconsultation.
             </p>
 
@@ -104,7 +111,7 @@ export default function Home() {
             <div className="mb-3">
               <DoctorNameSearch className="bg-white" />
             </div>
-            <p className="text-xs text-teal-dark mb-2">Ou parcourez par spécialité et ville :</p>
+            <p className="text-xs text-white/70 mb-2">Ou parcourez par spécialité et ville :</p>
 
             <form id="recherche" onSubmit={submitSearch} className="bg-white p-2 rounded-2xl shadow-md">
               <div className="flex items-center gap-2 px-3 py-3 border-b border-gray-100 min-w-0">
@@ -148,13 +155,13 @@ export default function Home() {
               </div>
             </form>
 
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-5 text-sm text-teal-dark">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-5 text-sm text-white/80">
               <span className="flex items-center gap-1.5">
-                <svg className="w-4 h-4 text-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <svg className="w-4 h-4 text-teal-mid" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 Professionnels vérifiés
               </span>
               <span className="flex items-center gap-1.5">
-                <svg className="w-4 h-4 text-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <svg className="w-4 h-4 text-teal-mid" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 Présentiel & téléconsultation
               </span>
             </div>
