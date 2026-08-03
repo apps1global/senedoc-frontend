@@ -225,7 +225,7 @@ export default function Home() {
       <section className="max-w-6xl mx-auto px-6 my-10">
       <div className="grid md:grid-cols-2 rounded-3xl overflow-hidden shadow-lg">
         <div
-          className="relative overflow-hidden flex flex-col justify-center p-12 py-16 order-2 md:order-1"
+          className="relative overflow-hidden flex flex-col justify-center p-12 py-16 md:order-2"
           style={{ background: "linear-gradient(160deg, #04342C 0%, #0F6E56 100%)" }}
         >
           <div className="absolute -right-10 -top-10 opacity-[0.08] pointer-events-none hidden md:block">
@@ -238,7 +238,7 @@ export default function Home() {
             Prenez rendez-vous dans la spécialité qu'il vous faut.
           </p>
         </div>
-        <div className="bg-white p-12 py-16 order-1 md:order-2">
+        <div className="bg-white p-12 py-16 md:order-1">
         <div className="grid grid-cols-2 gap-4">
           {[
             { name: "Cardiologie", icon: "heart" },

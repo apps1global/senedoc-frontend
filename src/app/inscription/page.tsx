@@ -155,7 +155,15 @@ function InscriptionContent() {
           Créez votre compte pour prendre rendez-vous avec un professionnel de santé.
         </p>
       </div>
-      <div className="flex-1 flex items-center justify-center bg-gray-50 px-6 py-10">
+      <div className="flex-1 flex flex-col bg-gray-50">
+        <div
+          className="md:hidden px-6 pt-8 pb-6 relative overflow-hidden flex items-center gap-3"
+          style={{ background: "linear-gradient(160deg, #04342C 0%, #0F6E56 100%)" }}
+        >
+          <StethoscopeMark size={40} />
+          <span className="font-display text-lg font-bold text-white">SeneDoc</span>
+        </div>
+        <div className="flex-1 flex items-center justify-center px-6 py-10">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-sm overflow-hidden">
 
           {step === "form" && (
@@ -298,6 +306,7 @@ function InscriptionContent() {
             </>
           )}
 
+        </div>
         </div>
       </div>
     </div>

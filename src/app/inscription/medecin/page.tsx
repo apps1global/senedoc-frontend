@@ -164,7 +164,15 @@ export default function InscriptionMedecin() {
             Bienvenue dans le réseau SeneDoc.
           </h2>
         </div>
-        <div className="flex-1 flex items-center justify-center bg-gray-50 px-6 py-10">
+        <div className="flex-1 flex flex-col bg-gray-50">
+          <div
+            className="md:hidden px-6 pt-8 pb-6 relative overflow-hidden flex items-center gap-3"
+            style={{ background: "linear-gradient(160deg, #04342C 0%, #0F6E56 100%)" }}
+          >
+            <StethoscopeMark size={40} />
+            <span className="font-display text-lg font-bold text-white">SeneDoc</span>
+          </div>
+          <div className="flex-1 flex items-center justify-center px-6 py-10">
           <div className="w-full max-w-md bg-white rounded-2xl shadow-sm p-8 text-center">
             <h1 className="font-display text-2xl font-semibold mb-3">Inscription reçue</h1>
             <p className="text-gray-600 leading-relaxed">
@@ -176,6 +184,7 @@ export default function InscriptionMedecin() {
               téléphone et le code PIN que vous venez de définir.
             </p>
             <Link href="/espace-medecin/connexion" className="inline-block mt-6 text-teal font-medium">Accéder à mon espace</Link>
+          </div>
           </div>
         </div>
       </div>
@@ -201,7 +210,15 @@ export default function InscriptionMedecin() {
           Rejoignez le réseau SeneDoc.
         </h2>
       </div>
-      <div className="flex-1 flex items-center justify-center bg-gray-50 px-6 py-10 min-w-0">
+      <div className="flex-1 flex flex-col bg-gray-50 min-w-0">
+        <div
+          className="md:hidden px-6 pt-8 pb-6 relative overflow-hidden flex items-center gap-3"
+          style={{ background: "linear-gradient(160deg, #04342C 0%, #0F6E56 100%)" }}
+        >
+          <StethoscopeMark size={40} />
+          <span className="font-display text-lg font-bold text-white">SeneDoc</span>
+        </div>
+        <div className="flex-1 flex items-center justify-center px-6 py-10">
         <div className={`w-full ${step === "tarifs" ? "max-w-3xl" : "max-w-lg"} bg-white rounded-2xl shadow-sm p-8`}>
 
           {step === "tarifs" && (
@@ -409,6 +426,7 @@ export default function InscriptionMedecin() {
             </>
           )}
 
+        </div>
         </div>
       </div>
     </div>
