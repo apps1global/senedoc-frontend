@@ -68,8 +68,14 @@ Open http://localhost:3000.
 
 ## Screenshots
 
+### Home and search
 ![Home](public/screenshots/home.png)
-![Search](public/screenshots/search.png)
+
+### Doctor subscription plans
+![Pricing](public/screenshots/pricing.png)
+
+### Doctor registration
+![Doctor signup](public/screenshots/doctor-signup.png)
 
 ## About the Author
 
